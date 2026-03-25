@@ -1,0 +1,170 @@
+// =============================================================
+// ONG CAMM4 — Prisma Schema
+// Fonte de verdade: diagrama ER do projeto
+// Banco: PostgreSQL hospedado no Neon (serverless)
+// =============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// =============================================================
+// USUARIO — Usuários do sistema com controle de acesso
+// nivel_acesso: 1 = Voluntário | 2 = Gestor | 3 = Diretor
+// =============================================================
+model Usuario {
+  id_usuario   Int    @id @default(autoincrement())
+  nome         String
+  email        String @unique
+  senha_hash   String
+  nivel_acesso Int    @default(1)
+
+  logs        LogSistema[]
+  eventos     Evento[]
+  atividades  Atividade[]
+  declaracoes Declaracao[]
+
+  @@map("usuario")
+}
+
+// =============================================================
+// RESPONSAVEL — Responsável legal pela criança
+// =============================================================
+model Responsavel {
+  id_responsavel Int    @id @default(autoincrement())
+  nome           String
+  cpf            String @unique
+  contato        String
+  endereco       String
+
+  criancas Crianca[]
+
+  @@map("responsavel")
+}
+
+// =============================================================
+// CRIANCA — Criança matriculada na ONG
+// =============================================================
+model Crianca {
+  id_matricula    Int      @id @default(autoincrement())
+  nome            String
+  data_nascimento DateTime
+  cpf             String   @unique
+  foto_path       String?
+  certidao_nasc   String?
+  cartao_vacina   String?
+  data_entrada    DateTime @default(now())
+  id_responsavel  Int
+
+  responsavel Responsavel  @relation(fields: [id_responsavel], references: [id_responsavel])
+  frequencias Frequencia[]
+  declaracoes Declaracao[]
+
+  @@map("crianca")
+}
+
+// =============================================================
+// FREQUENCIA — Registro diário de presença/ausência
+// status: "Presente" | "Ausente"
+// =============================================================
+model Frequencia {
+  id_frequencia Int      @id @default(autoincrement())
+  id_matricula  Int
+  data_registro DateTime @default(now())
+  status        String
+
+  crianca Crianca @relation(fields: [id_matricula], references: [id_matricula])
+
+  @@map("frequencia")
+}
+
+// =============================================================
+// ATIVIDADE — Atividades internas realizadas pela ONG
+// =============================================================
+model Atividade {
+  id_atividade    Int      @id @default(autoincrement())
+  titulo          String
+  data_realizacao DateTime
+  id_usuario_resp Int
+
+  responsavel Usuario @relation(fields: [id_usuario_resp], references: [id_usuario])
+
+  @@map("atividade")
+}
+
+// =============================================================
+// EVENTO — Eventos externos organizados pela ONG
+// =============================================================
+model Evento {
+  id_evento       Int      @id @default(autoincrement())
+  nome_evento     String
+  local           String
+  data_realizacao DateTime
+  id_usuario_resp Int
+
+  responsavel Usuario @relation(fields: [id_usuario_resp], references: [id_usuario])
+
+  @@map("evento")
+}
+
+// =============================================================
+// DOACAO — Doações recebidas pela ONG
+// =============================================================
+model Doacao {
+  id_doacao   Int      @id @default(autoincrement())
+  doador      String
+  tipo        String
+  valor       Decimal  @db.Decimal(10, 2)
+  data_doacao DateTime @default(now())
+
+  @@map("doacao")
+}
+
+// =============================================================
+// DECLARACAO — Declaração de responsabilidade (emitida por Diretor)
+// =============================================================
+model Declaracao {
+  id_declaracao          Int      @id @default(autoincrement())
+  id_matricula           Int
+  id_usuario_autorizador Int
+  nome_parente           String
+  parentesco             String
+  data_emissao           DateTime @default(now())
+
+  crianca     Crianca @relation(fields: [id_matricula], references: [id_matricula])
+  autorizador Usuario @relation(fields: [id_usuario_autorizador], references: [id_usuario])
+
+  @@map("declaracao")
+}
+
+// =============================================================
+// RELATORIO_AUDITORIA — Metadados dos relatórios gerados em PDF
+// =============================================================
+model RelatorioAuditoria {
+  id_relatorio Int      @id @default(autoincrement())
+  tipo_periodo String
+  data_geracao DateTime @default(now())
+  path_arquivo String
+
+  @@map("relatorio_auditoria")
+}
+
+// =============================================================
+// LOG_SISTEMA — Auditoria automática de todas as ações de escrita
+// =============================================================
+model LogSistema {
+  id_log    Int      @id @default(autoincrement())
+  id_usuario Int
+  acao      String
+  data_hora DateTime @default(now())
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@map("log_sistema")
+}

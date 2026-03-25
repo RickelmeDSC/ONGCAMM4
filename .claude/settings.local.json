@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \":*)",
+      "Bash(node -e \"const fs=require\\(''fs''\\); console.log\\(fs.readFileSync\\(''/c/Users/rickm/ONGCAMM4/Back-end/claude.MD'',''utf8''\\).slice\\(0,50\\)\\)\")",
+      "Bash(node -e \"const fs=require\\(''fs''\\); console.log\\(fs.readFileSync\\(''C:/Users/rickm/ONGCAMM4/Back-end/claude.MD'',''utf8''\\).slice\\(0,50\\)\\)\")",
+      "Bash(\"C:/Users/rickm/ONGCAMM4/Back-end/write_claude.js\":*)",
+      "Bash(node -e \"const fs=require\\(''fs''\\); const c=fs.readFileSync\\(''C:/Users/rickm/ONGCAMM4/Back-end/CLAUDE.md'',''utf8''\\); console.log\\(''size:'', c.length, ''chars''\\); console.log\\(''last 100:'', c.slice\\(-100\\)\\);\")",
+      "Bash(npx prisma:*)",
+      "Bash(del \"c:\\\\Users\\\\rickm\\\\ONGCAMM4\\\\Back-end\\\\prisma.config.ts\")"
+    ]
+  }
+}

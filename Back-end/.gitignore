@@ -1,0 +1,31 @@
+# Dependências
+node_modules/
+dist/
+
+# Ambiente — NUNCA versionar credenciais
+.env
+.env.local
+.env.*.local
+
+# Uploads gerados em runtime
+uploads/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+*.js.map
