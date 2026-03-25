@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAMM — Gerenciamento de Cadastros</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body data-page="cadastros">
+
+  <button class="hamburger" id="hamburger"><i data-lucide="menu" style="width:22px;height:22px"></i></button>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:80px;height:80px;background:var(--btn);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-main);font-weight:900;font-size:18px;color:#1a1a2e">CAMM</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item" data-page="home" onclick="window.location.href='cadastros.html'">
+        <span class="nav-icon"><i data-lucide="home" style="width:18px;height:18px"></i></span> Home
+      </button>
+      <button class="nav-item active" data-page="cadastros" onclick="window.location.href='cadastros.html'">
+        <span class="nav-icon"><i data-lucide="user-round" style="width:18px;height:18px"></i></span> Cadastros
+      </button>
+      <button class="nav-item" data-page="frequencia" onclick="window.location.href='frequencia.html'">
+        <span class="nav-icon"><i data-lucide="clipboard-list" style="width:18px;height:18px"></i></span> Frequência
+      </button>
+      <button class="nav-item" data-page="admin" onclick="window.location.href='admin.html'">
+        <span class="nav-icon"><i data-lucide="settings" style="width:18px;height:18px"></i></span> Administrativo
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-avatar" id="sidebar-avatar">U</div>
+      <span class="sidebar-user-name" id="sidebar-username">Usuário</span>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Gerenciamento de cadastros</h1>
+        <p style="color:rgba(255,255,255,0.6);font-size:14px;margin-top:4px">Visualize e gerencie todas as crianças cadastradas na ONG</p>
+      </div>
+      <button class="btn btn-primary" onclick="window.location.href='cadastrar-crianca.html'">
+        <i data-lucide="plus" style="width:14px;height:14px"></i> Novo cadastro
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row" id="stats-cadastros" style="padding-top:28px">
+      <div class="stat-card">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="stat-label">Total de Crianças</div>
+            <div class="stat-value" id="stat-total">—</div>
+          </div>
+          <div style="width:44px;height:44px;background:#FFF8E1;border-radius:12px;display:flex;align-items:center;justify-content:center">
+            <i data-lucide="users" style="width:22px;height:22px;color:#e8872a"></i>
+          </div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="stat-label">Ativos</div>
+            <div class="stat-value" id="stat-ativos" style="color:var(--presente)">—</div>
+          </div>
+          <div style="width:44px;height:44px;background:#DCFCE7;border-radius:12px;display:flex;align-items:center;justify-content:center">
+            <i data-lucide="user-check" style="width:22px;height:22px;color:#166534"></i>
+          </div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="stat-label">Cadastros este mês</div>
+            <div class="stat-value" id="stat-mes">—</div>
+          </div>
+          <div style="width:44px;height:44px;background:#DBEAFE;border-radius:12px;display:flex;align-items:center;justify-content:center">
+            <i data-lucide="calendar-plus" style="width:22px;height:22px;color:#1E40AF"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Busca -->
+    <div class="search-bar">
+      <div class="search-input-wrap" style="max-width:380px">
+        <span class="search-icon"><i data-lucide="search" style="width:16px;height:16px"></i></span>
+        <input id="search-criancas" type="text" class="form-input" placeholder="Buscar por nome da criança">
+      </div>
+      <button class="btn btn-primary btn-sm">Filtrar</button>
+    </div>
+
+    <!-- Tabela -->
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Foto</th>
+            <th>Matrícula</th>
+            <th>Nome</th>
+            <th>Data Nascimento</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="cadastros-tbody">
+          <!-- preenchido via app.js -->
+        </tbody>
+      </table>
+      <div class="table-footer">
+        <div class="lines-per-page">
+          <select><option>15</option><option>30</option><option>50</option></select>
+          Linhas / Páginas
+        </div>
+        <div class="pagination" id="paginacao-cadastros">
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal confirmação exclusão -->
+  <div class="modal-overlay" id="modal-confirmar">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirmar exclusão</h3>
+        <button class="modal-close" data-modal-close="modal-confirmar">✕</button>
+      </div>
+      <p style="color:var(--paragrafo);font-size:15px">
+        Tem certeza que deseja excluir <strong id="modal-delete-nome"></strong>? Esta ação não pode ser desfeita.
+      </p>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-modal-close="modal-confirmar">Cancelar</button>
+        <button class="btn btn-danger" onclick="executarExclusao()">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="app.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

@@ -25,10 +25,11 @@ model Usuario {
   senha_hash   String
   nivel_acesso Int    @default(1)
 
-  logs        LogSistema[]
-  eventos     Evento[]
-  atividades  Atividade[]
-  declaracoes Declaracao[]
+  logs           LogSistema[]
+  eventos        Evento[]
+  atividades     Atividade[]
+  declaracoes    Declaracao[]
+  refreshTokens  RefreshToken[]
 
   @@map("usuario")
 }
@@ -153,6 +154,21 @@ model RelatorioAuditoria {
   path_arquivo String
 
   @@map("relatorio_auditoria")
+}
+
+// =============================================================
+// REFRESH_TOKEN — Tokens de renovação de sessão
+// =============================================================
+model RefreshToken {
+  id         Int      @id @default(autoincrement())
+  token      String   @unique
+  id_usuario Int
+  expires_at DateTime
+  created_at DateTime @default(now())
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
+
+  @@map("refresh_token")
 }
 
 // =============================================================

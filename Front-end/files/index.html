@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAMM — Login</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      margin: 0; padding: 0;
+      min-height: 100vh;
+      display: flex;
+      background: var(--white);
+    }
+
+    /* ── Split Container ── */
+    .split-container {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* ── Lado esquerdo — Painel decorativo ── */
+    .split-left {
+      flex: 1;
+      background: linear-gradient(135deg, #f7c948 0%, #f0a030 40%, #e8872a 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Formas decorativas no fundo */
+    .split-left::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 50%;
+      top: -120px; left: -120px;
+    }
+    .split-left::after {
+      content: '';
+      position: absolute;
+      width: 350px; height: 350px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+      bottom: -80px; right: -80px;
+    }
+
+    .left-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 420px;
+    }
+
+    .left-logo {
+      width: 140px; height: 140px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-main);
+      font-weight: 900;
+      font-size: 32px;
+      color: #e8872a;
+      margin: 0 auto 32px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    }
+
+    .left-title {
+      font-family: var(--font-main);
+      font-weight: 900;
+      font-size: 36px;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .left-subtitle {
+      font-size: 16px;
+      color: rgba(255,255,255,0.9);
+      line-height: 1.7;
+      font-weight: 500;
+    }
+
+    .left-features {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      text-align: left;
+    }
+
+    .left-feature {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: rgba(255,255,255,0.95);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .feature-icon {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    /* ── Lado direito — Formulário ── */
+    .split-right {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      background: var(--bg);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      padding: 40px;
+    }
+
+    .login-card h2 {
+      font-family: var(--font-main);
+      font-weight: 800;
+      font-size: 26px;
+      color: var(--titulo);
+      margin-bottom: 6px;
+    }
+
+    .login-subtitle {
+      font-size: 14px;
+      color: var(--paragrafo);
+      margin-bottom: 28px;
+    }
+
+    .form-label-login {
+      display: block;
+      font-family: var(--font-main);
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--titulo);
+      margin-bottom: 6px;
+    }
+
+    .input-login {
+      width: 100%;
+      padding: 13px 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: var(--font-body);
+      background: var(--input-bg);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .input-login:focus {
+      border-color: #f0a030;
+      box-shadow: 0 0 0 3px rgba(240,160,48,0.15);
+    }
+    .input-login::placeholder { color: #94a3b8; }
+
+    .password-wrap {
+      position: relative;
+    }
+    .password-wrap .input-eye {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 4px;
+      color: var(--paragrafo);
+    }
+
+    .forgot-link {
+      display: block;
+      text-align: right;
+      font-size: 13px;
+      color: var(--paragrafo);
+      cursor: pointer;
+      margin-top: 6px;
+      font-weight: 600;
+    }
+    .forgot-link:hover { color: #e8872a; }
+
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f7c948, #f0a030);
+      color: #fff;
+      font-family: var(--font-main);
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px rgba(240,160,48,0.3);
+      letter-spacing: 0.02em;
+    }
+    .btn-login:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(240,160,48,0.4);
+    }
+    .btn-login:active { transform: translateY(0); }
+    .btn-login:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .register-link {
+      font-size: 13px;
+      color: var(--paragrafo);
+      text-align: center;
+      margin-top: 16px;
+    }
+    .register-link a {
+      color: #e8872a;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .register-link a:hover { text-decoration: underline; }
+
+    .divider-line {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0;
+      color: var(--paragrafo);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .divider-line::before,
+    .divider-line::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    #register-section { display: none; }
+
+    .register-section-title {
+      color: #e8872a;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 16px 0 12px;
+    }
+
+    /* ── Responsivo ── */
+    @media (max-width: 900px) {
+      .split-container { flex-direction: column; }
+      .split-left {
+        min-height: auto;
+        padding: 40px 24px 36px;
+      }
+      .left-logo { width: 80px; height: 80px; font-size: 22px; margin-bottom: 16px; }
+      .left-title { font-size: 24px; }
+      .left-features { display: none; }
+      .split-right { padding: 24px 16px 40px; }
+      .login-card { padding: 28px 24px; }
+    }
+
+    @media (max-width: 480px) {
+      .left-title { font-size: 20px; }
+      .left-subtitle { font-size: 14px; }
+      .login-card h2 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body data-page="login">
+
+  <div class="split-container">
+
+    <!-- ══ LADO ESQUERDO — Painel decorativo ══ -->
+    <div class="split-left">
+      <div class="left-content">
+        <div class="left-logo">CAMM</div>
+        <h1 class="left-title">Bem-vindo ao<br>Sistema CAMM</h1>
+        <p class="left-subtitle">
+          Gerencie cadastros, frequência e atividades da ONG de forma simples e organizada.
+        </p>
+
+        <div class="left-features">
+          <div class="left-feature">
+            <div class="feature-icon"><i data-lucide="users" style="width:18px;height:18px;color:#fff"></i></div>
+            <span>Cadastro completo de crianças e responsáveis</span>
+          </div>
+          <div class="left-feature">
+            <div class="feature-icon"><i data-lucide="clipboard-check" style="width:18px;height:18px;color:#fff"></i></div>
+            <span>Controle de frequência diário</span>
+          </div>
+          <div class="left-feature">
+            <div class="feature-icon"><i data-lucide="bar-chart-3" style="width:18px;height:18px;color:#fff"></i></div>
+            <span>Relatórios e histórico de atividades</span>
+          </div>
+          <div class="left-feature">
+            <div class="feature-icon"><i data-lucide="heart-handshake" style="width:18px;height:18px;color:#fff"></i></div>
+            <span>Gestão de doações e voluntários</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ LADO DIREITO — Formulário ══ -->
+    <div class="split-right">
+      <div class="login-card">
+
+        <!-- LOGIN -->
+        <div id="login-section">
+          <h2>Fazer Login</h2>
+          <p class="login-subtitle">Entre com suas credenciais para acessar o sistema.</p>
+
+          <form id="form-login" novalidate>
+            <div style="display:flex;flex-direction:column;gap:18px">
+
+              <div>
+                <label class="form-label-login">Email</label>
+                <input id="login-email" type="email" class="input-login" placeholder="seu@email.com" required>
+              </div>
+
+              <div>
+                <label class="form-label-login">Senha</label>
+                <div class="password-wrap">
+                  <input id="login-senha" type="password" class="input-login" placeholder="Digite sua senha" required>
+                  <button type="button" class="input-eye"><i data-lucide="eye" style="width:16px;height:16px"></i></button>
+                </div>
+                <a class="forgot-link">Esqueci minha senha</a>
+              </div>
+
+              <button id="btn-login" type="submit" class="btn-login">
+                Entrar
+              </button>
+            </div>
+          </form>
+
+          <p class="register-link">
+            Ainda no tem uma conta? <a id="show-register">Criar conta</a>
+          </p>
+        </div>
+
+        <!-- CADASTRO -->
+        <div id="register-section">
+          <h2>Criar Conta</h2>
+          <p class="login-subtitle">Preencha os dados para solicitar seu acesso.</p>
+
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div>
+              <label class="form-label-login">Nome completo</label>
+              <input type="text" class="input-login" placeholder="Ex: Joao da Silva Santos">
+            </div>
+            <div>
+              <label class="form-label-login">Email</label>
+              <input type="email" class="input-login" placeholder="exemplo@ong.org">
+            </div>
+            <div>
+              <label class="form-label-login">Cargo/Funcao</label>
+              <select class="input-login" style="cursor:pointer">
+                <option value="">Selecione a funcao</option>
+                <option>Voluntario</option>
+                <option>Gestor</option>
+                <option>Diretor</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label-login">Senha</label>
+              <div class="password-wrap">
+                <input type="password" class="input-login" placeholder="Minimo 8 caracteres">
+                <button type="button" class="input-eye"><i data-lucide="eye" style="width:16px;height:16px"></i></button>
+              </div>
+            </div>
+            <div>
+              <label class="form-label-login">Confirmar senha</label>
+              <div class="password-wrap">
+                <input type="password" class="input-login" placeholder="Repita a senha">
+                <button type="button" class="input-eye"><i data-lucide="eye" style="width:16px;height:16px"></i></button>
+              </div>
+            </div>
+            <button type="button" class="btn-login">
+              Criar conta
+            </button>
+            <p class="register-link">
+              Ja tem conta? <a id="show-login">Fazer login</a>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="app.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

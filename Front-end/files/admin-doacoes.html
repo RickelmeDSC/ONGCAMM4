@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAMM — Registro de Doações</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body data-page="admin-doacoes">
+
+  <button class="hamburger" id="hamburger"><i data-lucide="menu" style="width:22px;height:22px"></i></button>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:80px;height:80px;background:var(--btn);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-main);font-weight:900;font-size:18px;color:#1a1a2e">CAMM</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item" data-page="home"       onclick="window.location.href='cadastros.html'">      <span class="nav-icon"><i data-lucide="home" style="width:18px;height:18px"></i></span> Home</button>
+      <button class="nav-item" data-page="cadastros"  onclick="window.location.href='cadastros.html'"> <span class="nav-icon"><i data-lucide="user-round" style="width:18px;height:18px"></i></span> Cadastros</button>
+      <button class="nav-item" data-page="frequencia" onclick="window.location.href='frequencia.html'"><span class="nav-icon"><i data-lucide="clipboard-list" style="width:18px;height:18px"></i></span> Frequência</button>
+      <button class="nav-item active" data-page="admin" onclick="window.location.href='admin.html'">   <span class="nav-icon"><i data-lucide="settings" style="width:18px;height:18px"></i></span> Administrativo</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-avatar" id="sidebar-avatar">U</div>
+      <span class="sidebar-user-name" id="sidebar-username">Usuário</span>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Novo Registro de Doação</h1>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-outline" onclick="window.location.href='admin.html'">Cancelar</button>
+        <button class="btn btn-primary" form="form-doacao" type="submit"><i data-lucide="plus" style="width:14px;height:14px"></i> Salvar Registro</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <p style="font-size:13px;color:var(--paragrafo);margin-bottom:20px">
+        Preencha as informações abaixo para registrar uma nova entrada no estoque ou caixa.
+      </p>
+      <form id="form-doacao" novalidate>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label class="form-label">Nome do doador (pessoa ou instituição)</label>
+              <input id="d-doador" type="text" class="form-input" placeholder="Ex: João Silva ou Empresa de Alimentos S.A." required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo de doação</label>
+              <select id="d-tipo" class="form-select">
+                <option value="">Selecione o tipo</option>
+                <option value="financeira">Financeira</option>
+                <option value="alimentos">Alimentos</option>
+                <option value="roupas">Roupas</option>
+                <option value="materiais">Materiais</option>
+                <option value="outros">Outros</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Descrição da doação</label>
+            <textarea id="d-descricao" class="form-textarea" rows="3" placeholder="Detalhes adicionais sobre a doação..."></textarea>
+          </div>
+
+          <div class="form-row cols-3">
+            <div class="form-group">
+              <label class="form-label">Quantidade ou valor estimado</label>
+              <input id="d-quantidade" type="text" class="form-input" placeholder="Ex: R$ 500,00 ou 50kg">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Data da doação</label>
+              <input id="d-data" type="text" class="form-input" placeholder="DD/MM/AAAA" data-mask="date">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Responsável pelo registro</label>
+              <input id="d-responsavel" type="text" class="form-input" placeholder="Admin Silva" readonly
+                style="background:#F1F5F9;cursor:default">
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Histórico -->
+    <div class="card">
+      <div class="recent-table-title">
+        Histórico de Doações
+        <a onclick="" style="margin-left:auto">Ver relatório completo</a>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>DATA</th>
+            <th>DOADOR</th>
+            <th>TIPO</th>
+            <th>VALOR/QTD</th>
+            <th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody id="doacoes-tbody">
+          <!-- preenchido via app.js -->
+        </tbody>
+      </table>
+      <div style="padding:12px 16px;font-size:13px;color:var(--paragrafo);border-top:1px solid var(--border);display:flex;justify-content:space-between">
+        <span>Exibindo 3 de 128 registros</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline btn-sm">Anterior</button>
+          <button class="btn btn-outline btn-sm">Próxima</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="app.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

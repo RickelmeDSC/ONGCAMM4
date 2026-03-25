@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAMM — Registro de Atividades</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body data-page="admin-atividades">
+
+  <button class="hamburger" id="hamburger"><i data-lucide="menu" style="width:22px;height:22px"></i></button>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:80px;height:80px;background:var(--btn);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-main);font-weight:900;font-size:18px;color:#1a1a2e">CAMM</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item" data-page="home"       onclick="window.location.href='cadastros.html'">      <span class="nav-icon"><i data-lucide="home" style="width:18px;height:18px"></i></span> Home</button>
+      <button class="nav-item" data-page="cadastros"  onclick="window.location.href='cadastros.html'"> <span class="nav-icon"><i data-lucide="user-round" style="width:18px;height:18px"></i></span> Cadastros</button>
+      <button class="nav-item" data-page="frequencia" onclick="window.location.href='frequencia.html'"><span class="nav-icon"><i data-lucide="clipboard-list" style="width:18px;height:18px"></i></span> Frequência</button>
+      <button class="nav-item active" data-page="admin" onclick="window.location.href='admin.html'">   <span class="nav-icon"><i data-lucide="settings" style="width:18px;height:18px"></i></span> Administrativo</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-avatar" id="sidebar-avatar">U</div>
+      <span class="sidebar-user-name" id="sidebar-username">Usuário</span>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Registro de atividades</h1>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-outline" onclick="window.location.href='admin.html'">Cancelar</button>
+        <button class="btn btn-primary" form="form-atividade" type="submit"><i data-lucide="save" style="width:14px;height:14px"></i> Salvar Atividade</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <form id="form-atividade" novalidate>
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div class="form-group">
+            <label class="form-label">Título da Atividade</label>
+            <input id="a-titulo" type="text" class="form-input" placeholder="Ex: Oficina de Pintura e Criatividade">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Descrição da Atividade</label>
+            <textarea id="a-descricao" class="form-textarea" rows="4" placeholder="Descreva os objetivos e o que foi realizado durante a ação..."></textarea>
+          </div>
+
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label class="form-label">Data de Realização</label>
+              <input id="a-data" type="text" class="form-input" placeholder="DD/MM/AAAA" data-mask="date">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Responsável</label>
+              <select id="a-responsavel" class="form-select">
+                <option value="">Selecione um voluntário/colaborador</option>
+                <!-- carregado dinamicamente via app.js -->
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label class="form-label">Crianças Participantes <span class="optional">(Opcional)</span></label>
+              <input id="a-participantes" type="number" min="0" class="form-input" placeholder="Quantidade">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Categoria</label>
+              <select id="a-categoria" class="form-select">
+                <option value="Educativa">Educativa</option>
+                <option value="Esportiva">Esportiva</option>
+                <option value="Alimentação">Alimentação</option>
+                <option value="Cultural">Cultural</option>
+                <option value="Social">Social</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Observações Adicionais</label>
+            <textarea id="a-obs" class="form-textarea" rows="3" placeholder="Algum imprevisto ou nota importante sobre a atividade?"></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Atividades Recentes -->
+    <div class="card">
+      <div class="recent-table-title">
+        Atividades Recentes
+        <a onclick="">Ver todas</a>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Atividade</th>
+            <th>Responsável</th>
+            <th>Data</th>
+            <th>Participantes</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="atividades-tbody">
+          <!-- preenchido via app.js -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="app.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

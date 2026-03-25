@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAMM — Visualização de Cadastros</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body data-page="admin-voluntarios">
+
+  <button class="hamburger" id="hamburger"><i data-lucide="menu" style="width:22px;height:22px"></i></button>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:80px;height:80px;background:var(--btn);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-main);font-weight:900;font-size:18px;color:#1a1a2e">CAMM</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item" data-page="home"       onclick="window.location.href='cadastros.html'">      <span class="nav-icon"><i data-lucide="home" style="width:18px;height:18px"></i></span> Home</button>
+      <button class="nav-item" data-page="cadastros"  onclick="window.location.href='cadastros.html'"> <span class="nav-icon"><i data-lucide="user-round" style="width:18px;height:18px"></i></span> Cadastros</button>
+      <button class="nav-item" data-page="frequencia" onclick="window.location.href='frequencia.html'"><span class="nav-icon"><i data-lucide="clipboard-list" style="width:18px;height:18px"></i></span> Frequência</button>
+      <button class="nav-item active" data-page="admin" onclick="window.location.href='admin.html'">   <span class="nav-icon"><i data-lucide="settings" style="width:18px;height:18px"></i></span> Administrativo</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-avatar" id="sidebar-avatar">U</div>
+      <span class="sidebar-user-name" id="sidebar-username">Usuário</span>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Visualização de cadastros</h1>
+      <button class="btn btn-primary" onclick="window.location.href='admin-cadastrar-voluntario.html'">
+        <i data-lucide="plus" style="width:14px;height:14px"></i> Novo Voluntário
+      </button>
+    </div>
+
+    <!-- Busca -->
+    <div class="search-bar">
+      <div class="search-input-wrap" style="max-width:380px">
+        <span class="search-icon"><i data-lucide="search" style="width:16px;height:16px"></i></span>
+        <input id="search-usuarios" type="text" class="form-input" placeholder="Buscar por nome do voluntário">
+      </div>
+      <button class="btn btn-primary btn-sm">Filtrar</button>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Função</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="usuarios-tbody">
+          <!-- preenchido via app.js -->
+        </tbody>
+      </table>
+      <div class="table-footer">
+        <div class="lines-per-page">
+          <select><option>15</option><option>30</option><option>50</option></select>
+          Linhas / Páginas
+        </div>
+        <div class="pagination">
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal confirmação exclusão -->
+  <div class="modal-overlay" id="modal-confirmar">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirmar exclusão</h3>
+        <button class="modal-close" data-modal-close="modal-confirmar">✕</button>
+      </div>
+      <p style="color:var(--paragrafo);font-size:15px">
+        Tem certeza que deseja excluir <strong id="modal-delete-nome"></strong>?
+      </p>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-modal-close="modal-confirmar">Cancelar</button>
+        <button class="btn btn-danger" onclick="executarExclusao()">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="app.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

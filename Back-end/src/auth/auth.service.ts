@@ -6,9 +6,13 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
+  // Refresh token dura 30 dias
+  private readonly REFRESH_EXPIRATION_DAYS = 30;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
@@ -24,17 +28,10 @@ export class AuthService {
     const senhaValida = await bcrypt.compare(dto.senha, usuario.senha_hash);
     if (!senhaValida) throw new UnauthorizedException('Credenciais inválidas');
 
-    const payload = {
-      sub: usuario.id_usuario,
-      nome: usuario.nome,
-      nivel_acesso: usuario.nivel_acesso,
-    };
-
-    const access_token = this.jwtService.sign(payload);
+    const tokens = await this.generateTokens(usuario);
 
     return {
-      access_token,
-      expires_in: Number(process.env.JWT_EXPIRATION ?? 86400),
+      ...tokens,
       usuario: {
         id: usuario.id_usuario,
         nome: usuario.nome,
@@ -42,6 +39,45 @@ export class AuthService {
         nivel_acesso: usuario.nivel_acesso,
       },
     };
+  }
+
+  async refresh(refreshToken: string) {
+    // Busca o refresh token no banco
+    const stored = await this.prisma.refreshToken.findUnique({
+      where: { token: refreshToken },
+      include: { usuario: true },
+    });
+
+    if (!stored) throw new UnauthorizedException('Refresh token inválido');
+    if (stored.expires_at < new Date()) {
+      // Token expirado — remove do banco
+      await this.prisma.refreshToken.delete({ where: { id: stored.id } });
+      throw new UnauthorizedException('Refresh token expirado. Faça login novamente.');
+    }
+
+    // Remove o refresh token usado (rotação)
+    await this.prisma.refreshToken.delete({ where: { id: stored.id } });
+
+    // Gera novos tokens
+    const tokens = await this.generateTokens(stored.usuario);
+
+    return {
+      ...tokens,
+      usuario: {
+        id: stored.usuario.id_usuario,
+        nome: stored.usuario.nome,
+        email: stored.usuario.email,
+        nivel_acesso: stored.usuario.nivel_acesso,
+      },
+    };
+  }
+
+  async logout(refreshToken: string) {
+    // Remove o refresh token do banco (se existir)
+    await this.prisma.refreshToken.deleteMany({
+      where: { token: refreshToken },
+    });
+    return { message: 'Logout realizado com sucesso' };
   }
 
   async me(userId: number) {
@@ -56,5 +92,46 @@ export class AuthService {
     });
     if (!usuario) throw new UnauthorizedException();
     return usuario;
+  }
+
+  // ── Helpers internos ──────────────────────────────
+
+  private async generateTokens(usuario: { id_usuario: number; nome: string; nivel_acesso: number }) {
+    const payload = {
+      sub: usuario.id_usuario,
+      nome: usuario.nome,
+      nivel_acesso: usuario.nivel_acesso,
+    };
+
+    // Access token — curta duração (1 hora)
+    const access_token = this.jwtService.sign(payload);
+
+    // Refresh token — longa duração (30 dias), string aleatória
+    const refresh_token = crypto.randomBytes(64).toString('hex');
+    const expires_at = new Date();
+    expires_at.setDate(expires_at.getDate() + this.REFRESH_EXPIRATION_DAYS);
+
+    // Salva no banco
+    await this.prisma.refreshToken.create({
+      data: {
+        token: refresh_token,
+        id_usuario: usuario.id_usuario,
+        expires_at,
+      },
+    });
+
+    // Limpa tokens antigos expirados deste usuário
+    await this.prisma.refreshToken.deleteMany({
+      where: {
+        id_usuario: usuario.id_usuario,
+        expires_at: { lt: new Date() },
+      },
+    });
+
+    return {
+      access_token,
+      refresh_token,
+      expires_in: 3600, // 1 hora em segundos
+    };
   }
 }

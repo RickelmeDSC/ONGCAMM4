@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAMM — Cadastrar Nova Criança</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body data-page="cadastrar-crianca">
+
+  <button class="hamburger" id="hamburger"><i data-lucide="menu" style="width:22px;height:22px"></i></button>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:80px;height:80px;background:var(--btn);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-main);font-weight:900;font-size:18px;color:#1a1a2e">CAMM</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item" data-page="home"       onclick="window.location.href='cadastros.html'">      <span class="nav-icon"><i data-lucide="home" style="width:18px;height:18px"></i></span> Home</button>
+      <button class="nav-item" data-page="cadastros"  onclick="window.location.href='cadastros.html'"> <span class="nav-icon"><i data-lucide="user-round" style="width:18px;height:18px"></i></span> Cadastros</button>
+      <button class="nav-item" data-page="frequencia" onclick="window.location.href='frequencia.html'"><span class="nav-icon"><i data-lucide="clipboard-list" style="width:18px;height:18px"></i></span> Frequência</button>
+      <button class="nav-item active" data-page="admin" onclick="window.location.href='admin.html'">   <span class="nav-icon"><i data-lucide="settings" style="width:18px;height:18px"></i></span> Administrativo</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-avatar" id="sidebar-avatar">U</div>
+      <span class="sidebar-user-name" id="sidebar-username">Usuário</span>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Cadastrar nova criança</h1>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-outline" onclick="window.location.href='cadastros.html'">Cancelar</button>
+        <button class="btn btn-primary" form="form-crianca" type="submit">Finalizar</button>
+      </div>
+    </div>
+
+    <form id="form-crianca" novalidate>
+
+      <!-- DADOS DA CRIANÇA -->
+      <div class="card" style="margin-bottom:24px">
+        <div class="section-header">
+          <div class="section-header-icon"><i data-lucide="user" style="width:20px;height:20px;color:#e8872a"></i></div>
+          <h2>Dados da Criança</h2>
+        </div>
+
+        <div style="display:flex;gap:32px;flex-wrap:wrap">
+          <!-- Foto + documentos -->
+          <div style="display:flex;flex-direction:column;gap:16px;min-width:200px">
+            <div>
+              <p style="font-size:13px;font-weight:700;margin-bottom:8px;text-align:center;color:var(--paragrafo)">Foto 3x4 (Prominente)</p>
+              <label class="photo-upload">
+                <span class="photo-upload-icon"><i data-lucide="camera" style="width:24px;height:24px;color:var(--paragrafo)"></i></span>
+                <span class="photo-upload-text">Clique ou arraste para enviar foto</span>
+                <input id="c-foto" type="file" accept="image/*">
+              </label>
+            </div>
+            <div>
+              <p style="font-size:12px;font-weight:700;color:var(--titulo);margin-bottom:6px">Documentos necessários</p>
+              <ul style="font-size:12px;color:var(--paragrafo);padding-left:16px;line-height:1.8">
+                <li>Cartão de vacinação</li>
+                <li>Certidão de nascimento</li>
+                <li>Comprovante de residência</li>
+                <li>Xerox do CPF e RG do responsável e da criança</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Campos -->
+          <div style="flex:1;display:flex;flex-direction:column;gap:16px;min-width:280px">
+            <div class="form-group">
+              <label class="form-label">Nome completo</label>
+              <input id="c-nome" type="text" class="form-input" placeholder="Digite o nome completo da criança" required>
+            </div>
+
+            <div class="form-row cols-2">
+              <div class="form-group">
+                <label class="form-label">Data de Entrada</label>
+                <input id="c-entrada" type="text" class="form-input" placeholder="DD/MM/AAAA" data-mask="date" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Data de nascimento</label>
+                <input id="c-nascimento" type="text" class="form-input" placeholder="DD/MM/AAAA" data-mask="date" required>
+              </div>
+            </div>
+
+            <div class="form-row cols-2">
+              <div class="form-group">
+                <label class="form-label">CPF da Criança</label>
+                <input id="c-cpf" type="text" class="form-input" placeholder="000.000.000-00" data-mask="cpf" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">RG da Criança <span class="optional">(Opcional)</span></label>
+                <input id="c-rg" type="text" class="form-input" placeholder="00.000.000-0" data-mask="rg">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Fazer Upload de documentos</label>
+              <label class="doc-upload">
+                <span><i data-lucide="upload" style="width:16px;height:16px"></i></span>
+                <span>Selecionar documento</span>
+                <input id="c-docs" type="file" multiple accept=".pdf,.jpg,.jpeg,.png">
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DADOS DO RESPONSÁVEL -->
+      <div class="card">
+        <div class="section-header">
+          <div class="section-header-icon"><i data-lucide="users" style="width:20px;height:20px;color:#e8872a"></i></div>
+          <h2>Dados do Responsável</h2>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="form-group">
+            <label class="form-label">Nome Completo</label>
+            <input id="r-nome" type="text" class="form-input" placeholder="Digite o nome completo do responsável" required>
+          </div>
+
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label class="form-label">CPF</label>
+              <input id="r-cpf" type="text" class="form-input" placeholder="000.000.000-00" data-mask="cpf" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">RG</label>
+              <input id="r-rg" type="text" class="form-input" placeholder="00.000.000-0" data-mask="rg" required>
+            </div>
+          </div>
+
+          <div class="form-group" style="max-width:380px">
+            <label class="form-label">Telefone de Contato</label>
+            <input id="r-tel" type="text" class="form-input" placeholder="(00) 00000-0000" data-mask="phone" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Endereço Residencial <span class="optional">Opcional</span></label>
+            <textarea id="r-end" class="form-textarea" rows="3" placeholder="Rua, Número, Bairro, Cidade..."></textarea>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </main>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="app.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

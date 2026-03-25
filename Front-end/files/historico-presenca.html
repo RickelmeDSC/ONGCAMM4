@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAMM — Histórico de Presença</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body data-page="historico-presenca">
+
+  <button class="hamburger" id="hamburger"><i data-lucide="menu" style="width:22px;height:22px"></i></button>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:80px;height:80px;background:var(--btn);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-main);font-weight:900;font-size:18px;color:#1a1a2e">CAMM</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item" data-page="home"       onclick="window.location.href='cadastros.html'">      <span class="nav-icon"><i data-lucide="home" style="width:18px;height:18px"></i></span> Home</button>
+      <button class="nav-item" data-page="cadastros"  onclick="window.location.href='cadastros.html'"> <span class="nav-icon"><i data-lucide="user-round" style="width:18px;height:18px"></i></span> Cadastros</button>
+      <button class="nav-item active" data-page="frequencia" onclick="window.location.href='frequencia.html'"><span class="nav-icon"><i data-lucide="clipboard-list" style="width:18px;height:18px"></i></span> Frequência</button>
+      <button class="nav-item" data-page="admin"      onclick="window.location.href='admin.html'">     <span class="nav-icon"><i data-lucide="settings" style="width:18px;height:18px"></i></span> Administrativo</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-avatar" id="sidebar-avatar">U</div>
+      <span class="sidebar-user-name" id="sidebar-username">Usuário</span>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <!-- Back link -->
+    <button class="back-link" onclick="window.location.href='frequencia.html'"><i data-lucide="arrow-left" style="width:14px;height:14px"></i> VOLTAR PARA LISTAGEM</button>
+
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">
+          Historico de Presença Individual
+        </h1>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+          <span id="hist-nome" style="font-size:15px;font-weight:600;color:var(--paragrafo)">Carregando...</span>
+          <span id="hist-registro" class="registro-chip">REGISTRO: #—</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm">≡ Filtrar Período</button>
+        <button class="btn btn-primary btn-sm"><i data-lucide="file-text" style="width:14px;height:14px"></i> Exportar Histórico (PDF)</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Assiduidade</div>
+        <div class="stat-value">92%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total de Presenças</div>
+        <div class="stat-value">12</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total de Faltas</div>
+        <div class="stat-value">01</div>
+      </div>
+    </div>
+
+    <!-- Calendário + Logs -->
+    <div class="presence-grid">
+      <!-- Calendário -->
+      <div class="calendar-card">
+        <div id="calendario-container">
+          <!-- renderizado via app.js -->
+        </div>
+      </div>
+
+      <!-- Logs -->
+      <div class="logs-card">
+        <h3>Logs de Presença — Outubro 2023</h3>
+
+        <div class="log-row">
+          <div class="log-date">08 Out<br>2023</div>
+          <div><span class="badge badge-ativo" style="background:var(--ativo-badge);color:#1a6b0a">Presente</span></div>
+          <div class="log-obs">—</div>
+        </div>
+
+        <div class="log-row">
+          <div class="log-date">07 Out<br>2023</div>
+          <div><span class="badge badge-ativo" style="background:var(--ativo-badge);color:#1a6b0a">Presente</span></div>
+          <div class="log-obs">Participou da oficina de artes.</div>
+        </div>
+
+        <div class="log-row">
+          <div class="log-date">06 Out<br>2023</div>
+          <div><span class="badge badge-ativo" style="background:var(--ativo-badge);color:#1a6b0a">Presente</span></div>
+          <div class="log-obs">—</div>
+        </div>
+
+        <div class="log-row">
+          <div class="log-date">05 Out<br>2023</div>
+          <div><span class="badge" style="background:#FEE2E2;color:var(--ausente)">Ausente</span></div>
+          <div class="log-obs alert">Consulta odontológica (Atestado entregue)</div>
+        </div>
+
+        <div class="log-row">
+          <div class="log-date">02 Out<br>2023</div>
+          <div><span class="badge badge-ativo" style="background:var(--ativo-badge);color:#1a6b0a">Presente</span></div>
+          <div class="log-obs">—</div>
+        </div>
+
+        <div class="log-row">
+          <div class="log-date">01 Out<br>2023</div>
+          <div><span class="badge badge-ativo" style="background:var(--ativo-badge);color:#1a6b0a">Presente</span></div>
+          <div class="log-obs">—</div>
+        </div>
+
+        <a class="ver-mais-link">Ver histórico completo</a>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="app.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>
