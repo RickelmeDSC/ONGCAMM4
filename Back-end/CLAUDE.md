@@ -50,7 +50,7 @@ O sistema ONG CAMM4 é uma plataforma web destinada a digitalizar e profissional
 | Ícones | Lucide Icons (CDN) |
 | Fontes | Nunito + Nunito Sans (Google Fonts) |
 | Servidor local | Live Server (VSCode) ou npx serve |
-| Estilo | CSS custom properties, sidebar escura, layout responsivo |
+| Estilo | CSS custom properties, sidebar escura (#2B2D42), header gradiente amarelo, layout responsivo |
 
 ---
 
@@ -90,7 +90,8 @@ Front-end/files/
 ├── admin-atividades.html   ← Registro de atividades
 ├── admin-doacoes.html      ← Registro de doações
 ├── styles.css              ← Estilos globais
-└── app.js                  ← Lógica JS + integração com API
+├── app.js                  ← Lógica JS + integração com API
+└── logo-camm.png           ← Logo da ONG (PNG com fundo transparente)
 ```
 
 ### 3.3 Frontend — Fluxo de Navegação
@@ -411,7 +412,11 @@ Seguem o mesmo padrão CRUD. Consultar Swagger em `/api/docs` para detalhes.
 ### 8.1 Configuração
 
 ```javascript
-const API_BASE_URL = 'http://localhost:3000/api/v1';
+// Usa proxy do Nginx (/api/) quando servido via Docker (porta 80)
+// Aponta direto para o backend quando em dev local (Live Server, porta != 80)
+const API_BASE_URL = window.location.port === '' || window.location.port === '80'
+  ? '/api/v1'
+  : 'http://localhost:3000/api/v1';
 ```
 
 ### 8.2 Objeto `api` (app.js)
@@ -437,9 +442,12 @@ Todas as chamadas HTTP passam por `_fetchWithRefresh()` que:
 
 ### 8.5 Design System
 
-- **Sidebar**: tema escuro (#1a1a2e), itens com ícones Lucide
-- **Header**: gradiente escuro, título branco
-- **Cores**: amarelo (#FFD45E) como primária, laranja (#e8872a) como acento
+- **Logo**: `logo-camm.png` com fundo transparente, exibida na sidebar e na tela de login
+- **Sidebar**: tema escuro (#2B2D42), itens com ícones Lucide, item ativo com gradiente amarelo/laranja
+- **Header**: gradiente amarelo (#FFD45E → #FFBE4A → #FFA726), títulos escuros (#3D2800)
+- **Cores primárias**: amarelo (#FFD45E), laranja (#FFA726), coral (#F4845F)
+- **Cores de apoio**: rosa (#F48FB1), verde (#66BB6A), azul (#42A5F5)
+- **Fundo geral**: #F8F9FC (cinza claro neutro)
 - **Datas**: formato DD/MM/AAAA com máscara, convertidas para ISO antes de enviar à API
 
 ---
@@ -462,6 +470,18 @@ MAX_FILE_SIZE_MB=5
 ## 10. COMANDOS ESSENCIAIS
 
 ```bash
+# ── Docker (modo principal) ──
+docker compose up -d                    # sobe backend + frontend
+docker compose down                     # para tudo
+docker compose build --no-cache         # rebuild completo
+docker compose logs -f                  # acompanhar logs
+
+# Acesso via Docker:
+# Frontend: http://localhost (porta 80, Nginx)
+# Backend API: http://localhost/api/v1 (proxy Nginx)
+# Swagger: http://localhost:3000/api/docs (direto no backend)
+
+# ── Desenvolvimento local (sem Docker) ──
 # Backend
 cd Back-end
 npm install
@@ -475,6 +495,12 @@ cd Front-end/files
 # Abrir index.html com Live Server (VSCode) ou:
 npx serve .
 ```
+
+### 10.1 Observações do Build
+
+- O `tsconfig.build.json` exclui `prisma.config.ts` para evitar que o TypeScript gere `dist/src/main.js` ao invés de `dist/main.js`
+- O Dockerfile do backend usa multi-stage build (builder → production)
+- O frontend usa Nginx Alpine com proxy reverso para `/api/` apontando para o container `backend:3000`
 
 ---
 

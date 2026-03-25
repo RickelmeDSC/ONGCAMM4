@@ -4,8 +4,11 @@
    ================================================ */
 
 // ── Configuração da API ──────────────────────────
-// Altere esta URL quando o backend estiver pronto
-const API_BASE_URL = 'http://localhost:3000/api/v1';
+// Usa proxy do Nginx (/api/) quando servido via Docker (porta 80)
+// Aponta direto para o backend quando em dev local (Live Server, porta != 80)
+const API_BASE_URL = window.location.port === '' || window.location.port === '80'
+  ? '/api/v1'
+  : 'http://localhost:3000/api/v1';
 
 // ── Autenticação ─────────────────────────────────
 const Auth = {

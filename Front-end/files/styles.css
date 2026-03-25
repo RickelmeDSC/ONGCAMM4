@@ -7,23 +7,32 @@
 
 /* ── Variáveis ── */
 :root {
-  --bg:           #F6F6F6;
+  --bg:           #F8F9FC;
   --white:        #FFFFFF;
   --btn:          #FFD45E;
   --btn-hover:    #f0c040;
-  --ausente:      #C71A1A;
-  --presente:     #56BE15;
-  --ativo-badge:  #CBFFBC;
-  --titulo:       #000000;
-  --paragrafo:    #475569;
-  --input-bg:     #F8FAFC;
-  --border:       #E2E8F0;
-  --sidebar-w:    240px;
+  --ausente:      #E05252;
+  --presente:     #4CAF50;
+  --ativo-badge:  #DCFCE7;
+  --titulo:       #2D3748;
+  --paragrafo:    #64748B;
+  --input-bg:     #FAFBFE;
+  --border:       #E8ECF4;
+  --sidebar-w:    250px;
   --radius:       12px;
-  --shadow:       0 2px 12px rgba(0,0,0,0.08);
-  --shadow-lg:    0 8px 32px rgba(0,0,0,0.12);
+  --shadow:       0 2px 12px rgba(0,0,0,0.05);
+  --shadow-lg:    0 8px 32px rgba(0,0,0,0.10);
   --font-main:    'Nunito', sans-serif;
   --font-body:    'Nunito Sans', sans-serif;
+
+  /* Paleta CAMM — inspirada na logo */
+  --coral:        #F4845F;
+  --rosa:         #F48FB1;
+  --verde:        #66BB6A;
+  --azul:         #42A5F5;
+  --laranja:      #FFA726;
+  --sidebar-bg:   #2B2D42;
+  --sidebar-text: rgba(255,255,255,0.65);
 }
 
 /* ── Reset ── */
@@ -52,7 +61,7 @@ input, textarea, select { font-family: var(--font-body); }
 /* ── Sidebar ── */
 .sidebar {
   width: var(--sidebar-w);
-  background: #1a1a2e;
+  background: var(--sidebar-bg);
   display: flex;
   flex-direction: column;
   padding: 24px 0 16px;
@@ -60,7 +69,7 @@ input, textarea, select { font-family: var(--font-body); }
   top: 0; left: 0;
   height: 100vh;
   z-index: 100;
-  box-shadow: 2px 0 16px rgba(0,0,0,0.12);
+  box-shadow: 2px 0 20px rgba(0,0,0,0.10);
   transition: transform 0.3s ease;
 }
 
@@ -94,7 +103,7 @@ input, textarea, select { font-family: var(--font-body); }
   font-family: var(--font-main);
   font-weight: 600;
   font-size: 15px;
-  color: rgba(255,255,255,0.65);
+  color: var(--sidebar-text);
   transition: background 0.2s, color 0.2s;
   cursor: pointer;
   border: none;
@@ -102,10 +111,12 @@ input, textarea, select { font-family: var(--font-body); }
   width: 100%;
   text-align: left;
 }
-.nav-item:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9); }
+.nav-item:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.95); }
 .nav-item.active {
-  background: var(--btn);
-  color: #1a1a2e;
+  background: linear-gradient(135deg, #FFD45E, #FFA726);
+  color: #3D2800;
+  font-weight: 700;
+  box-shadow: 0 2px 12px rgba(255,212,94,0.35);
 }
 .nav-item .nav-icon { font-size: 18px; flex-shrink: 0; display:flex; align-items:center; }
 
@@ -120,11 +131,11 @@ input, textarea, select { font-family: var(--font-body); }
 .sidebar-avatar {
   width: 36px; height: 36px;
   border-radius: 50%;
-  background: var(--btn);
+  background: linear-gradient(135deg, #FFD45E, #FFA726);
   display: flex; align-items: center; justify-content: center;
   font-weight: 700;
   font-size: 14px;
-  color: #1a1a2e;
+  color: #3D2800;
   flex-shrink: 0;
 }
 .sidebar-user-name {
@@ -147,17 +158,22 @@ input, textarea, select { font-family: var(--font-body); }
 }
 
 .main-content > .page-header {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: linear-gradient(135deg, #FFD45E 0%, #FFBE4A 40%, #FFA726 100%);
   padding: 32px 40px;
   margin-bottom: 0;
   border-radius: 0;
 }
 .main-content > .page-header .page-title {
-  color: #fff;
+  color: #3D2800;
 }
 .main-content > .page-header .btn-primary {
-  background: var(--btn);
-  color: #1a1a2e;
+  background: rgba(255,255,255,0.9);
+  color: #3D2800;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.main-content > .page-header .btn-primary:hover {
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
 .main-content > *:not(.page-header) {
@@ -593,7 +609,7 @@ input, textarea, select { font-family: var(--font-body); }
 }
 .admin-card-icon {
   width: 48px; height: 48px;
-  background: #FFF8E1;
+  background: linear-gradient(135deg, #FFF8E1, #FFECB3);
   border-radius: 12px;
   display: flex; align-items: center; justify-content: center;
   font-size: 22px;
@@ -676,7 +692,7 @@ input, textarea, select { font-family: var(--font-body); }
 }
 .section-header-icon {
   width: 36px; height: 36px;
-  background: #FFF8E1;
+  background: linear-gradient(135deg, #FFF8E1, #FFECB3);
   border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
   font-size: 18px;

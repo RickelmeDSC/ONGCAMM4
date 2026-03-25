@@ -24,7 +24,7 @@
     /* ── Lado esquerdo — Painel decorativo ── */
     .split-left {
       flex: 1;
-      background: linear-gradient(135deg, #f7c948 0%, #f0a030 40%, #e8872a 100%);
+      background: linear-gradient(135deg, #FFD45E 0%, #FFA726 35%, #F4845F 70%, #F48FB1 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -39,7 +39,7 @@
       content: '';
       position: absolute;
       width: 500px; height: 500px;
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.12);
       border-radius: 50%;
       top: -120px; left: -120px;
     }
@@ -47,7 +47,7 @@
       content: '';
       position: absolute;
       width: 350px; height: 350px;
-      background: rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.10);
       border-radius: 50%;
       bottom: -80px; right: -80px;
     }
@@ -60,18 +60,17 @@
     }
 
     .left-logo {
-      width: 140px; height: 140px;
-      background: rgba(255,255,255,0.95);
-      border-radius: 50%;
+      width: 280px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: var(--font-main);
-      font-weight: 900;
-      font-size: 32px;
-      color: #e8872a;
       margin: 0 auto 32px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    }
+    .left-logo img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 16px rgba(0,0,0,0.12));
     }
 
     .left-title {
@@ -110,13 +109,14 @@
 
     .feature-icon {
       width: 36px; height: 36px;
-      background: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.25);
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 16px;
       flex-shrink: 0;
+      backdrop-filter: blur(4px);
     }
 
     /* ── Lado direito — Formulário ── */
@@ -173,8 +173,8 @@
       outline: none;
     }
     .input-login:focus {
-      border-color: #f0a030;
-      box-shadow: 0 0 0 3px rgba(240,160,48,0.15);
+      border-color: #FFA726;
+      box-shadow: 0 0 0 3px rgba(255,167,38,0.15);
     }
     .input-login::placeholder { color: #94a3b8; }
 
@@ -203,26 +203,26 @@
       margin-top: 6px;
       font-weight: 600;
     }
-    .forgot-link:hover { color: #e8872a; }
+    .forgot-link:hover { color: var(--coral, #F4845F); }
 
     .btn-login {
       width: 100%;
       padding: 14px;
       border: none;
       border-radius: 12px;
-      background: linear-gradient(135deg, #f7c948, #f0a030);
-      color: #fff;
+      background: linear-gradient(135deg, #FFD45E, #FFA726);
+      color: #5A3E0A;
       font-family: var(--font-main);
       font-weight: 800;
       font-size: 15px;
       cursor: pointer;
       transition: transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 4px 16px rgba(240,160,48,0.3);
+      box-shadow: 0 4px 16px rgba(255,167,38,0.3);
       letter-spacing: 0.02em;
     }
     .btn-login:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(240,160,48,0.4);
+      box-shadow: 0 6px 20px rgba(255,167,38,0.4);
     }
     .btn-login:active { transform: translateY(0); }
     .btn-login:disabled {
@@ -238,7 +238,7 @@
       margin-top: 16px;
     }
     .register-link a {
-      color: #e8872a;
+      color: #F4845F;
       font-weight: 700;
       cursor: pointer;
     }
@@ -264,7 +264,7 @@
     #register-section { display: none; }
 
     .register-section-title {
-      color: #e8872a;
+      color: #F4845F;
       font-size: 11px;
       font-weight: 800;
       letter-spacing: 0.08em;
@@ -279,7 +279,7 @@
         min-height: auto;
         padding: 40px 24px 36px;
       }
-      .left-logo { width: 80px; height: 80px; font-size: 22px; margin-bottom: 16px; }
+      .left-logo { width: 180px; margin-bottom: 16px; }
       .left-title { font-size: 24px; }
       .left-features { display: none; }
       .split-right { padding: 24px 16px 40px; }
@@ -300,7 +300,7 @@
     <!-- ══ LADO ESQUERDO — Painel decorativo ══ -->
     <div class="split-left">
       <div class="left-content">
-        <div class="left-logo">CAMM</div>
+        <div class="left-logo"><img src="logo-camm.png" alt="CAMM"></div>
         <h1 class="left-title">Bem-vindo ao<br>Sistema CAMM</h1>
         <p class="left-subtitle">
           Gerencie cadastros, frequência e atividades da ONG de forma simples e organizada.
