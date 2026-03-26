@@ -220,4 +220,4 @@ Olinda - PE, Brasil
 
 ## Licenca
 
-Projeto privado — uso exclusivo da ONG CAMM.
+Projeto publico — uso exclusivo da ONG CAMM.
