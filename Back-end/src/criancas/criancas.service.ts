@@ -61,6 +61,9 @@ export class CriancasService {
 
   async remove(id: number) {
     await this.findOne(id);
+    // Remove registros vinculados antes de excluir a criança
+    await this.prisma.frequencia.deleteMany({ where: { id_matricula: id } });
+    await this.prisma.declaracao.deleteMany({ where: { id_matricula: id } });
     await this.prisma.crianca.delete({ where: { id_matricula: id } });
     return { message: `Criança ${id} removida com sucesso` };
   }
