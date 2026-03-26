@@ -780,21 +780,41 @@ async function renderUsuariosTable() {
   const tbody = document.getElementById('usuarios-tbody');
   if (!tbody) return;
   const nivelLabel = { 1: 'Voluntário', 2: 'Gestor', 3: 'Diretor' };
+  const currentUser = Auth.getUser();
+  const myNivel = currentUser?.nivel_acesso ?? 1;
+  const myId = currentUser?.id ?? currentUser?.id_usuario;
   try {
     const usuarios = await api.get('/usuarios');
-    tbody.innerHTML = usuarios.map(u => `
+    tbody.innerHTML = usuarios.map(u => {
+      const isMe = u.id_usuario === myId;
+      let actions = '';
+
+      if (myNivel === 3) {
+        // Diretor: editar todos, redefinir senha, excluir (menos a si mesmo)
+        actions += `<button class="action-btn" title="Editar" onclick="abrirEditarUsuario(${u.id_usuario},'${u.nome}','${u.email}',${u.nivel_acesso})"><i data-lucide="pencil" style="width:14px;height:14px"></i></button>`;
+        actions += `<button class="action-btn" title="Redefinir senha" onclick="abrirResetSenha(${u.id_usuario},'${u.nome}')"><i data-lucide="key-round" style="width:14px;height:14px"></i></button>`;
+        if (!isMe) {
+          actions += `<button class="action-btn delete" title="Excluir" onclick="confirmarExclusao(${u.id_usuario},'${u.nome}','usuario')"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>`;
+        }
+      } else if (myNivel === 2) {
+        // Gestor: pode excluir voluntarios (nivel 1) com confirmacao
+        if (u.nivel_acesso === 1) {
+          actions += `<button class="action-btn delete" title="Excluir" onclick="confirmarExclusao(${u.id_usuario},'${u.nome}','usuario')"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>`;
+        }
+      }
+
+      return `
       <tr>
-        <td data-label="Nome">${u.nome}</td>
+        <td data-label="Nome">${u.nome}${isMe ? ' <span style="font-size:11px;color:var(--paragrafo)">(você)</span>' : ''}</td>
         <td data-label="Função">${nivelLabel[u.nivel_acesso] ?? 'Voluntário'}</td>
         <td data-label="Email"><a href="mailto:${u.email}" style="color:var(--paragrafo)">${u.email}</a></td>
         <td data-label="Status"><span class="badge badge-ativo">Ativo</span></td>
         <td data-label="Ações">
-          <div class="action-btns">
-            <button class="action-btn" title="Editar"><i data-lucide="pencil" style="width:14px;height:14px"></i></button>
-            <button class="action-btn delete" title="Excluir" onclick="confirmarExclusao(${u.id_usuario},'${u.nome}','usuario')"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>
-          </div>
+          <div class="action-btns">${actions || '<span style="color:var(--paragrafo);font-size:12px">—</span>'}</div>
         </td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
+    lucide.createIcons();
   } catch (err) {
     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--paragrafo)">Erro ao carregar dados.</td></tr>';
     console.error(err);
