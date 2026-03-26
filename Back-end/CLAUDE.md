@@ -464,6 +464,7 @@ JWT_EXPIRATION="3600"                  # 1 hora (access_token)
 PORT=3000
 NODE_ENV=development                   # "production" no Render
 FRONTEND_URL="https://..."             # URL do frontend (CORS) — só em produção
+TURNSTILE_SECRET="..."                 # Cloudflare Turnstile secret key (CAPTCHA)
 UPLOAD_DIR="./uploads"
 MAX_FILE_SIZE_MB=5
 ```

@@ -6,6 +6,7 @@
   <title>CAMM — Login</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <style>
     body {
       margin: 0; padding: 0;
@@ -342,20 +343,74 @@
                 </div>
               </div>
 
+              <!-- Cloudflare Turnstile CAPTCHA -->
+              <div class="cf-turnstile" data-sitekey="0x4AAAAAAACwYMomz5_YQDClv" data-theme="light"></div>
+
               <button id="btn-login" type="submit" class="btn-login">
                 Entrar
               </button>
             </div>
           </form>
 
-          <p class="register-link" style="color:#94a3b8;font-size:12px">
-            Contas sao criadas pelo administrador do sistema.
-          </p>
+          <div style="margin-top:16px;text-align:center">
+            <a href="#" onclick="document.getElementById('modal-termos').classList.add('open');return false" style="color:#64748B;font-size:12px;text-decoration:underline">
+              Termos de Responsabilidade e Uso de Imagem
+            </a>
+          </div>
         </div>
 
       </div>
     </div>
 
+  </div>
+
+  <!-- Modal Termos de Responsabilidade e Uso de Imagem -->
+  <div class="modal-overlay" id="modal-termos" style="z-index:600">
+    <div class="modal" style="max-width:640px;max-height:85vh;overflow-y:auto">
+      <div class="modal-header">
+        <h3 class="modal-title">Termos de Responsabilidade e Uso de Imagem</h3>
+        <button class="modal-close" onclick="document.getElementById('modal-termos').classList.remove('open')">&#10005;</button>
+      </div>
+      <div style="font-size:13px;color:var(--paragrafo);line-height:1.8">
+
+        <h4 style="color:var(--titulo);font-size:14px;margin:16px 0 8px">1. TERMO DE RESPONSABILIDADE</h4>
+        <p>Ao matricular uma crianca no Centro de Assistencia Missionaria Maranhense (CAMM), o responsavel legal declara estar ciente e de acordo com as seguintes condicoes:</p>
+        <ul style="padding-left:20px;margin:8px 0">
+          <li>A crianca participara das atividades educativas, recreativas e culturais promovidas pela instituicao;</li>
+          <li>O responsavel se compromete a manter os dados cadastrais atualizados;</li>
+          <li>O responsavel autoriza a equipe do CAMM a tomar providencias de emergencia em caso de necessidade medica;</li>
+          <li>A frequencia da crianca sera registrada diariamente e o responsavel podera acompanhar pelo sistema;</li>
+          <li>O CAMM nao se responsabiliza por objetos pessoais trazidos pela crianca;</li>
+          <li>Em caso de desistencia, o responsavel devera comunicar formalmente a direcao.</li>
+        </ul>
+
+        <h4 style="color:var(--titulo);font-size:14px;margin:16px 0 8px">2. TERMO DE AUTORIZACAO DE USO DE IMAGEM</h4>
+        <p>O responsavel legal, ao cadastrar a crianca e fornecer sua fotografia, autoriza o CAMM a:</p>
+        <ul style="padding-left:20px;margin:8px 0">
+          <li>Utilizar a imagem (foto 3x4) para fins de identificacao interna no sistema de gestao;</li>
+          <li>Utilizar registros fotograficos das atividades para divulgacao institucional, relatorios e prestacao de contas;</li>
+          <li>As imagens serao utilizadas exclusivamente para fins educativos, institucionais e de prestacao de contas, nunca para fins comerciais;</li>
+          <li>O responsavel podera revogar esta autorizacao a qualquer momento mediante comunicacao formal a direcao do CAMM.</li>
+        </ul>
+
+        <h4 style="color:var(--titulo);font-size:14px;margin:16px 0 8px">3. PROTECAO DE DADOS</h4>
+        <p>O CAMM se compromete a:</p>
+        <ul style="padding-left:20px;margin:8px 0">
+          <li>Armazenar os dados pessoais e imagens de forma segura em sistema com controle de acesso;</li>
+          <li>Nao compartilhar dados pessoais com terceiros sem autorizacao;</li>
+          <li>Garantir que apenas usuarios autorizados tenham acesso as informacoes cadastrais;</li>
+          <li>Manter registro de auditoria de todas as acoes realizadas no sistema.</li>
+        </ul>
+
+        <p style="margin-top:16px;font-style:italic;color:#94a3b8">
+          Centro de Assistencia Missionaria Maranhense — CAMM<br>
+          Documento vigente a partir da data de cadastro da crianca.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="document.getElementById('modal-termos').classList.remove('open')">Entendi</button>
+      </div>
+    </div>
   </div>
 
   <div id="toast-container" class="toast-container"></div>

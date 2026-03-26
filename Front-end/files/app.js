@@ -440,7 +440,10 @@ async function handleLogin(e) {
        Body: { email, senha }
        Response: { token, user: { id, nome, email, cargo, nivel } }
     */
-    const data = await api.post('/auth/login', { email, senha });
+    // Capturar token do Cloudflare Turnstile (se presente)
+    const turnstileInput = document.querySelector('[name="cf-turnstile-response"]');
+    const turnstile_token = turnstileInput?.value || undefined;
+    const data = await api.post('/auth/login', { email, senha, turnstile_token });
     Auth.setToken(data.access_token);
     Auth.setRefreshToken(data.refresh_token);
     Auth.setUser(data.usuario);
@@ -450,6 +453,7 @@ async function handleLogin(e) {
     Toast.error('Email ou senha incorretos.');
     console.error(err);
     if (btn) { btn.textContent = 'Entrar'; btn.disabled = false; }
+    if (typeof turnstile !== 'undefined') turnstile.reset();
   }
 }
 
