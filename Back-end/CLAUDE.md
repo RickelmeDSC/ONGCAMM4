@@ -370,6 +370,7 @@ Prefixo global: `/api/v1`. Todos (exceto login e refresh) exigem `Authorization:
 | GET | /usuarios/:id | Gestor (2) | Por ID |
 | POST | /usuarios | Diretor (3) | Criar |
 | PATCH | /usuarios/:id | Diretor (3) | Atualizar |
+| PATCH | /usuarios/:id/reset-senha | Diretor (3) | Redefinir senha |
 | DELETE | /usuarios/:id | Diretor (3) | Remover |
 
 ### 7.3 Crianças

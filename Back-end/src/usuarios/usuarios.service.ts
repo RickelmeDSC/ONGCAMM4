@@ -74,6 +74,16 @@ export class UsuariosService {
     });
   }
 
+  async resetSenha(id: number, novaSenha: string) {
+    await this.findOne(id);
+    const senha_hash = await bcrypt.hash(novaSenha, 10);
+    await this.prisma.usuario.update({
+      where: { id_usuario: id },
+      data: { senha_hash },
+    });
+    return { message: `Senha do usuário ${id} redefinida com sucesso` };
+  }
+
   async remove(id: number) {
     await this.findOne(id);
     await this.prisma.usuario.delete({ where: { id_usuario: id } });

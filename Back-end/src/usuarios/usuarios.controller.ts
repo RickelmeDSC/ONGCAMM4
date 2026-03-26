@@ -14,6 +14,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { UsuariosService } from './usuarios.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
+import { ResetSenhaDto } from './dto/reset-senha.dto';
 import { Roles } from '../common/decorators/roles.decorator';
 
 @ApiTags('usuarios')
@@ -48,6 +49,16 @@ export class UsuariosController {
   @ApiOperation({ summary: 'Atualizar usuário' })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUsuarioDto) {
     return this.usuariosService.update(id, dto);
+  }
+
+  @Patch(':id/reset-senha')
+  @Roles(3)
+  @ApiOperation({ summary: 'Redefinir senha de um usuário (somente Diretor)' })
+  resetSenha(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ResetSenhaDto,
+  ) {
+    return this.usuariosService.resetSenha(id, dto.nova_senha);
   }
 
   @Delete(':id')
