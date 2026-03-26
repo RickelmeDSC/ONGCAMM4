@@ -114,6 +114,57 @@ export async function gerarRelatorioAuditoria(dados: any[]): Promise<string> {
   return salvarPdf(pdfDoc, 'auditoria');
 }
 
+export async function gerarRelatorioCriancas(dados: any[]): Promise<string> {
+  const pdfDoc = await PDFDocument.create();
+  let page = pdfDoc.addPage([595, 842]);
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+  header(page, bold, `Relatório de Crianças Cadastradas (${dados.length} registros)`);
+
+  let y = 720;
+  const colX = { mat: 50, nome: 85, genero: 250, nasc: 320, cpf: 400, resp: 490 };
+
+  // Cabeçalho da tabela
+  const drawTableHeader = (p: any, yPos: number) => {
+    p.drawText('Mat.', { x: colX.mat, y: yPos, size: 9, font: bold });
+    p.drawText('Nome', { x: colX.nome, y: yPos, size: 9, font: bold });
+    p.drawText('Gênero', { x: colX.genero, y: yPos, size: 9, font: bold });
+    p.drawText('Nascimento', { x: colX.nasc, y: yPos, size: 9, font: bold });
+    p.drawText('CPF', { x: colX.cpf, y: yPos, size: 9, font: bold });
+    p.drawText('Responsável', { x: colX.resp, y: yPos, size: 9, font: bold });
+    p.drawLine({ start: { x: 50, y: yPos - 5 }, end: { x: 545, y: yPos - 5 }, thickness: 0.5, color: rgb(0.6, 0.6, 0.6) });
+    return yPos - 20;
+  };
+
+  y = drawTableHeader(page, y);
+
+  for (const c of dados) {
+    if (y < 60) {
+      page = pdfDoc.addPage([595, 842]);
+      header(page, bold, 'Relatório de Crianças Cadastradas (cont.)');
+      y = 720;
+      y = drawTableHeader(page, y);
+    }
+    const nasc = new Date(c.data_nascimento).toLocaleDateString('pt-BR');
+    page.drawText(String(c.id_matricula), { x: colX.mat, y, size: 9, font });
+    page.drawText((c.nome || '-').substring(0, 22), { x: colX.nome, y, size: 9, font });
+    page.drawText(c.genero || '-', { x: colX.genero, y, size: 9, font });
+    page.drawText(nasc, { x: colX.nasc, y, size: 9, font });
+    page.drawText((c.cpf || '-').substring(0, 14), { x: colX.cpf, y, size: 9, font });
+    page.drawText((c.responsavel?.nome || '-').substring(0, 15), { x: colX.resp, y, size: 9, font });
+    y -= 16;
+  }
+
+  // Rodapé com total
+  y -= 10;
+  if (y < 60) { page = pdfDoc.addPage([595, 842]); y = 780; }
+  page.drawLine({ start: { x: 50, y: y + 5 }, end: { x: 545, y: y + 5 }, thickness: 0.5, color: rgb(0.6, 0.6, 0.6) });
+  page.drawText(`Total de crianças cadastradas: ${dados.length}`, { x: 50, y: y - 10, size: 11, font: bold });
+
+  return salvarPdf(pdfDoc, 'criancas');
+}
+
 async function salvarPdf(pdfDoc: PDFDocument, tipo: string): Promise<string> {
   const dir = './uploads/relatorios';
   mkdirSync(dir, { recursive: true });

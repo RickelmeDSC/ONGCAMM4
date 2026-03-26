@@ -604,6 +604,33 @@ async function handleSalvarDoacao(e) {
   }
 }
 
+// ── GERAR RELATÓRIO PDF DE CRIANÇAS ───────────────
+async function gerarRelatorioCriancas() {
+  const btn = document.getElementById('btn-relatorio');
+  if (btn) { btn.disabled = true; btn.textContent = 'Gerando...'; }
+  try {
+    const relatorio = await api.post('/relatorios/criancas');
+    // Baixar o PDF gerado
+    const token = Auth.getToken();
+    const res = await fetch(`${API_BASE_URL}/relatorios/${relatorio.id_relatorio}/download`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `relatorio-criancas-${new Date().toISOString().slice(0,10)}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+    Toast.success('Relatório gerado com sucesso!');
+  } catch (err) {
+    Toast.error('Erro ao gerar relatório.');
+    console.error(err);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="file-text" style="width:14px;height:14px"></i> Gerar PDF'; lucide.createIcons(); }
+  }
+}
+
 // ── EXCLUIR CRIANÇA ───────────────────────────────
 function confirmarExclusao(id, nome, tipo = 'criança') {
   const modal = document.getElementById('modal-confirmar');

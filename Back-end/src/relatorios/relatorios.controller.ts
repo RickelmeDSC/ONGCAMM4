@@ -15,6 +15,11 @@ export class RelatoriosController {
   @ApiOperation({ summary: 'Listar relatórios gerados' })
   findAll() { return this.service.findAll(); }
 
+  @Post('criancas')
+  @Roles(2)
+  @ApiOperation({ summary: 'Gerar relatório de crianças cadastradas em PDF' })
+  gerarCriancas() { return this.service.gerarCriancas(); }
+
   @Post('frequencia')
   @Roles(2)
   @ApiOperation({ summary: 'Gerar relatório de frequência em PDF' })

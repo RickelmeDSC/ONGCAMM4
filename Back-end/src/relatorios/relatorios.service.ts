@@ -5,6 +5,7 @@ import {
   gerarRelatorioDoacoes,
   gerarRelatorioAtividades,
   gerarRelatorioAuditoria,
+  gerarRelatorioCriancas,
 } from './relatorio.generator';
 import { createReadStream } from 'fs';
 
@@ -14,6 +15,15 @@ export class RelatoriosService {
 
   findAll() {
     return this.prisma.relatorioAuditoria.findMany({ orderBy: { data_geracao: 'desc' } });
+  }
+
+  async gerarCriancas() {
+    const dados = await this.prisma.crianca.findMany({
+      include: { responsavel: true },
+      orderBy: { nome: 'asc' },
+    });
+    const path = await gerarRelatorioCriancas(dados);
+    return this.salvar('criancas', path);
   }
 
   async gerarFrequencia() {

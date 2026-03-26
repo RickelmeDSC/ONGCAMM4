@@ -44,9 +44,14 @@
         <h1 class="page-title">Gerenciamento de cadastros</h1>
         <p style="color:rgba(61,40,0,0.6);font-size:14px;margin-top:4px">Visualize e gerencie todas as crianças cadastradas na ONG</p>
       </div>
-      <button class="btn btn-primary" onclick="window.location.href='cadastrar-crianca.html'">
-        <i data-lucide="plus" style="width:14px;height:14px"></i> Novo cadastro
-      </button>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-outline" onclick="gerarRelatorioCriancas()" id="btn-relatorio">
+          <i data-lucide="file-text" style="width:14px;height:14px"></i> Gerar PDF
+        </button>
+        <button class="btn btn-primary" onclick="window.location.href='cadastrar-crianca.html'">
+          <i data-lucide="plus" style="width:14px;height:14px"></i> Novo cadastro
+        </button>
+      </div>
     </div>
 
     <!-- Stats -->
