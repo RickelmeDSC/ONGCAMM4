@@ -6,7 +6,7 @@
 
 ## 1. VISÃO GERAL DO SISTEMA
 
-O sistema ONG CAMM4 é uma plataforma web destinada a digitalizar e profissionalizar a gestão interna de uma organização não governamental. Substitui processos manuais em papel por um sistema digital com controle de acesso, auditoria e geração de relatórios.
+O sistema ONG CAMM4 — **Centro de Atendimento a Meninos e a Meninas** — é uma plataforma web destinada a digitalizar e profissionalizar a gestão interna da ONG. Substitui processos manuais em papel por um sistema digital com controle de acesso, auditoria e geração de relatórios.
 
 ### 1.1 Objetivos Principais
 
@@ -78,17 +78,16 @@ Request HTTP
 
 ```
 Front-end/files/
-├── index.html              ← Login (split-screen)
-├── cadastros.html          ← Lista de crianças (página principal)
-├── cadastrar-crianca.html  ← Formulário de cadastro
-├── frequencia.html         ← Registro de frequência diária
+├── index.html              ← Login (split-screen) + CAPTCHA Turnstile + Termos
+├── cadastros.html          ← Lista de crianças + botão Gerar PDF
+├── cadastrar-crianca.html  ← Formulário de cadastro (com gênero)
+├── frequencia.html         ← Registro de frequência + botão Gerar PDF
 ├── historico-presenca.html ← Histórico individual com calendário
 ├── admin.html              ← Painel administrativo (cards)
-├── admin-voluntarios.html  ← Lista de voluntários
-├── admin-cadastrar-voluntario.html ← Cadastro de voluntário
+├── admin-voluntarios.html  ← Lista de voluntários + modal cadastro/editar/reset senha
 ├── admin-permissoes.html   ← Permissões por nível
 ├── admin-atividades.html   ← Registro de atividades
-├── admin-doacoes.html      ← Registro de doações
+├── admin-doacoes.html      ← Registro de doações (modal)
 ├── styles.css              ← Estilos globais
 ├── app.js                  ← Lógica JS + integração com API
 └── logo-camm.png           ← Logo da ONG (PNG com fundo transparente)
@@ -103,11 +102,10 @@ cadastros.html (Home)
     ├── cadastrar-crianca.html
     ├── frequencia.html → historico-presenca.html?id=X
     └── admin.html
-         ├── admin-voluntarios.html
-         ├── admin-cadastrar-voluntario.html
+         ├── admin-voluntarios.html (modal: cadastro, edição, reset senha)
          ├── admin-permissoes.html
          ├── admin-atividades.html
-         └── admin-doacoes.html
+         └── admin-doacoes.html (modal: nova doação)
 ```
 
 ---
@@ -126,8 +124,9 @@ O sistema usa **dois tokens**:
 ### 4.2 Fluxo de Login
 
 ```
-1. POST /auth/login { email, senha }
-2. Backend valida credenciais (bcrypt.compare)
+1. POST /auth/login { email, senha, turnstile_token }
+2. Backend valida CAPTCHA Turnstile (se TURNSTILE_SECRET configurado)
+3. Backend valida credenciais (bcrypt.compare)
 3. Gera access_token (JWT, 1h) + refresh_token (random, 30 dias)
 4. Salva refresh_token na tabela refresh_token
 5. Retorna { access_token, refresh_token, expires_in, usuario }
@@ -222,8 +221,10 @@ providers: [
 | Registrar frequência | Sim | Sim | Sim |
 | Gerar declaração | Não | Não | Sim |
 | Gerenciar usuários | Não | Não | Sim |
+| Redefinir senha | Não | Não | Sim |
+| Excluir voluntários | Não | Apenas nível 1 | Todos (menos si mesmo) |
 | Visualizar logs | Não | Não | Sim |
-| Gerar relatórios | Não | Sim | Sim |
+| Gerar relatórios (PDF) | Não | Sim | Sim |
 
 ---
 
@@ -403,7 +404,19 @@ Prefixo global: `/api/v1`. Todos (exceto login e refresh) exigem `Authorization:
 | PATCH | /frequencia/:id | Gestor (2) | Corrigir |
 | DELETE | /frequencia/:id | Diretor (3) | Remover |
 
-### 7.6 Atividades, Eventos, Doações, Declarações, Relatórios, Auditoria
+### 7.6 Relatórios (PDF)
+
+| Método | Rota | Acesso Mínimo | Descrição |
+|---|---|---|---|
+| GET | /relatorios | Gestor (2) | Listar relatórios gerados |
+| POST | /relatorios/criancas | Gestor (2) | Gerar PDF de crianças cadastradas |
+| POST | /relatorios/frequencia | Gestor (2) | Gerar PDF de frequência |
+| POST | /relatorios/doacoes | Gestor (2) | Gerar PDF de doações |
+| POST | /relatorios/atividades | Gestor (2) | Gerar PDF de atividades |
+| POST | /relatorios/auditoria | Diretor (3) | Gerar PDF de auditoria |
+| GET | /relatorios/:id/download | Gestor (2) | Download do PDF gerado |
+
+### 7.7 Atividades, Eventos, Doações, Declarações, Auditoria
 
 Seguem o mesmo padrão CRUD. Consultar Swagger em `/api/docs` para detalhes.
 
@@ -414,11 +427,14 @@ Seguem o mesmo padrão CRUD. Consultar Swagger em `/api/docs` para detalhes.
 ### 8.1 Configuração
 
 ```javascript
-// Usa proxy do Nginx (/api/) quando servido via Docker (porta 80)
-// Aponta direto para o backend quando em dev local (Live Server, porta != 80)
-const API_BASE_URL = window.location.port === '' || window.location.port === '80'
-  ? '/api/v1'
-  : 'http://localhost:3000/api/v1';
+// Produção (Vercel): aponta para o Render
+// Docker local (porta 80): usa proxy Nginx
+// Dev local (Live Server): aponta direto para localhost:3000
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? (window.location.port === '' || window.location.port === '80'
+      ? '/api/v1'
+      : 'http://localhost:3000/api/v1')
+  : 'https://ongcamm4-api.onrender.com/api/v1';
 ```
 
 ### 8.2 Objeto `api` (app.js)
@@ -441,6 +457,7 @@ Todas as chamadas HTTP passam por `_fetchWithRefresh()` que:
 
 - **Lucide Icons** — `https://unpkg.com/lucide@latest` (carregado em todas as páginas)
 - **Google Fonts** — Nunito + Nunito Sans
+- **Cloudflare Turnstile** — CAPTCHA na tela de login (site key no HTML, secret key no backend)
 
 ### 8.5 Design System
 
@@ -450,7 +467,10 @@ Todas as chamadas HTTP passam por `_fetchWithRefresh()` que:
 - **Cores primárias**: amarelo (#FFD45E), laranja (#FFA726), coral (#F4845F)
 - **Cores de apoio**: rosa (#F48FB1), verde (#66BB6A), azul (#42A5F5)
 - **Fundo geral**: #F8F9FC (cinza claro neutro)
-- **Datas**: formato DD/MM/AAAA com máscara, convertidas para ISO antes de enviar à API
+- **Datas**: inputs `type="date"` (calendário nativo do navegador), formato ISO (YYYY-MM-DD)
+- **Login**: inclui Cloudflare Turnstile CAPTCHA e link para Termos de Responsabilidade e Uso de Imagem
+- **Formulários modais**: cadastro de voluntário e doação usam modais com overlay opaco (65%)
+- **Relatórios PDF**: botão "Gerar PDF" em cadastros e frequência, gera e baixa automaticamente
 
 ---
 
@@ -530,7 +550,7 @@ npx serve .
 ### 11.3 Variáveis de Ambiente no Render
 
 Configuradas no painel do Render (Environment → Environment Variables):
-`DATABASE_URL`, `DIRECT_URL`, `JWT_SECRET`, `JWT_EXPIRATION`, `NODE_ENV=production`, `PORT=3000`, `FRONTEND_URL`, `UPLOAD_DIR`, `MAX_FILE_SIZE_MB`
+`DATABASE_URL`, `DIRECT_URL`, `JWT_SECRET`, `JWT_EXPIRATION`, `NODE_ENV=production`, `PORT=3000`, `FRONTEND_URL`, `TURNSTILE_SECRET`, `UPLOAD_DIR`, `MAX_FILE_SIZE_MB`
 
 ---
 
