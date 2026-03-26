@@ -165,6 +165,9 @@
     function abrirModalVoluntario() {
       document.getElementById('modal-voluntario').classList.add('open');
     }
+    if (new URLSearchParams(window.location.search).get('modal') === 'novo') {
+      abrirModalVoluntario();
+    }
   </script>
 </body>
 </html>
