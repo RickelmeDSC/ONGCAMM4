@@ -1,190 +1,223 @@
-# 🏢 ONGCAMM4 — Sistema de Gestão para ONG
+# CAMM — Sistema de Gestao da ONG
 
-> Plataforma completa para digitalização e gestão operacional de uma ONG  
-> Foco em **controle, rastreabilidade, segurança e eficiência**
+**Centro de Atendimento a Meninos e a Meninas**
 
----
+> Plataforma completa para digitalizacao e gestao operacional da ONG CAMM.
+> Foco em **controle, rastreabilidade, seguranca e eficiencia**.
 
-## 📌 Visão Geral
-
-O **ONGCAMM4** foi desenvolvido para substituir processos manuais (papel) por um sistema digital estruturado, garantindo:
-
-- Centralização de dados
-- Controle de acesso por nível (RBAC)
-- Auditoria completa de ações
-- Geração de relatórios em PDF
-- Escalabilidade e organização
-
-> Projeto com aplicação real, orientado a regras de negócio e arquitetura backend moderna.
+**Producao:** [ongcamm4.vercel.app](https://ongcamm4.vercel.app) | **API Docs:** [ongcamm4-api.onrender.com/api/docs](https://ongcamm4-api.onrender.com/api/docs)
 
 ---
 
-## 🧠 Problema Resolvido
+## Problema Resolvido
 
-**Antes**
-- Controle manual de presença
-- Documentos físicos
-- Falta de rastreabilidade
-- Risco de perda de dados
-
-**Depois**
-- Sistema centralizado e auditável
-- Histórico completo de ações
-- Automação de relatórios
-- Segurança e controle de acesso
+| Antes | Depois |
+|-------|--------|
+| Controle manual de presenca | Sistema centralizado e auditavel |
+| Documentos fisicos | Upload digital com rastreabilidade |
+| Falta de rastreabilidade | Historico completo de acoes (LogSistema) |
+| Risco de perda de dados | Banco PostgreSQL em nuvem (Neon) |
 
 ---
 
-## ⚙️ Stack Tecnológica
+## Stack Tecnologica
 
 **Backend**
 - NestJS (Node.js + TypeScript)
 - Prisma ORM
-- PostgreSQL (Neon)
-- Autenticação: JWT + Refresh Token (rotação)
-- Validação: class-validator
-- Upload: Multer (armazena path)
-- PDF: pdf-lib
+- PostgreSQL (Neon serverless)
+- JWT + Refresh Token (rotacao automatica)
+- class-validator, Multer, pdf-lib
+- Swagger (OpenAPI)
 
 **Frontend**
-- HTML + CSS + JavaScript (vanilla)
-- Integração via fetch com refresh automático
+- HTML5 + CSS3 + JavaScript (vanilla)
+- Lucide Icons, Google Fonts (Nunito)
+- Cloudflare Turnstile (CAPTCHA)
 
-**Infra**
-- Docker + Docker Compose
-- Nginx (proxy reverso)
+**Infraestrutura**
+- Docker + Docker Compose + Nginx
 - Deploy: Render (API) + Vercel (Frontend) + Neon (DB)
 
 ---
 
-## 🧩 Arquitetura — Pipeline de Requisição
+## Arquitetura
 
 ```mermaid
 flowchart TD
     A[Client / Frontend] --> B[API NestJS]
     B --> C[JWT Auth Guard]
-    C --> D[Roles Guard (RBAC)]
+    C --> D[Roles Guard - RBAC]
     D --> E[Controller]
     E --> F[Service]
     F --> G[Prisma ORM]
     G --> H[(PostgreSQL - Neon)]
     F --> I[Logging Interceptor]
     I --> J[(LOG_SISTEMA)]
+```
 
-🔐 Autenticação e Autorização
-Fluxo de Login e Renovação
+### Autenticacao e Autorizacao
 
 <img width="1459" height="1474" alt="mermaid-diagram" src="https://github.com/user-attachments/assets/8c20e93f-8c3a-4fbe-9b9b-40b5ca079098" />
 
-🗄️ Modelagem de Dados (Visão)
+### Modelagem de Dados
 
 <img width="2971" height="1207" alt="mermaid-diagram (1)" src="https://github.com/user-attachments/assets/ea1b32a4-d46e-4117-8ce4-4d3c28efe6ad" />
 
-Entidades principais
+---
 
-Usuario, Crianca, Responsavel
-Frequencia, Atividade, Evento
-Doacao, Declaracao
-RelatorioAuditoria, LogSistema, RefreshToken
-📊 Funcionalidades
-👶 Gestão de Crianças
-Cadastro completo
-Upload de documentos (path)
-Vínculo obrigatório com responsável
-👨‍👩‍👧 Responsáveis
-Cadastro e associação
-CPF único
-📅 Frequência
-Registro Presente/Ausente
-Histórico por criança
-Correções controladas
-🎯 Atividades e Eventos
-Registro com responsável
-Histórico organizacional
-💰 Doações
-Registro financeiro estruturado
-📄 Declarações
-Geração restrita ao Diretor
-Registro de parentesco e autorização
-📑 Relatórios (PDF)
-Crianças, Frequência, Doações, Atividades, Auditoria
-Download por endpoint
-🧾 Auditoria
-Log automático de ações
-Rastreabilidade por usuário e entidade
-🌐 API
+## Niveis de Acesso (RBAC)
 
-Prefixo: /api/v1
-
-Auth
-POST /auth/login
-POST /auth/refresh
-POST /auth/logout
-GET /auth/me
-Recursos
-/usuarios
-/criancas
-/responsaveis
-/frequencia
-/relatorios
-
-Swagger
-/api/docs
-
-🖥️ Frontend
-Interface responsiva (vanilla)
-Controle automático de refresh (retry com 401)
-Organização por páginas (cadastros, frequência, admin)
-
-🐳 Execução com Docker
-docker compose up -d
-
-Acessos:
-Frontend: http://localhost
-API (via proxy): http://localhost/api/v1
-Swagger (direto): http://localhost:3000/api/docs
-
-
+| Operacao | Voluntario (1) | Gestor (2) | Diretor (3) |
+|----------|---------------|-----------|------------|
+| Visualizar criancas | Sim | Sim | Sim |
+| Cadastrar criancas | — | Sim | Sim |
+| Excluir criancas | — | — | Sim |
+| Registrar frequencia | Sim | Sim | Sim |
+| Gerar relatorios PDF | — | Sim | Sim |
+| Gerenciar usuarios | — | — | Sim |
+| Redefinir senhas | — | — | Sim |
+| Auditoria / Logs | — | — | Sim |
 
 ---
 
-## 🧪 Execução Local
+## Funcionalidades
+
+- **Cadastro de criancas** — dados pessoais, foto 3x4, genero, documentos e responsavel legal
+- **Controle de frequencia** — registro diario de presenca/ausencia com historico e calendario
+- **Painel administrativo** — gestao de voluntarios, permissoes, atividades e doacoes
+- **Relatorios em PDF** — criancas, frequencia, doacoes, atividades e auditoria
+- **Autenticacao segura** — JWT + Refresh Token com rotacao automatica
+- **Auditoria completa** — log automatico com entidade, entidade_id, IP e timestamp
+- **CAPTCHA** — Cloudflare Turnstile na tela de login
+- **Termos legais** — Termo de Responsabilidade e Uso de Imagem integrado
+- **Declaracoes** — geracao de PDF restrita ao Diretor
+
+---
+
+## Estrutura do Projeto
+
+```
+ONGCAMM4/
+├── Back-end/
+│   ├── src/
+│   │   ├── auth/              # JWT + Refresh Token
+│   │   ├── usuarios/          # CRUD + reset senha
+│   │   ├── criancas/          # CRUD de criancas
+│   │   ├── responsaveis/      # CRUD de responsaveis
+│   │   ├── frequencia/        # Registro de presenca
+│   │   ├── atividades/        # Atividades da ONG
+│   │   ├── eventos/           # Eventos externos
+│   │   ├── doacoes/           # Registro de doacoes
+│   │   ├── declaracoes/       # Declaracoes (PDF)
+│   │   ├── relatorios/        # Relatorios em PDF
+│   │   ├── auditoria/         # Logs do sistema
+│   │   ├── documentos/        # Upload de fotos/docs
+│   │   ├── prisma/            # Prisma Service
+│   │   └── common/            # Guards, decorators, interceptors
+│   ├── prisma/
+│   │   └── schema.prisma
+│   ├── Dockerfile
+│   └── package.json
+├── Front-end/
+│   ├── files/                 # HTML, CSS, JS, logo
+│   ├── nginx.conf
+│   └── Dockerfile
+├── docker-compose.yml
+├── vercel.json
+└── README.md
+```
+
+---
+
+## API
+
+Prefixo global: `/api/v1` | Swagger: `/api/docs`
+
+| Modulo | Endpoints | Acesso |
+|--------|----------|--------|
+| Auth | `POST /login`, `/refresh`, `/logout`, `GET /me` | Publico / Autenticado |
+| Usuarios | CRUD + `PATCH /:id/reset-senha` | Gestor / Diretor |
+| Criancas | CRUD completo | Voluntario+ |
+| Responsaveis | CRUD completo | Voluntario+ |
+| Frequencia | CRUD + historico por crianca | Voluntario+ |
+| Relatorios | PDF de criancas, frequencia, doacoes, atividades, auditoria | Gestor+ |
+| Doacoes, Atividades, Eventos | CRUD padrao | Gestor+ |
+| Declaracoes | Geracao de PDF | Diretor |
+| Auditoria | Logs do sistema | Diretor |
+
+---
+
+## Execucao
+
+### Docker (recomendado)
 
 ```bash
+docker compose up -d
+# Frontend: http://localhost
+# API:      http://localhost/api/v1
+# Swagger:  http://localhost:3000/api/docs
+```
+
+### Desenvolvimento Local
+
+```bash
+# Backend
 cd Back-end
 npm install
 npx prisma generate
 npx prisma migrate dev
 npm run start:dev
 
-| Camada   | Serviço |
-| -------- | ------- |
-| Backend  | Render  |
-| Frontend | Vercel  |
-| Banco    | Neon    |
+# Frontend — abrir com Live Server (VSCode)
+```
 
+---
 
-📈 Diferenciais Técnicos
-Arquitetura modular (NestJS)
-RBAC com Guards globais
-Autenticação robusta (JWT + Refresh Token com rotação)
-Auditoria via interceptor
-Banco serverless (Neon)
-Separação clara: Controller / Service / ORM
-🧭 Roadmap (curto prazo)
-Paginação e filtros avançados
-Índices e otimizações de query
-Endpoints de busca (ILIKE)
-Hardenização de upload (naming + isolamento)
-Expansão de auditoria (payload JSON)
-👨‍💻 Autor
+## Deploy em Producao
 
-Rickelme David
-📍 Olinda - PE, Brasil
+| Servico | Plataforma | URL |
+|---------|-----------|-----|
+| Frontend | Vercel | [ongcamm4.vercel.app](https://ongcamm4.vercel.app) |
+| Backend | Render (Docker) | [ongcamm4-api.onrender.com](https://ongcamm4-api.onrender.com) |
+| Banco | NeonTech | PostgreSQL serverless (us-east-1) |
+| CAPTCHA | Cloudflare Turnstile | Managed widget |
 
-GitHub: https://github.com/RickelmeDSC
-LinkedIn: https://www.linkedin.com/in/rickelme-david-75630b203/
+Auto-deploy: push na `main` atualiza Vercel e Render automaticamente.
 
+---
 
+## Diferenciais Tecnicos
 
-    
+- Arquitetura modular (NestJS)
+- RBAC com Guards globais
+- Autenticacao robusta (JWT + Refresh Token com rotacao)
+- Auditoria via interceptor (entidade, ID, IP)
+- Indices de performance em todas as tabelas criticas
+- Banco serverless (Neon)
+- Separacao clara: Controller / Service / ORM
+- CAPTCHA anti-bot (Cloudflare Turnstile)
+- Relatorios PDF com multiplas paginas
+
+---
+
+## Equipe
+
+| Membro | Responsabilidade |
+|--------|-----------------|
+| **Rickelme** | Arquitetura, auth, usuarios, infra, deploy |
+| **Mike** | Criancas, responsaveis, documentos |
+| **Lucas** | Frequencia, atividades, eventos, doacoes, declaracoes, relatorios, auditoria |
+
+### Autor Principal
+
+**Rickelme David**
+Olinda - PE, Brasil
+
+[GitHub](https://github.com/RickelmeDSC) | [LinkedIn](https://www.linkedin.com/in/rickelme-david-75630b203/)
+
+---
+
+## Licenca
+
+Projeto privado — uso exclusivo da ONG CAMM.
