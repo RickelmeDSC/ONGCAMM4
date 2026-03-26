@@ -4,11 +4,14 @@
    ================================================ */
 
 // ── Configuração da API ──────────────────────────
-// Usa proxy do Nginx (/api/) quando servido via Docker (porta 80)
-// Aponta direto para o backend quando em dev local (Live Server, porta != 80)
-const API_BASE_URL = window.location.port === '' || window.location.port === '80'
-  ? '/api/v1'
-  : 'http://localhost:3000/api/v1';
+// Produção (Vercel): aponta para o Render
+// Docker local (porta 80): usa proxy Nginx
+// Dev local (Live Server): aponta direto para localhost:3000
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? (window.location.port === '' || window.location.port === '80'
+      ? '/api/v1'
+      : 'http://localhost:3000/api/v1')
+  : 'https://ongcamm4-api.onrender.com/api/v1';
 
 // ── Autenticação ─────────────────────────────────
 const Auth = {
