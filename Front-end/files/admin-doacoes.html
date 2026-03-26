@@ -30,63 +30,14 @@
 
   <main class="main-content">
     <div class="page-header">
-      <h1 class="page-title">Novo Registro de Doação</h1>
-      <div style="display:flex;gap:10px">
-        <button class="btn btn-outline" onclick="window.location.href='admin.html'">Cancelar</button>
-        <button class="btn btn-primary" form="form-doacao" type="submit"><i data-lucide="plus" style="width:14px;height:14px"></i> Salvar Registro</button>
-      </div>
-    </div>
-
-    <div class="card" style="margin-bottom:24px">
-      <p style="font-size:13px;color:var(--paragrafo);margin-bottom:20px">
-        Preencha as informações abaixo para registrar uma nova entrada no estoque ou caixa.
-      </p>
-      <form id="form-doacao" novalidate>
-        <div style="display:flex;flex-direction:column;gap:16px">
-          <div class="form-row cols-2">
-            <div class="form-group">
-              <label class="form-label">Nome do doador (pessoa ou instituição)</label>
-              <input id="d-doador" type="text" class="form-input" placeholder="Ex: João Silva ou Empresa de Alimentos S.A." required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Tipo de doação</label>
-              <select id="d-tipo" class="form-select">
-                <option value="">Selecione o tipo</option>
-                <option value="financeira">Financeira</option>
-                <option value="alimentos">Alimentos</option>
-                <option value="roupas">Roupas</option>
-                <option value="materiais">Materiais</option>
-                <option value="outros">Outros</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Descrição da doação</label>
-            <textarea id="d-descricao" class="form-textarea" rows="3" placeholder="Detalhes adicionais sobre a doação..."></textarea>
-          </div>
-
-          <div class="form-row cols-3">
-            <div class="form-group">
-              <label class="form-label">Quantidade ou valor estimado</label>
-              <input id="d-quantidade" type="text" class="form-input" placeholder="Ex: R$ 500,00 ou 50kg">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Data da doação</label>
-              <input id="d-data" type="text" class="form-input" placeholder="DD/MM/AAAA" data-mask="date">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Responsável pelo registro</label>
-              <input id="d-responsavel" type="text" class="form-input" placeholder="Admin Silva" readonly
-                style="background:#F1F5F9;cursor:default">
-            </div>
-          </div>
-        </div>
-      </form>
+      <h1 class="page-title">Registro de Doações</h1>
+      <button class="btn btn-primary" onclick="abrirModalDoacao()">
+        <i data-lucide="plus" style="width:14px;height:14px"></i> Nova Doação
+      </button>
     </div>
 
     <!-- Histórico -->
-    <div class="card">
+    <div class="card" style="margin-top:28px">
       <div class="recent-table-title">
         Histórico de Doações
         <a onclick="" style="margin-left:auto">Ver relatório completo</a>
@@ -115,8 +66,76 @@
     </div>
   </main>
 
+  <!-- Modal nova doação -->
+  <div class="modal-overlay" id="modal-doacao">
+    <div class="modal" style="max-width:620px">
+      <div class="modal-header">
+        <h3 class="modal-title">Nova Doação</h3>
+        <button class="modal-close" data-modal-close="modal-doacao">✕</button>
+      </div>
+      <p style="font-size:13px;color:var(--paragrafo);margin-bottom:16px">
+        Preencha as informações para registrar uma nova entrada no estoque ou caixa.
+      </p>
+      <form id="form-doacao" novalidate>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label class="form-label">Nome do doador</label>
+              <input id="d-doador" type="text" class="form-input" placeholder="Ex: João Silva ou Empresa S.A." required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo de doação</label>
+              <select id="d-tipo" class="form-select">
+                <option value="">Selecione o tipo</option>
+                <option value="financeira">Financeira</option>
+                <option value="alimentos">Alimentos</option>
+                <option value="roupas">Roupas</option>
+                <option value="materiais">Materiais</option>
+                <option value="outros">Outros</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Descrição da doação</label>
+            <textarea id="d-descricao" class="form-textarea" rows="2" placeholder="Detalhes adicionais sobre a doação..."></textarea>
+          </div>
+
+          <div class="form-row cols-3">
+            <div class="form-group">
+              <label class="form-label">Valor/Quantidade</label>
+              <input id="d-quantidade" type="text" class="form-input" placeholder="Ex: R$ 500,00 ou 50kg">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Data da doação</label>
+              <input id="d-data" type="text" class="form-input" placeholder="DD/MM/AAAA" data-mask="date">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Responsável</label>
+              <input id="d-responsavel" type="text" class="form-input" placeholder="Admin" readonly
+                style="background:#F1F5F9;cursor:default">
+            </div>
+          </div>
+
+          <div class="modal-footer" style="margin-top:4px">
+            <button type="button" class="btn btn-outline" data-modal-close="modal-doacao">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar Registro</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="toast-container" class="toast-container"></div>
   <script src="app.js"></script>
-  <script>lucide.createIcons();</script>
+  <script>
+    lucide.createIcons();
+    function abrirModalDoacao() {
+      document.getElementById('modal-doacao').classList.add('open');
+    }
+    if (new URLSearchParams(window.location.search).get('modal') === 'novo') {
+      abrirModalDoacao();
+    }
+  </script>
 </body>
 </html>
