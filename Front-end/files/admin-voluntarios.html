@@ -31,7 +31,7 @@
   <main class="main-content">
     <div class="page-header">
       <h1 class="page-title">Visualização de cadastros</h1>
-      <button class="btn btn-primary" onclick="window.location.href='admin-cadastrar-voluntario.html'">
+      <button class="btn btn-primary" onclick="abrirModalVoluntario()">
         <i data-lucide="plus" style="width:14px;height:14px"></i> Novo Voluntário
       </button>
     </div>
@@ -75,6 +75,72 @@
     </div>
   </main>
 
+  <!-- Modal cadastro de voluntário -->
+  <div class="modal-overlay" id="modal-voluntario">
+    <div class="modal" style="max-width:580px">
+      <div class="modal-header">
+        <h3 class="modal-title">Cadastrar Voluntário</h3>
+        <button class="modal-close" data-modal-close="modal-voluntario">✕</button>
+      </div>
+      <form id="form-voluntario" novalidate>
+        <div style="display:flex;flex-direction:column;gap:14px">
+
+          <p class="form-section-title" style="margin:0">Informações Pessoais</p>
+
+          <div class="form-group">
+            <label class="form-label">Nome completo</label>
+            <input id="v-nome" type="text" class="form-input" placeholder="Ex: João da Silva Santos" required>
+          </div>
+
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input id="v-email" type="email" class="form-input" placeholder="exemplo@ong.org" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cargo/Função</label>
+              <select id="v-cargo" class="form-select" required>
+                <option value="">Selecione a função</option>
+                <option value="voluntario">Voluntário (Nível 1)</option>
+                <option value="gestor">Gestor (Nível 2)</option>
+                <option value="diretor">Diretor (Nível 3)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="height:1px;background:var(--border);margin:4px 0"></div>
+          <p class="form-section-title" style="margin:0">Segurança e Acesso</p>
+
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label class="form-label">Senha</label>
+              <div style="position:relative">
+                <input id="v-senha" type="password" class="form-input" placeholder="••••••••" required>
+                <button type="button" class="input-eye"><i data-lucide="eye" style="width:16px;height:16px"></i></button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirmar senha</label>
+              <div style="position:relative">
+                <input id="v-conf" type="password" class="form-input" placeholder="••••••••" required>
+                <button type="button" class="input-eye"><i data-lucide="eye" style="width:16px;height:16px"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <p style="font-size:12px;color:var(--paragrafo);margin:0">
+            A senha deve ter mínimo 8 caracteres, uma letra maiúscula, uma minúscula, um número e um caractere especial.
+          </p>
+
+          <div class="modal-footer" style="margin-top:4px">
+            <button type="button" class="btn btn-outline" data-modal-close="modal-voluntario">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar Cadastro</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Modal confirmação exclusão -->
   <div class="modal-overlay" id="modal-confirmar">
     <div class="modal">
@@ -94,6 +160,11 @@
 
   <div id="toast-container" class="toast-container"></div>
   <script src="app.js"></script>
-  <script>lucide.createIcons();</script>
+  <script>
+    lucide.createIcons();
+    function abrirModalVoluntario() {
+      document.getElementById('modal-voluntario').classList.add('open');
+    }
+  </script>
 </body>
 </html>
