@@ -17,6 +17,11 @@ export class UpdateCriancaDto {
   @IsString()
   cpf?: string;
 
+  @ApiPropertyOptional({ example: 'Masculino', enum: ['Masculino', 'Feminino'] })
+  @IsOptional()
+  @IsString()
+  genero?: string;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsInt()

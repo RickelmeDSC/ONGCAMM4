@@ -14,6 +14,11 @@ export class CreateCriancaDto {
   @IsString()
   cpf: string;
 
+  @ApiPropertyOptional({ example: 'Masculino', enum: ['Masculino', 'Feminino'] })
+  @IsOptional()
+  @IsString()
+  genero?: string;
+
   @ApiProperty({ example: 1 })
   @IsInt()
   id_responsavel: number;

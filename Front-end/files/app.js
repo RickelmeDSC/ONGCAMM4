@@ -481,12 +481,15 @@ async function handleCadastrarCrianca(e) {
     });
 
     // 2. Cadastrar criança vinculando ao responsável
-    const criancaData = await api.post('/criancas', {
+    const genero = document.getElementById('c-genero')?.value || undefined;
+    const criancaBody = {
       nome,
       data_nascimento: toISO(data_nascimento),
       cpf: cpf || '',
       id_responsavel: responsavel.id_responsavel,
-    });
+    };
+    if (genero) criancaBody.genero = genero;
+    const criancaData = await api.post('/criancas', criancaBody);
 
     // 3. Upload da foto (se houver)
     if (foto) {

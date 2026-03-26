@@ -259,6 +259,7 @@ model Crianca {
   nome            String
   data_nascimento DateTime
   cpf             String   @unique
+  genero          String?
   foto_path       String?
   certidao_nasc   String?
   cartao_vacina   String?
