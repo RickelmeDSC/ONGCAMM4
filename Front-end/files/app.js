@@ -997,14 +997,6 @@ document.addEventListener('DOMContentLoaded', () => {
   switch (page) {
     case 'login':
       document.getElementById('form-login')?.addEventListener('submit', handleLogin);
-      document.getElementById('show-register')?.addEventListener('click', () => {
-        document.getElementById('login-section').style.display = 'none';
-        document.getElementById('register-section').style.display = 'block';
-      });
-      document.getElementById('show-login')?.addEventListener('click', () => {
-        document.getElementById('register-section').style.display = 'none';
-        document.getElementById('login-section').style.display = 'block';
-      });
       break;
 
     case 'cadastros':
