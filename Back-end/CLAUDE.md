@@ -460,7 +460,8 @@ DIRECT_URL="postgresql://..."          # Neon direto (migrations)
 JWT_SECRET="string-aleatoria-64-chars" # HS256 secret
 JWT_EXPIRATION="3600"                  # 1 hora (access_token)
 PORT=3000
-NODE_ENV=development
+NODE_ENV=development                   # "production" no Render
+FRONTEND_URL="https://..."             # URL do frontend (CORS) — só em produção
 UPLOAD_DIR="./uploads"
 MAX_FILE_SIZE_MB=5
 ```
@@ -504,7 +505,33 @@ npx serve .
 
 ---
 
-## 11. DIVISÃO DE RESPONSABILIDADES
+## 11. DEPLOY EM PRODUÇÃO
+
+### 11.1 Arquitetura de Deploy
+
+| Serviço | Plataforma | URL |
+|---------|-----------|-----|
+| Backend (API) | Render (Docker, Free) | https://ongcamm4-api.onrender.com |
+| Frontend | Vercel (Static) | *(a definir)* |
+| Banco de dados | NeonTech (PostgreSQL) | Neon pooler (us-east-1) |
+
+### 11.2 Backend — Render
+
+- **Tipo**: Web Service (Docker)
+- **Root Directory**: `Back-end`
+- **Branch**: `main`
+- **Auto-Deploy**: On Commit
+- **Plano**: Free (512MB RAM, 0.1 CPU — dorme após inatividade)
+- **CORS**: controlado pela variável `FRONTEND_URL` no `main.ts`
+
+### 11.3 Variáveis de Ambiente no Render
+
+Configuradas no painel do Render (Environment → Environment Variables):
+`DATABASE_URL`, `DIRECT_URL`, `JWT_SECRET`, `JWT_EXPIRATION`, `NODE_ENV=production`, `PORT=3000`, `FRONTEND_URL`, `UPLOAD_DIR`, `MAX_FILE_SIZE_MB`
+
+---
+
+## 12. DIVISÃO DE RESPONSABILIDADES
 
 ### Rickelme
 - Inicialização do projeto, configuração base
@@ -520,4 +547,4 @@ npx serve .
 
 ---
 
-*Documento atualizado em 2026-03-25. Toda alteração estrutural deve ser refletida aqui antes de ser implementada.*
+*Documento atualizado em 2026-03-26. Toda alteração estrutural deve ser refletida aqui antes de ser implementada.*

@@ -19,9 +19,9 @@ async function bootstrap() {
     }),
   );
 
-  // CORS — ajustar origens permitidas em produção
+  // CORS — em produção usa FRONTEND_URL, em dev libera tudo
   app.enableCors({
-    origin: process.env.NODE_ENV === 'production' ? false : '*',
+    origin: process.env.FRONTEND_URL || '*',
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
