@@ -249,10 +249,13 @@ function fillSidebarUser() {
 function refreshIcons() { if (window.lucide) lucide.createIcons(); }
 
 // ── Conversão de datas ────────────────────────────
-// DD/MM/AAAA → YYYY-MM-DD (formato ISO para a API)
-function toISO(dataBR) {
-  if (!dataBR) return undefined;
-  const [d, m, y] = dataBR.split('/');
+// DD/MM/AAAA ou YYYY-MM-DD → YYYY-MM-DD (formato ISO para a API)
+function toISO(dateStr) {
+  if (!dateStr) return undefined;
+  // Se já está em ISO (YYYY-MM-DD), retorna direto
+  if (dateStr.includes('-') && dateStr.length === 10) return dateStr;
+  // Senão converte DD/MM/AAAA
+  const [d, m, y] = dateStr.split('/');
   if (!d || !m || !y) return undefined;
   return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
 }
@@ -605,6 +608,32 @@ async function handleSalvarDoacao(e) {
   } catch (err) {
     Toast.error('Erro ao registrar doação.');
     console.error(err);
+  }
+}
+
+// ── GERAR RELATÓRIO PDF DE FREQUÊNCIA ──────────────
+async function gerarRelatorioFrequencia() {
+  const btn = document.getElementById('btn-relatorio-freq');
+  if (btn) { btn.disabled = true; btn.textContent = 'Gerando...'; }
+  try {
+    const relatorio = await api.post('/relatorios/frequencia');
+    const token = Auth.getToken();
+    const res = await fetch(`${API_BASE_URL}/relatorios/${relatorio.id_relatorio}/download`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `relatorio-frequencia-${new Date().toISOString().slice(0,10)}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+    Toast.success('Relatório de frequência gerado!');
+  } catch (err) {
+    Toast.error('Erro ao gerar relatório.');
+    console.error(err);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="file-text" style="width:14px;height:14px"></i> Gerar PDF'; lucide.createIcons(); }
   }
 }
 
@@ -1068,9 +1097,9 @@ document.addEventListener('DOMContentLoaded', () => {
       renderFreqTable();
       initSearch('search-freq', 'freq-tbody', [0, 1]);
       document.getElementById('btn-salvar-chamada')?.addEventListener('click', salvarChamada);
-      // Definir data de hoje no input (DD/MM/AAAA)
+      // Definir data de hoje no input (YYYY-MM-DD para type="date")
       const freqDate = document.getElementById('freq-date');
-      if (freqDate) freqDate.value = new Date().toLocaleDateString('pt-BR');
+      if (freqDate) freqDate.value = new Date().toISOString().slice(0, 10);
       break;
 
     case 'admin':
