@@ -340,11 +340,17 @@ model RelatorioAuditoria {
 }
 
 model LogSistema {
-  id_log     Int      @id @default(autoincrement())
-  id_usuario Int
-  acao       String
-  data_hora  DateTime @default(now())
-  usuario    Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+  id_log      Int      @id @default(autoincrement())
+  id_usuario  Int
+  acao        String
+  entidade    String?  // ex: "crianca", "usuario", "doacao"
+  entidade_id Int?     // ID do registro afetado
+  ip          String?  // IP do cliente
+  data_hora   DateTime @default(now())
+  usuario     Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+  @@index([id_usuario])
+  @@index([data_hora])
+  @@index([entidade])
   @@map("log_sistema")
 }
 ```
@@ -520,7 +526,27 @@ cd Front-end/files
 npx serve .
 ```
 
-### 10.1 Observações do Build
+### 10.1 Indices e Performance
+
+Indices foram adicionados nas tabelas mais consultadas:
+- `usuario`: nome
+- `responsavel`: nome
+- `crianca`: nome, id_responsavel
+- `frequencia`: id_matricula, data_registro
+- `doacao`: data_doacao
+- `refresh_token`: id_usuario, expires_at
+- `log_sistema`: id_usuario, data_hora, entidade
+
+### 10.2 Auditoria (LogSistema)
+
+O `LoggingInterceptor` registra automaticamente toda operação de escrita (POST, PATCH, PUT, DELETE) com:
+- `acao`: método HTTP + URL (ex: `POST /api/v1/criancas`)
+- `entidade`: nome da entidade afetada (ex: `criancas`)
+- `entidade_id`: ID do registro afetado (quando presente na URL)
+- `ip`: endereço IP do cliente
+- `data_hora`: timestamp automático
+
+### 10.3 Observações do Build
 
 - O `tsconfig.build.json` exclui `prisma.config.ts` para evitar que o TypeScript gere `dist/src/main.js` ao invés de `dist/main.js`
 - O Dockerfile do backend usa multi-stage build (builder → production)

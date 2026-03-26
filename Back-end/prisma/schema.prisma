@@ -31,6 +31,7 @@ model Usuario {
   declaracoes    Declaracao[]
   refreshTokens  RefreshToken[]
 
+  @@index([nome])
   @@map("usuario")
 }
 
@@ -46,6 +47,7 @@ model Responsavel {
 
   criancas Crianca[]
 
+  @@index([nome])
   @@map("responsavel")
 }
 
@@ -68,6 +70,8 @@ model Crianca {
   frequencias Frequencia[]
   declaracoes Declaracao[]
 
+  @@index([nome])
+  @@index([id_responsavel])
   @@map("crianca")
 }
 
@@ -83,6 +87,8 @@ model Frequencia {
 
   crianca Crianca @relation(fields: [id_matricula], references: [id_matricula])
 
+  @@index([id_matricula])
+  @@index([data_registro])
   @@map("frequencia")
 }
 
@@ -125,6 +131,7 @@ model Doacao {
   valor       Decimal  @db.Decimal(10, 2)
   data_doacao DateTime @default(now())
 
+  @@index([data_doacao])
   @@map("doacao")
 }
 
@@ -169,6 +176,8 @@ model RefreshToken {
 
   usuario Usuario @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
 
+  @@index([id_usuario])
+  @@index([expires_at])
   @@map("refresh_token")
 }
 
@@ -176,12 +185,18 @@ model RefreshToken {
 // LOG_SISTEMA — Auditoria automática de todas as ações de escrita
 // =============================================================
 model LogSistema {
-  id_log    Int      @id @default(autoincrement())
-  id_usuario Int
-  acao      String
-  data_hora DateTime @default(now())
+  id_log      Int      @id @default(autoincrement())
+  id_usuario  Int
+  acao        String
+  entidade    String?  // ex: "crianca", "usuario", "doacao"
+  entidade_id Int?     // ID do registro afetado
+  ip          String?  // IP do cliente
+  data_hora   DateTime @default(now())
 
   usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
 
+  @@index([id_usuario])
+  @@index([data_hora])
+  @@index([entidade])
   @@map("log_sistema")
 }
