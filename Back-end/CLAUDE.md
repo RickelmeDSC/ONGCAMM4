@@ -512,7 +512,7 @@ npx serve .
 | Serviço | Plataforma | URL |
 |---------|-----------|-----|
 | Backend (API) | Render (Docker, Free) | https://ongcamm4-api.onrender.com |
-| Frontend | Vercel (Static) | https://ongcamm4.vercel.app *(estimado)* |
+| Frontend | Vercel (Static) | https://ongcamm4.vercel.app |
 | Banco de dados | NeonTech (PostgreSQL) | Neon pooler (us-east-1) |
 
 ### 11.2 Backend — Render
