@@ -529,7 +529,9 @@ async function handleCadastrarVoluntario(e) {
   try {
     await api.post('/usuarios', body);
     Toast.success('Voluntário cadastrado!');
-    setTimeout(() => window.location.href = 'admin.html', 1000);
+    document.getElementById('modal-voluntario')?.classList.remove('open');
+    document.getElementById('form-voluntario')?.reset();
+    renderUsuariosTable();
   } catch (err) {
     Toast.error('Erro ao cadastrar voluntário.');
     console.error(err);
@@ -1047,6 +1049,7 @@ document.addEventListener('DOMContentLoaded', () => {
       setActiveNav('admin');
       renderUsuariosTable();
       initSearch('search-usuarios', 'usuarios-tbody', [0, 1, 2]);
+      document.getElementById('form-voluntario')?.addEventListener('submit', handleCadastrarVoluntario);
       break;
 
     case 'admin-permissoes':
