@@ -238,7 +238,7 @@ function fillSidebarUser() {
     btn.id = 'btn-logout';
     btn.className = 'btn btn-sm';
     btn.innerHTML = '<i data-lucide="log-out" style="width:14px;height:14px"></i> Sair';
-    btn.style.cssText = 'margin-top:8px;width:100%;font-size:12px;padding:8px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;gap:6px';
+    btn.style.cssText = 'margin-top:8px;width:100%;font-size:12px;padding:8px;background:rgba(255,255,255,0.5);color:#3D2800;border:1px solid rgba(0,0,0,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;gap:6px';
     btn.addEventListener('click', Auth.logout);
     footer.appendChild(btn);
   }
