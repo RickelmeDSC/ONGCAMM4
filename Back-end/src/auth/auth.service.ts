@@ -10,8 +10,8 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
-  // Refresh token dura 30 dias
-  private readonly REFRESH_EXPIRATION_DAYS = 30;
+  // Refresh token dura 8 horas (1 expediente)
+  private readonly REFRESH_EXPIRATION_HOURS = 8;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -117,10 +117,10 @@ export class AuthService {
     // Access token — curta duração (1 hora)
     const access_token = this.jwtService.sign(payload);
 
-    // Refresh token — longa duração (30 dias), string aleatória
+    // Refresh token — duração de 1 expediente (8 horas)
     const refresh_token = crypto.randomBytes(64).toString('hex');
     const expires_at = new Date();
-    expires_at.setDate(expires_at.getDate() + this.REFRESH_EXPIRATION_DAYS);
+    expires_at.setHours(expires_at.getHours() + this.REFRESH_EXPIRATION_HOURS);
 
     // Salva no banco
     await this.prisma.refreshToken.create({
