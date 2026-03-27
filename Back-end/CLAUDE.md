@@ -79,18 +79,20 @@ Request HTTP
 ```
 Front-end/files/
 ├── index.html              ← Login (split-screen) + CAPTCHA Turnstile + Termos
+├── home.html               ← Página inicial (Nossa História, Missão, Valores)
 ├── cadastros.html          ← Lista de crianças + botão Gerar PDF
 ├── cadastrar-crianca.html  ← Formulário de cadastro (com gênero)
 ├── frequencia.html         ← Registro de frequência + botão Gerar PDF
 ├── historico-presenca.html ← Histórico individual com calendário
 ├── admin.html              ← Painel administrativo (cards)
 ├── admin-voluntarios.html  ← Lista de voluntários + modal cadastro/editar/reset senha
-├── admin-permissoes.html   ← Permissões por nível
+├── admin-permissoes.html   ← Controle de acessos (select de nível por usuário)
 ├── admin-atividades.html   ← Registro de atividades
 ├── admin-doacoes.html      ← Registro de doações (modal)
 ├── styles.css              ← Estilos globais
 ├── app.js                  ← Lógica JS + integração com API
-└── logo-camm.png           ← Logo da ONG (PNG com fundo transparente)
+├── logo-camm.png           ← Logo da ONG (PNG com fundo transparente)
+└── home-banner.png         ← Banner da página Home (crianças CAMM)
 ```
 
 ### 3.3 Frontend — Fluxo de Navegação
@@ -98,7 +100,9 @@ Front-end/files/
 ```
 index.html (Login)
     ↓ login bem-sucedido
-cadastros.html (Home)
+home.html (Página Inicial)
+    ↓
+cadastros.html (Cadastros)
     ├── cadastrar-crianca.html
     ├── frequencia.html → historico-presenca.html?id=X
     └── admin.html
@@ -119,7 +123,7 @@ O sistema usa **dois tokens**:
 | Token | Tipo | Duração | Armazenamento |
 |---|---|---|---|
 | **access_token** | JWT (HS256) | 1 hora | localStorage (`camm_token`) |
-| **refresh_token** | String aleatória (128 hex) | 30 dias | localStorage (`camm_refresh`) + tabela `refresh_token` no banco |
+| **refresh_token** | String aleatória (128 hex) | 8 horas | localStorage (`camm_refresh`) + tabela `refresh_token` no banco |
 
 ### 4.2 Fluxo de Login
 
@@ -162,6 +166,7 @@ O sistema usa **dois tokens**:
 - **Limpeza automática**: tokens expirados são removidos do banco a cada login
 - **Proteção contra replay**: refresh_token só pode ser usado uma vez
 - **Cascade delete**: ao deletar um usuário, todos os refresh_tokens são removidos
+- **Validação de sessão**: ao carregar qualquer página, `validateSession()` faz `GET /auth/me` em background; se 401, tenta refresh; se falhar, redireciona para login
 
 ### 4.6 Endpoints de Auth
 
@@ -472,7 +477,7 @@ Todas as chamadas HTTP passam por `_fetchWithRefresh()` que:
 ### 8.5 Design System
 
 - **Logo**: `logo-camm.png` com fundo transparente, exibida na sidebar e na tela de login
-- **Sidebar**: tema escuro (#2B2D42), itens com ícones Lucide, item ativo com gradiente amarelo/laranja
+- **Sidebar**: gradiente amarelo (#FFD45E → #FFBE4A → #FFA726), textos marrom (#5A3E0A), item ativo com fundo branco semi-transparente
 - **Header**: gradiente amarelo (#FFD45E → #FFBE4A → #FFA726), títulos escuros (#3D2800)
 - **Cores primárias**: amarelo (#FFD45E), laranja (#FFA726), coral (#F4845F)
 - **Cores de apoio**: rosa (#F48FB1), verde (#66BB6A), azul (#42A5F5)

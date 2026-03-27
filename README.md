@@ -88,7 +88,8 @@ flowchart TD
 - **Painel administrativo** — gestao de voluntarios, permissoes por nivel, atividades e doacoes
 - **Relatorios em PDF** — criancas, frequencia, doacoes, atividades e auditoria (gerados em memoria)
 - **Soft delete** — usuarios e criancas desativados podem ser visualizados com filtro
-- **Autenticacao segura** — JWT + Refresh Token com rotacao automatica
+- **Pagina Home** — Nossa Historia, Missao e Valores com banner institucional
+- **Autenticacao segura** — JWT (1h) + Refresh Token (8h) com rotacao e validacao de sessao
 - **Auditoria completa** — log automatico com entidade, entidade_id, IP e timestamp
 - **CAPTCHA** — Cloudflare Turnstile na tela de login
 - **Termos legais** — Termo de Responsabilidade e Uso de Imagem integrado
@@ -193,7 +194,8 @@ Auto-deploy: push na `main` atualiza Vercel e Render automaticamente.
 
 - Arquitetura modular (NestJS)
 - RBAC com Guards globais
-- Autenticacao robusta (JWT + Refresh Token com rotacao)
+- Autenticacao robusta (JWT 1h + Refresh Token 8h com rotacao)
+- Validacao de sessao automatica ao reabrir pagina
 - Auditoria via interceptor (entidade, ID, IP)
 - Indices de performance em todas as tabelas criticas
 - Banco serverless (Neon)
