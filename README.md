@@ -84,14 +84,16 @@ flowchart TD
 ## Funcionalidades
 
 - **Cadastro de criancas** — dados pessoais, foto 3x4, genero, documentos e responsavel legal
-- **Controle de frequencia** — registro diario de presenca/ausencia com historico e calendario
-- **Painel administrativo** — gestao de voluntarios, permissoes, atividades e doacoes
-- **Relatorios em PDF** — criancas, frequencia, doacoes, atividades e auditoria
+- **Controle de frequencia** — registro diario com turno (Manha/Tarde/Integral) e justificativa de falta
+- **Painel administrativo** — gestao de voluntarios, permissoes por nivel, atividades e doacoes
+- **Relatorios em PDF** — criancas, frequencia, doacoes, atividades e auditoria (gerados em memoria)
+- **Soft delete** — usuarios e criancas desativados podem ser visualizados com filtro
 - **Autenticacao segura** — JWT + Refresh Token com rotacao automatica
 - **Auditoria completa** — log automatico com entidade, entidade_id, IP e timestamp
 - **CAPTCHA** — Cloudflare Turnstile na tela de login
 - **Termos legais** — Termo de Responsabilidade e Uso de Imagem integrado
 - **Declaracoes** — geracao de PDF restrita ao Diretor
+- **Controle de visibilidade** — menu Administrativo oculto para voluntarios
 
 ---
 
@@ -197,7 +199,10 @@ Auto-deploy: push na `main` atualiza Vercel e Render automaticamente.
 - Banco serverless (Neon)
 - Separacao clara: Controller / Service / ORM
 - CAPTCHA anti-bot (Cloudflare Turnstile)
-- Relatorios PDF com multiplas paginas
+- Relatorios PDF gerados em memoria (sem dependencia de disco)
+- Soft delete com filtro de excluidos
+- Frequencia com turno e justificativa de falta
+- Controle de visibilidade do menu por nivel de acesso
 
 ---
 

@@ -232,11 +232,12 @@ providers: [
 
 ```prisma
 model Usuario {
-  id_usuario   Int    @id @default(autoincrement())
+  id_usuario   Int     @id @default(autoincrement())
   nome         String
-  email        String @unique
+  email        String  @unique
   senha_hash   String
-  nivel_acesso Int    @default(1)
+  nivel_acesso Int     @default(1)
+  ativo        Boolean @default(true)
   logs           LogSistema[]
   eventos        Evento[]
   atividades     Atividade[]
@@ -265,6 +266,7 @@ model Crianca {
   certidao_nasc   String?
   cartao_vacina   String?
   data_entrada    DateTime @default(now())
+  ativo           Boolean  @default(true)
   id_responsavel  Int
   responsavel     Responsavel  @relation(fields: [id_responsavel], references: [id_responsavel])
   frequencias     Frequencia[]
@@ -277,6 +279,8 @@ model Frequencia {
   id_matricula  Int
   data_registro DateTime @default(now())
   status        String
+  turno         String?  // "Manhã" | "Tarde" | "Integral"
+  observacao    String?  // Justificativa da falta
   crianca       Crianca  @relation(fields: [id_matricula], references: [id_matricula])
   @@map("frequencia")
 }
@@ -304,7 +308,7 @@ model Doacao {
   id_doacao   Int      @id @default(autoincrement())
   doador      String
   tipo        String
-  valor       Decimal  @db.Decimal(10, 2)
+  valor       Decimal? @db.Decimal(10, 2)
   data_doacao DateTime @default(now())
   @@map("doacao")
 }
@@ -476,7 +480,10 @@ Todas as chamadas HTTP passam por `_fetchWithRefresh()` que:
 - **Datas**: inputs `type="date"` (calendário nativo do navegador), formato ISO (YYYY-MM-DD)
 - **Login**: inclui Cloudflare Turnstile CAPTCHA e link para Termos de Responsabilidade e Uso de Imagem
 - **Formulários modais**: cadastro de voluntário e doação usam modais com overlay opaco (65%)
-- **Relatórios PDF**: botão "Gerar PDF" em cadastros e frequência, gera e baixa automaticamente
+- **Relatórios PDF**: botão "Gerar PDF" em cadastros e frequência, gerados em memória (buffer) e retornados direto na response
+- **Soft delete**: exclusão de usuários e crianças faz `UPDATE ativo=false`; query param `?includeInactive=true` para ver excluídos
+- **Frequência**: inclui turno (Manhã/Tarde/Integral) e campo de justificativa de falta (observação)
+- **Visibilidade**: menu Administrativo oculto para voluntários (nível < 2)
 
 ---
 
@@ -596,4 +603,4 @@ Configuradas no painel do Render (Environment → Environment Variables):
 
 ---
 
-*Documento atualizado em 2026-03-26. Toda alteração estrutural deve ser refletida aqui antes de ser implementada.*
+*Documento atualizado em 2026-03-27. Toda alteração estrutural deve ser refletida aqui antes de ser implementada.*
