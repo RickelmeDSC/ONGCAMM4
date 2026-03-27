@@ -52,11 +52,18 @@ const Auth = {
     return true;
   },
   async validateSession() {
+    // Só valida se tem token — evita request desnecessário
+    if (!Auth.getToken()) return;
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
       const res = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: { 'Authorization': `Bearer ${Auth.getToken()}` },
+        signal: controller.signal,
       });
+      clearTimeout(timeout);
       if (res.status === 401) {
+        // Token expirou — tenta refresh silenciosamente
         const refreshed = await Auth.tryRefresh();
         if (!refreshed) {
           localStorage.removeItem('camm_token');
@@ -65,7 +72,10 @@ const Auth = {
           window.location.href = 'index.html';
         }
       }
-    } catch (_) { /* offline ou erro de rede — ignora */ }
+    } catch (_) {
+      // Timeout ou erro de rede (Render dormindo) — não redireciona
+      // O _fetchWithRefresh vai tratar quando o usuário interagir
+    }
   },
 
   // Tenta renovar o access_token usando o refresh_token
@@ -122,12 +132,13 @@ async function _fetchWithRefresh(url, options) {
     }
   }
 
-  // Se ainda 401 após refresh, limpa sessao mas NÃO redireciona automaticamente
-  // O redirecionamento fica a cargo de requireAuth() no carregamento da pagina
-  if (res.status === 401 && !Auth.getRefreshToken()) {
+  // Se ainda 401 após refresh, sessão realmente expirou
+  if (res.status === 401) {
     localStorage.removeItem('camm_token');
     localStorage.removeItem('camm_refresh');
     localStorage.removeItem('camm_user');
+    window.location.href = 'index.html';
+    throw new Error('Sessão expirada');
   }
 
   return res;
