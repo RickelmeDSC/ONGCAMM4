@@ -47,7 +47,25 @@ const Auth = {
       window.location.href = 'index.html';
       return false;
     }
+    // Validar token em background — se expirou, tenta refresh
+    Auth.validateSession();
     return true;
+  },
+  async validateSession() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/me`, {
+        headers: { 'Authorization': `Bearer ${Auth.getToken()}` },
+      });
+      if (res.status === 401) {
+        const refreshed = await Auth.tryRefresh();
+        if (!refreshed) {
+          localStorage.removeItem('camm_token');
+          localStorage.removeItem('camm_refresh');
+          localStorage.removeItem('camm_user');
+          window.location.href = 'index.html';
+        }
+      }
+    } catch (_) { /* offline ou erro de rede — ignora */ }
   },
 
   // Tenta renovar o access_token usando o refresh_token
