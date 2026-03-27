@@ -166,7 +166,8 @@ O sistema usa **dois tokens**:
 - **Limpeza automática**: tokens expirados são removidos do banco a cada login
 - **Proteção contra replay**: refresh_token só pode ser usado uma vez
 - **Cascade delete**: ao deletar um usuário, todos os refresh_tokens são removidos
-- **Validação de sessão**: ao carregar qualquer página, `validateSession()` faz `GET /auth/me` em background; se 401, tenta refresh; se falhar, redireciona para login
+- **Validação de sessão**: ao carregar qualquer página, `validateSession()` faz `GET /auth/me` em background (timeout 10s); se 401, tenta refresh; se refresh falhar, redireciona para login; se timeout (Render dormindo), ignora e espera interação do usuário
+- **_fetchWithRefresh**: toda requisição que retorna 401 tenta refresh automático; se o refresh também falhar, limpa localStorage e redireciona para login imediatamente
 
 ### 4.6 Endpoints de Auth
 
