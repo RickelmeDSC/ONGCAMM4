@@ -7,16 +7,7 @@
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    .home-section { padding: 32px 40px; }
-
-    .home-welcome {
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--paragrafo);
-      margin-bottom: 8px;
-    }
+    .home-section { padding-top: 28px; }
     .home-title {
       font-family: var(--font-main);
       font-weight: 900;
@@ -106,7 +97,6 @@
 
     @media (max-width: 768px) {
       .home-cards { grid-template-columns: 1fr; }
-      .home-section { padding: 20px 16px; }
       .home-title { font-size: 24px; }
     }
   </style>
@@ -133,9 +123,15 @@
   </aside>
 
   <main class="main-content">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Bem-vindo ao Portal CAMM</h1>
+        <p style="color:rgba(61,40,0,0.6);font-size:14px;margin-top:4px">Centro de Atendimento a Meninos e a Meninas</p>
+      </div>
+    </div>
+
     <div class="home-section">
-      <p class="home-welcome">BEM-VINDO AO PORTAL CAMM</p>
-      <h1 class="home-title">Nossa Historia</h1>
+      <h2 class="home-title">Nossa Historia</h2>
       <p class="home-text">
         O Portal CAMM nasceu da necessidade de conectar recursos a quem mais precisa. Com mais de 40 anos de atuacao, temos o compromisso de gerir projetos sociais com transparencia, eficiencia e, acima de tudo, amor ao proximo.
       </p>
