@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAMM — Home</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .home-section { padding: 32px 40px; }
+
+    .home-welcome {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--paragrafo);
+      margin-bottom: 8px;
+    }
+    .home-title {
+      font-family: var(--font-main);
+      font-weight: 900;
+      font-size: 32px;
+      color: #FFA726;
+      margin-bottom: 16px;
+    }
+    .home-text {
+      font-size: 15px;
+      color: var(--paragrafo);
+      line-height: 1.8;
+      max-width: 700px;
+    }
+
+    .home-banner {
+      width: 100%;
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin: 28px 0;
+    }
+    .home-banner img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+
+    .home-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 28px;
+    }
+
+    .home-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+    .home-card-icon {
+      width: 44px; height: 44px;
+      background: #FFF8E1;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .home-card h3 {
+      font-family: var(--font-main);
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--titulo);
+      margin-bottom: 12px;
+    }
+    .home-card p {
+      font-size: 14px;
+      color: var(--paragrafo);
+      line-height: 1.7;
+    }
+    .home-card ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .home-card ul li {
+      font-size: 14px;
+      color: var(--paragrafo);
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .home-card ul li::before {
+      content: '';
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #FFA726;
+      flex-shrink: 0;
+    }
+    .home-card-line {
+      width: 40px;
+      height: 3px;
+      background: #FFA726;
+      border-radius: 2px;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .home-cards { grid-template-columns: 1fr; }
+      .home-section { padding: 20px 16px; }
+      .home-title { font-size: 24px; }
+    }
+  </style>
+</head>
+<body data-page="home">
+
+  <button class="hamburger" id="hamburger"><i data-lucide="menu" style="width:22px;height:22px"></i></button>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="logo-camm.png" alt="CAMM" style="width:100px;height:auto;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.15))">
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-page="home" onclick="window.location.href='home.html'"><span class="nav-icon"><i data-lucide="home" style="width:18px;height:18px"></i></span> Home</button>
+      <button class="nav-item" data-page="cadastros" onclick="window.location.href='cadastros.html'"><span class="nav-icon"><i data-lucide="user-round" style="width:18px;height:18px"></i></span> Cadastros</button>
+      <button class="nav-item" data-page="frequencia" onclick="window.location.href='frequencia.html'"><span class="nav-icon"><i data-lucide="clipboard-list" style="width:18px;height:18px"></i></span> Frequencia</button>
+      <button class="nav-item" data-page="admin" onclick="window.location.href='admin.html'"><span class="nav-icon"><i data-lucide="settings" style="width:18px;height:18px"></i></span> Administrativo</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-avatar" id="sidebar-avatar">U</div>
+      <span class="sidebar-user-name" id="sidebar-username">Usuario</span>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="home-section">
+      <p class="home-welcome">BEM-VINDO AO PORTAL CAMM</p>
+      <h1 class="home-title">Nossa Historia</h1>
+      <p class="home-text">
+        O Portal CAMM nasceu da necessidade de conectar recursos a quem mais precisa. Com mais de 40 anos de atuacao, temos o compromisso de gerir projetos sociais com transparencia, eficiencia e, acima de tudo, amor ao proximo.
+      </p>
+
+      <div class="home-banner">
+        <img src="home-banner.png" alt="Criancas do CAMM">
+      </div>
+
+      <div class="home-cards">
+        <!-- Nossa Missao -->
+        <div class="home-card">
+          <div class="home-card-icon">
+            <i data-lucide="target" style="width:22px;height:22px;color:#FFA726"></i>
+          </div>
+          <h3>Nossa Missao</h3>
+          <p>Promover o bem-estar social e o desenvolvimento integral de criancas e adolescentes em situacao de vulnerabilidade, garantindo seus direitos e oferecendo ferramentas para um futuro digno.</p>
+          <div class="home-card-line"></div>
+        </div>
+
+        <!-- Nossos Valores -->
+        <div class="home-card">
+          <div class="home-card-icon">
+            <i data-lucide="heart" style="width:22px;height:22px;color:#FFA726"></i>
+          </div>
+          <h3>Nossos Valores</h3>
+          <ul>
+            <li>Transparencia e Etica</li>
+            <li>Empatia e Acolhimento</li>
+            <li>Educacao Transformadora</li>
+            <li>Responsabilidade Social</li>
+          </ul>
+          <div class="home-card-line"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="app.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

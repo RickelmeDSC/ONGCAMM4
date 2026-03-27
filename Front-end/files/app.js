@@ -463,7 +463,7 @@ async function handleLogin(e) {
     Auth.setRefreshToken(data.refresh_token);
     Auth.setUser(data.usuario);
     Toast.success('Login realizado!');
-    setTimeout(() => window.location.href = 'cadastros.html', 800);
+    setTimeout(() => window.location.href = 'home.html', 800);
   } catch (err) {
     Toast.error('Email ou senha incorretos.');
     console.error(err);
@@ -1065,6 +1065,11 @@ document.addEventListener('DOMContentLoaded', () => {
   switch (page) {
     case 'login':
       document.getElementById('form-login')?.addEventListener('submit', handleLogin);
+      break;
+
+    case 'home':
+      if (!Auth.requireAuth()) break;
+      setActiveNav('home');
       break;
 
     case 'cadastros':
