@@ -7,8 +7,11 @@ import { UpdateCriancaDto } from './dto/update-crianca.dto';
 export class CriancasService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findAll() {
-    return this.prisma.crianca.findMany({ include: { responsavel: true } });
+  findAll(includeInactive = false) {
+    return this.prisma.crianca.findMany({
+      where: includeInactive ? {} : { ativo: true },
+      include: { responsavel: true },
+    });
   }
 
   async findOne(id: number) {
@@ -61,10 +64,10 @@ export class CriancasService {
 
   async remove(id: number) {
     await this.findOne(id);
-    // Remove registros vinculados antes de excluir a criança
-    await this.prisma.frequencia.deleteMany({ where: { id_matricula: id } });
-    await this.prisma.declaracao.deleteMany({ where: { id_matricula: id } });
-    await this.prisma.crianca.delete({ where: { id_matricula: id } });
-    return { message: `Criança ${id} removida com sucesso` };
+    await this.prisma.crianca.update({
+      where: { id_matricula: id },
+      data: { ativo: false },
+    });
+    return { message: `Criança ${id} desativada com sucesso` };
   }
 }

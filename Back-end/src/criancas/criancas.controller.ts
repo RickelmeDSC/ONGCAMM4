@@ -14,7 +14,9 @@ export class CriancasController {
   @Get()
   @Roles(1)
   @ApiOperation({ summary: 'Listar todas as crianças' })
-  findAll() { return this.service.findAll(); }
+  findAll(@Query('includeInactive') includeInactive?: string) {
+    return this.service.findAll(includeInactive === 'true');
+  }
 
   @Get('busca')
   @Roles(1)

@@ -3,16 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CAMM — Permissões de Usuário</title>
+  <title>CAMM — Permissoes de Usuario</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    .permissions-table th { text-align: center; vertical-align: bottom; }
-    .permissions-table th:first-child { text-align: left; }
-    @media (max-width: 768px) {
-      .permissions-table { display: block; overflow-x: auto; }
-    }
-  </style>
 </head>
 <body data-page="admin-permissoes">
 
@@ -26,51 +19,43 @@
     <nav class="sidebar-nav">
       <button class="nav-item" data-page="home"       onclick="window.location.href='cadastros.html'">      <span class="nav-icon"><i data-lucide="home" style="width:18px;height:18px"></i></span> Home</button>
       <button class="nav-item" data-page="cadastros"  onclick="window.location.href='cadastros.html'"> <span class="nav-icon"><i data-lucide="user-round" style="width:18px;height:18px"></i></span> Cadastros</button>
-      <button class="nav-item" data-page="frequencia" onclick="window.location.href='frequencia.html'"><span class="nav-icon"><i data-lucide="clipboard-list" style="width:18px;height:18px"></i></span> Frequência</button>
+      <button class="nav-item" data-page="frequencia" onclick="window.location.href='frequencia.html'"><span class="nav-icon"><i data-lucide="clipboard-list" style="width:18px;height:18px"></i></span> Frequencia</button>
       <button class="nav-item active" data-page="admin" onclick="window.location.href='admin.html'">   <span class="nav-icon"><i data-lucide="settings" style="width:18px;height:18px"></i></span> Administrativo</button>
     </nav>
     <div class="sidebar-footer">
       <div class="sidebar-avatar" id="sidebar-avatar">U</div>
-      <span class="sidebar-user-name" id="sidebar-username">Usuário</span>
+      <span class="sidebar-user-name" id="sidebar-username">Usuario</span>
     </div>
   </aside>
 
   <main class="main-content">
     <div class="page-header">
-      <h1 class="page-title">Permissões de usuário</h1>
+      <h1 class="page-title">Controle de Acessos</h1>
     </div>
 
-    <!-- Busca -->
-    <div class="search-bar" style="margin-bottom:20px">
-      <div class="search-input-wrap" style="max-width:380px">
-        <span class="search-icon"><i data-lucide="search" style="width:16px;height:16px"></i></span>
-        <input id="search-perm" type="text" class="form-input" placeholder="Buscar por nome do usuário">
-      </div>
-      <button class="btn btn-primary btn-sm">Filtrar</button>
-    </div>
+    <div class="card" style="margin-top:28px;max-width:700px">
+      <p style="font-size:13px;color:var(--paragrafo);margin-bottom:20px">
+        Altere o nivel de acesso de cada usuario. As permissoes sao definidas automaticamente pelo nivel.
+      </p>
 
-    <div class="table-wrapper">
-      <div style="overflow-x:auto">
-        <table class="data-table permissions-table">
-          <thead>
-            <tr>
-              <th style="min-width:180px">USUÁRIO</th>
-              <th style="min-width:80px">CRIAR<br>USUÁRIOS</th>
-              <th style="min-width:80px">EDITAR<br>USUÁRIOS</th>
-              <th style="min-width:80px">EXCLUIR<br>USUÁRIOS</th>
-              <th style="min-width:90px">GERAR<br>DECLARAÇÕES</th>
-              <th style="min-width:90px">CADASTRAR<br>CRIANÇA</th>
-              <th style="min-width:90px">VISUALIZAR<br>FREQUÊNCIA</th>
-              <th style="min-width:90px">REGISTRAR<br>FREQUÊNCIA</th>
-            </tr>
-          </thead>
-          <tbody id="perm-tbody">
-            <!-- preenchido via app.js -->
-          </tbody>
-        </table>
-      </div>
-      <div style="display:flex;justify-content:flex-end;padding:16px">
-        <button class="btn btn-primary" id="btn-salvar-perm">Salvar</button>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th style="min-width:180px">Nivel de Acesso</th>
+          </tr>
+        </thead>
+        <tbody id="perm-tbody">
+          <!-- preenchido via app.js -->
+        </tbody>
+      </table>
+
+      <div style="margin-top:20px;padding:16px;background:var(--input-bg);border-radius:var(--radius);font-size:12px;color:var(--paragrafo);line-height:1.8">
+        <strong style="color:var(--titulo)">Permissoes por nivel:</strong><br>
+        <strong>Voluntario (1)</strong> — Visualizar criancas e frequencia<br>
+        <strong>Gestor (2)</strong> — Cadastrar criancas, registrar frequencia, gerar relatorios<br>
+        <strong>Diretor (3)</strong> — Acesso total: gerenciar usuarios, excluir, auditoria, declaracoes
       </div>
     </div>
   </main>

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsIn, IsInt, IsOptional, IsDateString } from 'class-validator';
+import { IsIn, IsInt, IsOptional, IsDateString, IsString } from 'class-validator';
 
 export class CreateFrequenciaDto {
   @ApiProperty({ example: 1 })
@@ -14,4 +14,14 @@ export class CreateFrequenciaDto {
   @IsOptional()
   @IsDateString()
   data_registro?: string;
+
+  @ApiPropertyOptional({ example: 'Manhã', enum: ['Manhã', 'Tarde', 'Integral'] })
+  @IsOptional()
+  @IsString()
+  turno?: string;
+
+  @ApiPropertyOptional({ example: 'Consulta médica' })
+  @IsOptional()
+  @IsString()
+  observacao?: string;
 }

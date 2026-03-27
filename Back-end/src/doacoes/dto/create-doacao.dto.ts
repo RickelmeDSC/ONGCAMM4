@@ -10,10 +10,11 @@ export class CreateDoacaoDto {
   @IsString()
   tipo: string;
 
-  @ApiProperty({ example: 150.00 })
+  @ApiPropertyOptional({ example: 150.00 })
+  @IsOptional()
   @IsNumber()
   @Min(0)
-  valor: number;
+  valor?: number;
 
   @ApiPropertyOptional({ example: '2026-03-25' })
   @IsOptional()

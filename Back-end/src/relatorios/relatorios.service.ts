@@ -7,7 +7,6 @@ import {
   gerarRelatorioAuditoria,
   gerarRelatorioCriancas,
 } from './relatorio.generator';
-import { createReadStream } from 'fs';
 
 @Injectable()
 export class RelatoriosService {
@@ -17,51 +16,37 @@ export class RelatoriosService {
     return this.prisma.relatorioAuditoria.findMany({ orderBy: { data_geracao: 'desc' } });
   }
 
-  async gerarCriancas() {
+  async gerarCriancasBuffer(): Promise<Buffer> {
     const dados = await this.prisma.crianca.findMany({
       include: { responsavel: true },
       orderBy: { nome: 'asc' },
     });
-    const path = await gerarRelatorioCriancas(dados);
-    return this.salvar('criancas', path);
+    return Buffer.from(await gerarRelatorioCriancas(dados));
   }
 
-  async gerarFrequencia() {
-    const dados = await this.prisma.frequencia.findMany({ include: { crianca: true } });
-    const path = await gerarRelatorioFrequencia(dados);
-    return this.salvar('frequencia', path);
+  async gerarFrequenciaBuffer(): Promise<Buffer> {
+    const dados = await this.prisma.frequencia.findMany({
+      include: { crianca: true },
+      orderBy: { data_registro: 'desc' },
+    });
+    return Buffer.from(await gerarRelatorioFrequencia(dados));
   }
 
-  async gerarDoacoes() {
-    const dados = await this.prisma.doacao.findMany();
-    const path = await gerarRelatorioDoacoes(dados);
-    return this.salvar('doacoes', path);
+  async gerarDoacoesBuffer(): Promise<Buffer> {
+    const dados = await this.prisma.doacao.findMany({ orderBy: { data_doacao: 'desc' } });
+    return Buffer.from(await gerarRelatorioDoacoes(dados));
   }
 
-  async gerarAtividades() {
+  async gerarAtividadesBuffer(): Promise<Buffer> {
     const dados = await this.prisma.atividade.findMany({ include: { responsavel: true } });
-    const path = await gerarRelatorioAtividades(dados);
-    return this.salvar('atividades', path);
+    return Buffer.from(await gerarRelatorioAtividades(dados));
   }
 
-  async gerarAuditoria() {
+  async gerarAuditoriaBuffer(): Promise<Buffer> {
     const dados = await this.prisma.logSistema.findMany({
       include: { usuario: { select: { id_usuario: true, nome: true, email: true, nivel_acesso: true } } },
       orderBy: { data_hora: 'desc' },
     });
-    const path = await gerarRelatorioAuditoria(dados);
-    return this.salvar('auditoria', path);
-  }
-
-  async download(id: number) {
-    const relatorio = await this.prisma.relatorioAuditoria.findUnique({ where: { id_relatorio: id } });
-    if (!relatorio) throw new Error(`Relatório ${id} não encontrado`);
-    return { path: relatorio.path_arquivo, stream: createReadStream(relatorio.path_arquivo) };
-  }
-
-  private salvar(tipo: string, path: string) {
-    return this.prisma.relatorioAuditoria.create({
-      data: { tipo_periodo: tipo, path_arquivo: path },
-    });
+    return Buffer.from(await gerarRelatorioAuditoria(dados));
   }
 }

@@ -19,8 +19,11 @@ const SELECT_FIELDS = {
 export class UsuariosService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
-    return this.prisma.usuario.findMany({ select: SELECT_FIELDS });
+  async findAll(includeInactive = false) {
+    return this.prisma.usuario.findMany({
+      where: includeInactive ? {} : { ativo: true },
+      select: { ...SELECT_FIELDS, ativo: true },
+    });
   }
 
   async findOne(id: number) {
@@ -86,7 +89,10 @@ export class UsuariosService {
 
   async remove(id: number) {
     await this.findOne(id);
-    await this.prisma.usuario.delete({ where: { id_usuario: id } });
-    return { message: `Usuário ${id} removido com sucesso` };
+    await this.prisma.usuario.update({
+      where: { id_usuario: id },
+      data: { ativo: false },
+    });
+    return { message: `Usuário ${id} desativado com sucesso` };
   }
 }

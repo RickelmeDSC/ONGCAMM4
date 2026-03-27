@@ -32,7 +32,12 @@
     <div class="page-header">
       <h1 class="page-title">Frequência das crianças</h1>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <input id="freq-date" type="date" class="form-input" style="width:180px">
+        <input id="freq-date" type="date" class="form-input" style="width:170px">
+        <select id="freq-turno" class="form-select" style="width:140px">
+          <option value="Manhã">Manhã</option>
+          <option value="Tarde">Tarde</option>
+          <option value="Integral">Integral</option>
+        </select>
         <button class="btn btn-outline" onclick="gerarRelatorioFrequencia()" id="btn-relatorio-freq"><i data-lucide="file-text" style="width:14px;height:14px"></i> Gerar PDF</button>
         <button class="btn btn-primary" id="btn-salvar-chamada"><i data-lucide="save" style="width:14px;height:14px"></i> Salvar Chamada</button>
       </div>

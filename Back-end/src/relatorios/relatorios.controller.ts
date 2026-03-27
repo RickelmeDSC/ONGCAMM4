@@ -18,37 +18,50 @@ export class RelatoriosController {
   @Post('criancas')
   @Roles(2)
   @ApiOperation({ summary: 'Gerar relatório de crianças cadastradas em PDF' })
-  gerarCriancas() { return this.service.gerarCriancas(); }
+  async gerarCriancas(@Res() res: Response) {
+    const buffer = await this.service.gerarCriancasBuffer();
+    this.sendPdf(res, buffer, 'relatorio-criancas');
+  }
 
   @Post('frequencia')
   @Roles(2)
   @ApiOperation({ summary: 'Gerar relatório de frequência em PDF' })
-  gerarFrequencia() { return this.service.gerarFrequencia(); }
+  async gerarFrequencia(@Res() res: Response) {
+    const buffer = await this.service.gerarFrequenciaBuffer();
+    this.sendPdf(res, buffer, 'relatorio-frequencia');
+  }
 
   @Post('doacoes')
   @Roles(2)
   @ApiOperation({ summary: 'Gerar relatório de doações em PDF' })
-  gerarDoacoes() { return this.service.gerarDoacoes(); }
+  async gerarDoacoes(@Res() res: Response) {
+    const buffer = await this.service.gerarDoacoesBuffer();
+    this.sendPdf(res, buffer, 'relatorio-doacoes');
+  }
 
   @Post('atividades')
   @Roles(2)
   @ApiOperation({ summary: 'Gerar relatório de atividades em PDF' })
-  gerarAtividades() { return this.service.gerarAtividades(); }
+  async gerarAtividades(@Res() res: Response) {
+    const buffer = await this.service.gerarAtividadesBuffer();
+    this.sendPdf(res, buffer, 'relatorio-atividades');
+  }
 
   @Post('auditoria')
   @Roles(3)
   @ApiOperation({ summary: 'Gerar relatório de auditoria em PDF' })
-  gerarAuditoria() { return this.service.gerarAuditoria(); }
+  async gerarAuditoria(@Res() res: Response) {
+    const buffer = await this.service.gerarAuditoriaBuffer();
+    this.sendPdf(res, buffer, 'relatorio-auditoria');
+  }
 
-  @Get(':id/download')
-  @Roles(2)
-  @ApiOperation({ summary: 'Download de um relatório gerado' })
-  async download(@Param('id', ParseIntPipe) id: number, @Res() res: Response) {
-    const { stream, path } = await this.service.download(id);
+  private sendPdf(res: Response, buffer: Buffer, name: string) {
+    const date = new Date().toISOString().slice(0, 10);
     res.set({
       'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${path.split('/').pop()}"`,
+      'Content-Disposition': `attachment; filename="${name}-${date}.pdf"`,
+      'Content-Length': buffer.length.toString(),
     });
-    stream.pipe(res);
+    res.end(buffer);
   }
 }

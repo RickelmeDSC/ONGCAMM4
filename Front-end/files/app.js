@@ -104,13 +104,12 @@ async function _fetchWithRefresh(url, options) {
     }
   }
 
-  // Se ainda 401 após refresh, redireciona para login
-  if (res.status === 401) {
+  // Se ainda 401 após refresh, limpa sessao mas NÃO redireciona automaticamente
+  // O redirecionamento fica a cargo de requireAuth() no carregamento da pagina
+  if (res.status === 401 && !Auth.getRefreshToken()) {
     localStorage.removeItem('camm_token');
     localStorage.removeItem('camm_refresh');
     localStorage.removeItem('camm_user');
-    window.location.href = 'index.html';
-    throw new Error('Sessão expirada. Faça login novamente.');
   }
 
   return res;
@@ -243,6 +242,13 @@ function fillSidebarUser() {
     btn.addEventListener('click', Auth.logout);
     footer.appendChild(btn);
   }
+
+  // Esconder menu Administrativo para voluntários (nivel 1)
+  if (user.nivel_acesso < 2) {
+    document.querySelectorAll('.nav-item').forEach(el => {
+      if (el.dataset.page === 'admin') el.style.display = 'none';
+    });
+  }
 }
 
 // ── Renderizar ícones Lucide ──────────────────────
@@ -366,11 +372,12 @@ function initFreqButtons() {
         group.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const row = btn.closest('tr');
-        const matricula = row?.dataset.matricula;
         const status = btn.classList.contains('presente') ? 'presente' : 'ausente';
-        if (matricula) {
-          // Salva localmente para envio posterior
+        if (row) {
           row.dataset.status = status;
+          // Mostra campo de justificativa apenas se ausente
+          const obsInput = row.querySelector('.obs-falta');
+          if (obsInput) obsInput.style.display = status === 'ausente' ? 'block' : 'none';
         }
       });
     });
@@ -388,13 +395,18 @@ async function salvarChamada() {
   if (btn) { btn.textContent = 'Salvando...'; btn.disabled = true; }
 
   try {
+    const turno = document.getElementById('freq-turno')?.value || 'Integral';
     const promises = Array.from(rows).map(row => {
       const statusRaw = row.dataset.status || 'ausente';
-      const status = statusRaw.charAt(0).toUpperCase() + statusRaw.slice(1); // 'presente' → 'Presente'
+      const status = statusRaw.charAt(0).toUpperCase() + statusRaw.slice(1);
+      const obsInput = row.querySelector('.obs-falta');
+      const observacao = (status === 'Ausente' && obsInput) ? obsInput.value.trim() || undefined : undefined;
       return api.post('/frequencia', {
         id_matricula: Number(row.dataset.matricula),
         status,
         data_registro: toISO(date),
+        turno,
+        observacao,
       });
     });
     await Promise.all(promises);
@@ -548,10 +560,17 @@ async function handleCadastrarVoluntario(e) {
   }
 }
 
-// ── SALVAR PERMISSÕES ─────────────────────────────
-// Permissões são gerenciadas pelo campo nivel_acesso no backend
-async function salvarPermissoes() {
-  Toast.show('Permissões são definidas pelo nível de acesso de cada usuário.');
+// ── PERMISSÕES — alterar nivel_acesso ─────────────
+async function handleNivelChange(selectEl) {
+  const userId = selectEl.dataset.userid;
+  const novoNivel = parseInt(selectEl.value);
+  try {
+    await api.patch(`/usuarios/${userId}`, { nivel_acesso: novoNivel });
+    Toast.success('Nível de acesso atualizado!');
+  } catch (err) {
+    Toast.error('Erro ao atualizar nível.');
+    console.error(err);
+  }
 }
 
 // ── SALVAR ATIVIDADE ──────────────────────────────
@@ -612,47 +631,22 @@ async function handleSalvarDoacao(e) {
 }
 
 // ── GERAR RELATÓRIO PDF DE FREQUÊNCIA ──────────────
-async function gerarRelatorioFrequencia() {
-  const btn = document.getElementById('btn-relatorio-freq');
+// ── GERAR E BAIXAR PDF ────────────────────────────
+async function _baixarPdf(endpoint, filename, btnId) {
+  const btn = btnId ? document.getElementById(btnId) : null;
   if (btn) { btn.disabled = true; btn.textContent = 'Gerando...'; }
   try {
-    const relatorio = await api.post('/relatorios/frequencia');
     const token = Auth.getToken();
-    const res = await fetch(`${API_BASE_URL}/relatorios/${relatorio.id_relatorio}/download`, {
+    const res = await fetch(`${API_BASE_URL}/relatorios/${endpoint}`, {
+      method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` },
     });
+    if (!res.ok) throw new Error(`Erro ${res.status}`);
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `relatorio-frequencia-${new Date().toISOString().slice(0,10)}.pdf`;
-    a.click();
-    URL.revokeObjectURL(url);
-    Toast.success('Relatório de frequência gerado!');
-  } catch (err) {
-    Toast.error('Erro ao gerar relatório.');
-    console.error(err);
-  } finally {
-    if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="file-text" style="width:14px;height:14px"></i> Gerar PDF'; lucide.createIcons(); }
-  }
-}
-
-// ── GERAR RELATÓRIO PDF DE CRIANÇAS ───────────────
-async function gerarRelatorioCriancas() {
-  const btn = document.getElementById('btn-relatorio');
-  if (btn) { btn.disabled = true; btn.textContent = 'Gerando...'; }
-  try {
-    const relatorio = await api.post('/relatorios/criancas');
-    // Baixar o PDF gerado
-    const token = Auth.getToken();
-    const res = await fetch(`${API_BASE_URL}/relatorios/${relatorio.id_relatorio}/download`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    });
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `relatorio-criancas-${new Date().toISOString().slice(0,10)}.pdf`;
+    a.download = `${filename}-${new Date().toISOString().slice(0,10)}.pdf`;
     a.click();
     URL.revokeObjectURL(url);
     Toast.success('Relatório gerado com sucesso!');
@@ -663,6 +657,9 @@ async function gerarRelatorioCriancas() {
     if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="file-text" style="width:14px;height:14px"></i> Gerar PDF'; lucide.createIcons(); }
   }
 }
+
+async function gerarRelatorioFrequencia() { return _baixarPdf('frequencia', 'relatorio-frequencia', 'btn-relatorio-freq'); }
+async function gerarRelatorioCriancas() { return _baixarPdf('criancas', 'relatorio-criancas', 'btn-relatorio'); }
 
 // ── EXCLUIR CRIANÇA ───────────────────────────────
 function confirmarExclusao(id, nome, tipo = 'criança') {
@@ -829,6 +826,7 @@ async function renderFreqTable() {
             <button class="freq-btn presente">Presente</button>
             <button class="freq-btn ausente">Ausente</button>
           </div>
+          <input class="obs-falta form-input" type="text" placeholder="Justificativa da falta" style="display:none;margin-top:6px;font-size:12px;padding:6px 10px">
         </td>
         <td data-label="Visualizar">
           <button class="btn btn-outline btn-sm" onclick="window.location.href='historico-presenca.html?id=${c.id_matricula}'">Ver histórico</button>
@@ -889,37 +887,22 @@ async function renderUsuariosTable() {
 async function renderPermissoesTable() {
   const tbody = document.getElementById('perm-tbody');
   if (!tbody) return;
-  const perms = ['criar_usuarios','editar_usuarios','excluir_usuarios','gerar_declaracoes','cadastrar_crianca','visualizar_frequencia','registrar_frequencia'];
-  const labels = ['Criar Usuários','Editar Usuários','Excluir Usuários','Gerar Declarações','Cadastrar Criança','Visualizar Frequência','Registrar Frequência'];
-  // Nível 3 (Diretor) = tudo, Nível 2 (Gestor) = cadastrar+frequência, Nível 1 (Voluntário) = visualizar freq
-  const permsByLevel = {
-    3: [true, true, true, true, true, true, true],
-    2: [false, false, false, true, true, true, true],
-    1: [false, false, false, false, false, true, false],
-  };
   try {
     const usuarios = await api.get('/usuarios');
-    tbody.innerHTML = usuarios.map(u => {
-      const checks = permsByLevel[u.nivel_acesso] || permsByLevel[1];
-      return `
-      <tr data-userid="${u.id_usuario}">
-        <td data-label="Usuário">
-          <div class="user-cell">
-            <div class="user-name">${u.nome}</div>
-            <div class="user-email">${u.email}</div>
-          </div>
+    tbody.innerHTML = usuarios.map(u => `
+      <tr>
+        <td data-label="Usuário"><strong>${u.nome}</strong></td>
+        <td data-label="Email" style="color:var(--paragrafo)">${u.email}</td>
+        <td data-label="Nível">
+          <select class="form-select" data-userid="${u.id_usuario}" onchange="handleNivelChange(this)" style="max-width:200px">
+            <option value="1" ${u.nivel_acesso === 1 ? 'selected' : ''}>Voluntário (1)</option>
+            <option value="2" ${u.nivel_acesso === 2 ? 'selected' : ''}>Gestor (2)</option>
+            <option value="3" ${u.nivel_acesso === 3 ? 'selected' : ''}>Diretor (3)</option>
+          </select>
         </td>
-        ${perms.map((p, pi) => `
-          <td data-label="${labels[pi]}">
-            <label class="toggle">
-              <input type="checkbox" data-perm="${p}" ${checks[pi] ? 'checked' : ''}>
-              <span class="toggle-slider"></span>
-            </label>
-          </td>`).join('')}
-      </tr>`;
-    }).join('');
+      </tr>`).join('');
   } catch (err) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--paragrafo)">Erro ao carregar usuários.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--paragrafo)">Erro ao carregar usuários.</td></tr>';
     console.error(err);
   }
 }
@@ -1119,8 +1102,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!Auth.requireAuth()) break;
       setActiveNav('admin');
       renderPermissoesTable();
-      initSearch('search-perm', 'perm-tbody', [0]);
-      document.getElementById('btn-salvar-perm')?.addEventListener('click', salvarPermissoes);
       break;
 
     case 'admin-atividades':
@@ -1141,9 +1122,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     case 'cadastrar-crianca':
       if (!Auth.requireAuth()) break;
-      setActiveNav('admin');
+      setActiveNav('cadastros');
       initPhotoUpload();
       document.getElementById('form-crianca')?.addEventListener('submit', handleCadastrarCrianca);
+      // Se tem ?id=X, preenche o formulario com dados do BD (edicao)
+      const editId = new URLSearchParams(window.location.search).get('id');
+      if (editId) {
+        (async () => {
+          try {
+            const c = await api.get(`/criancas/${editId}`);
+            document.getElementById('c-nome').value = c.nome || '';
+            document.getElementById('c-nascimento').value = c.data_nascimento ? c.data_nascimento.slice(0, 10) : '';
+            document.getElementById('c-entrada').value = c.data_entrada ? c.data_entrada.slice(0, 10) : '';
+            document.getElementById('c-cpf').value = c.cpf || '';
+            const generoSelect = document.getElementById('c-genero');
+            if (generoSelect && c.genero) generoSelect.value = c.genero;
+            // Preencher dados do responsavel
+            if (c.responsavel) {
+              document.getElementById('r-nome').value = c.responsavel.nome || '';
+              document.getElementById('r-cpf').value = c.responsavel.cpf || '';
+              document.getElementById('r-tel').value = c.responsavel.contato || '';
+              document.getElementById('r-end').value = c.responsavel.endereco || '';
+            }
+          } catch (err) {
+            console.error('Erro ao carregar dados da criança:', err);
+          }
+        })();
+      }
       break;
 
     case 'cadastrar-voluntario':

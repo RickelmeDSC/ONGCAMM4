@@ -1,5 +1,4 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
-import { writeFileSync, mkdirSync } from 'fs';
 
 function header(page: any, font: any, titulo: string) {
   page.drawText('ONG CAMM4', { x: 50, y: 800, size: 18, font, color: rgb(0, 0, 0.6) });
@@ -8,7 +7,7 @@ function header(page: any, font: any, titulo: string) {
   page.drawLine({ start: { x: 50, y: 748 }, end: { x: 545, y: 748 }, thickness: 1, color: rgb(0, 0, 0) });
 }
 
-export async function gerarRelatorioFrequencia(dados: any[]): Promise<string> {
+export async function gerarRelatorioFrequencia(dados: any[]): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([595, 842]);
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -30,10 +29,10 @@ export async function gerarRelatorioFrequencia(dados: any[]): Promise<string> {
     y -= 18;
   }
 
-  return salvarPdf(pdfDoc, 'frequencia');
+  return pdfDoc.save();
 }
 
-export async function gerarRelatorioDoacoes(dados: any[]): Promise<string> {
+export async function gerarRelatorioDoacoes(dados: any[]): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([595, 842]);
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -61,10 +60,10 @@ export async function gerarRelatorioDoacoes(dados: any[]): Promise<string> {
 
   page.drawText(`Total: R$ ${total.toFixed(2)}`, { x: 350, y: y - 10, size: 12, font: bold });
 
-  return salvarPdf(pdfDoc, 'doacoes');
+  return pdfDoc.save();
 }
 
-export async function gerarRelatorioAtividades(dados: any[]): Promise<string> {
+export async function gerarRelatorioAtividades(dados: any[]): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([595, 842]);
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -86,10 +85,10 @@ export async function gerarRelatorioAtividades(dados: any[]): Promise<string> {
     y -= 18;
   }
 
-  return salvarPdf(pdfDoc, 'atividades');
+  return pdfDoc.save();
 }
 
-export async function gerarRelatorioAuditoria(dados: any[]): Promise<string> {
+export async function gerarRelatorioAuditoria(dados: any[]): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([595, 842]);
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -111,10 +110,10 @@ export async function gerarRelatorioAuditoria(dados: any[]): Promise<string> {
     y -= 16;
   }
 
-  return salvarPdf(pdfDoc, 'auditoria');
+  return pdfDoc.save();
 }
 
-export async function gerarRelatorioCriancas(dados: any[]): Promise<string> {
+export async function gerarRelatorioCriancas(dados: any[]): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
   let page = pdfDoc.addPage([595, 842]);
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -162,15 +161,6 @@ export async function gerarRelatorioCriancas(dados: any[]): Promise<string> {
   page.drawLine({ start: { x: 50, y: y + 5 }, end: { x: 545, y: y + 5 }, thickness: 0.5, color: rgb(0.6, 0.6, 0.6) });
   page.drawText(`Total de crianças cadastradas: ${dados.length}`, { x: 50, y: y - 10, size: 11, font: bold });
 
-  return salvarPdf(pdfDoc, 'criancas');
+  return pdfDoc.save();
 }
 
-async function salvarPdf(pdfDoc: PDFDocument, tipo: string): Promise<string> {
-  const dir = './uploads/relatorios';
-  mkdirSync(dir, { recursive: true });
-  const filename = `${tipo}-${Date.now()}.pdf`;
-  const path = `${dir}/${filename}`;
-  const bytes = await pdfDoc.save();
-  writeFileSync(path, bytes);
-  return path;
-}

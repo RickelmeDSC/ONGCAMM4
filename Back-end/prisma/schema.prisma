@@ -19,11 +19,12 @@ datasource db {
 // nivel_acesso: 1 = Voluntário | 2 = Gestor | 3 = Diretor
 // =============================================================
 model Usuario {
-  id_usuario   Int    @id @default(autoincrement())
+  id_usuario   Int     @id @default(autoincrement())
   nome         String
-  email        String @unique
+  email        String  @unique
   senha_hash   String
-  nivel_acesso Int    @default(1)
+  nivel_acesso Int     @default(1)
+  ativo        Boolean @default(true)
 
   logs           LogSistema[]
   eventos        Evento[]
@@ -64,6 +65,7 @@ model Crianca {
   certidao_nasc   String?
   cartao_vacina   String?
   data_entrada    DateTime @default(now())
+  ativo           Boolean  @default(true)
   id_responsavel  Int
 
   responsavel Responsavel  @relation(fields: [id_responsavel], references: [id_responsavel])
@@ -84,6 +86,8 @@ model Frequencia {
   id_matricula  Int
   data_registro DateTime @default(now())
   status        String
+  turno         String?  // "Manhã" | "Tarde" | "Integral"
+  observacao    String?  // Justificativa da falta
 
   crianca Crianca @relation(fields: [id_matricula], references: [id_matricula])
 
@@ -128,7 +132,7 @@ model Doacao {
   id_doacao   Int      @id @default(autoincrement())
   doador      String
   tipo        String
-  valor       Decimal  @db.Decimal(10, 2)
+  valor       Decimal? @db.Decimal(10, 2)
   data_doacao DateTime @default(now())
 
   @@index([data_doacao])
