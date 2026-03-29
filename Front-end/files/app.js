@@ -43,45 +43,17 @@ const Auth = {
   },
   isLoggedIn: () => !!localStorage.getItem('camm_token'),
   requireAuth: () => {
+    // Só redireciona se não tem NENHUM token salvo
     if (!Auth.isLoggedIn() && !Auth.getRefreshToken()) {
       window.location.href = 'index.html';
       return false;
     }
-    // Validar token em background — se expirou, tenta refresh
-    Auth.validateSession();
     return true;
-  },
-  async validateSession() {
-    // Só valida se tem token — evita request desnecessário
-    if (!Auth.getToken()) return;
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
-      const res = await fetch(`${API_BASE_URL}/auth/me`, {
-        headers: { 'Authorization': `Bearer ${Auth.getToken()}` },
-        signal: controller.signal,
-      });
-      clearTimeout(timeout);
-      if (res.status === 401) {
-        // Token expirou — tenta refresh silenciosamente
-        const refreshed = await Auth.tryRefresh();
-        if (!refreshed) {
-          localStorage.removeItem('camm_token');
-          localStorage.removeItem('camm_refresh');
-          localStorage.removeItem('camm_user');
-          window.location.href = 'index.html';
-        }
-      }
-    } catch (_) {
-      // Timeout ou erro de rede (Render dormindo) — não redireciona
-      // O _fetchWithRefresh vai tratar quando o usuário interagir
-    }
   },
 
   // Tenta renovar o access_token usando o refresh_token
   _refreshing: null,
   async tryRefresh() {
-    // Evita múltiplas renovações simultâneas
     if (Auth._refreshing) return Auth._refreshing;
 
     const rt = Auth.getRefreshToken();
@@ -94,14 +66,18 @@ const Auth = {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refresh_token: rt }),
         });
-        if (!res.ok) return false;
+        if (!res.ok) {
+          // Servidor respondeu mas token invalido/expirado — sessao acabou
+          return 'expired';
+        }
         const data = await res.json();
         Auth.setToken(data.access_token);
         Auth.setRefreshToken(data.refresh_token);
         if (data.usuario) Auth.setUser(data.usuario);
         return true;
       } catch (_) {
-        return false;
+        // Erro de rede (Render dormindo) — NÃO é sessao expirada
+        return 'network_error';
       } finally {
         Auth._refreshing = null;
       }
@@ -117,14 +93,16 @@ async function _fetchWithRefresh(url, options) {
   try {
     res = await fetch(url, options);
   } catch (e) {
-    // Erro de rede (Render dormindo) — NÃO redireciona, só propaga o erro
+    // Erro de rede (Render dormindo) — propaga sem redirecionar
     throw e;
   }
 
   // Se 401, tenta renovar o token e refazer a requisição
   if (res.status === 401) {
-    const refreshed = await Auth.tryRefresh();
-    if (refreshed) {
+    const refreshResult = await Auth.tryRefresh();
+
+    if (refreshResult === true) {
+      // Refresh funcionou — refaz a requisição com novo token
       const newToken = Auth.getToken();
       if (options.headers) {
         if (options.headers instanceof Headers) {
@@ -136,19 +114,16 @@ async function _fetchWithRefresh(url, options) {
       try {
         res = await fetch(url, options);
       } catch (e) { throw e; }
-    }
-  }
-
-  // Se ainda 401 após refresh, sessão realmente expirou
-  if (res.status === 401) {
-    // Só redireciona se realmente não tem mais refresh token
-    if (!Auth.getRefreshToken()) {
+    } else if (refreshResult === 'expired') {
+      // Token de refresh expirado — sessão acabou de verdade
       localStorage.removeItem('camm_token');
       localStorage.removeItem('camm_refresh');
       localStorage.removeItem('camm_user');
       window.location.href = 'index.html';
+      throw new Error('Sessão expirada');
     }
-    throw new Error('Sessão expirada');
+    // Se 'network_error' — não redireciona, só propaga o erro
+    // O usuário pode tentar novamente quando o servidor acordar
   }
 
   return res;
