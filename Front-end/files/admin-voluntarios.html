@@ -43,6 +43,9 @@
         <input id="search-usuarios" type="text" class="form-input" placeholder="Buscar por nome do voluntário">
       </div>
       <button class="btn btn-primary btn-sm">Filtrar</button>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--paragrafo);margin-left:auto;cursor:pointer">
+        <input type="checkbox" id="toggle-inativos-usuarios" onchange="renderUsuariosTable(this.checked)"> Ver excluidos
+      </label>
     </div>
 
     <div class="table-wrapper">

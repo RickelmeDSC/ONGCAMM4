@@ -113,13 +113,18 @@ const Auth = {
 
 // ── Fetch com renovação automática de token ──────
 async function _fetchWithRefresh(url, options) {
-  let res = await fetch(url, options);
+  let res;
+  try {
+    res = await fetch(url, options);
+  } catch (e) {
+    // Erro de rede (Render dormindo) — NÃO redireciona, só propaga o erro
+    throw e;
+  }
 
   // Se 401, tenta renovar o token e refazer a requisição
   if (res.status === 401) {
     const refreshed = await Auth.tryRefresh();
     if (refreshed) {
-      // Atualiza o header com o novo token
       const newToken = Auth.getToken();
       if (options.headers) {
         if (options.headers instanceof Headers) {
@@ -128,16 +133,21 @@ async function _fetchWithRefresh(url, options) {
           options.headers['Authorization'] = `Bearer ${newToken}`;
         }
       }
-      res = await fetch(url, options);
+      try {
+        res = await fetch(url, options);
+      } catch (e) { throw e; }
     }
   }
 
   // Se ainda 401 após refresh, sessão realmente expirou
   if (res.status === 401) {
-    localStorage.removeItem('camm_token');
-    localStorage.removeItem('camm_refresh');
-    localStorage.removeItem('camm_user');
-    window.location.href = 'index.html';
+    // Só redireciona se realmente não tem mais refresh token
+    if (!Auth.getRefreshToken()) {
+      localStorage.removeItem('camm_token');
+      localStorage.removeItem('camm_refresh');
+      localStorage.removeItem('camm_user');
+      window.location.href = 'index.html';
+    }
     throw new Error('Sessão expirada');
   }
 
@@ -805,24 +815,27 @@ const CalendarioPresenca = {
 // ── Dados MOCK removidos — tudo vem da API agora ─
 
 // ── Renderização de tabelas com dados da API ─────
-async function renderCadastrTable() {
+async function renderCadastrTable(includeInactive = false) {
   const tbody = document.getElementById('cadastros-tbody');
   if (!tbody) return;
   try {
-    const criancas = await api.get('/criancas');
+    const endpoint = includeInactive ? '/criancas?includeInactive=true' : '/criancas';
+    const criancas = await api.get(endpoint);
     tbody.innerHTML = criancas.map(c => {
       const nascimento = toBR(c.data_nascimento);
+      const isInativo = c.ativo === false;
       return `
-        <tr>
+        <tr style="${isInativo ? 'opacity:0.5' : ''}">
           <td data-label="Foto"><div class="table-avatar">${c.nome.charAt(0)}</div></td>
           <td data-label="Matrícula">${c.id_matricula}</td>
           <td data-label="Nome">${c.nome}</td>
           <td data-label="Nascimento">${nascimento}</td>
-          <td data-label="Status"><span class="badge badge-ativo">Ativo</span></td>
+          <td data-label="Status"><span class="badge ${isInativo ? 'badge-inativo' : 'badge-ativo'}">${isInativo ? 'Inativo' : 'Ativo'}</span></td>
           <td data-label="Ações">
             <div class="action-btns">
+              ${isInativo ? '<span style="color:var(--paragrafo);font-size:12px">Excluido</span>' : `
               <button class="action-btn" title="Editar" onclick="window.location.href='cadastrar-crianca.html?id=${c.id_matricula}'"><i data-lucide="pencil" style="width:14px;height:14px"></i></button>
-              <button class="action-btn delete" title="Excluir" onclick="confirmarExclusao(${c.id_matricula},'${c.nome}','criança')"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>
+              <button class="action-btn delete" title="Excluir" onclick="confirmarExclusao(${c.id_matricula},'${c.nome}','criança')"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>`}
             </div>
           </td>
         </tr>`;
@@ -869,7 +882,7 @@ async function renderFreqTable() {
   }
 }
 
-async function renderUsuariosTable() {
+async function renderUsuariosTable(includeInactive = false) {
   const tbody = document.getElementById('usuarios-tbody');
   if (!tbody) return;
   const nivelLabel = { 1: 'Voluntário', 2: 'Gestor', 3: 'Diretor' };
@@ -877,7 +890,8 @@ async function renderUsuariosTable() {
   const myNivel = currentUser?.nivel_acesso ?? 1;
   const myId = currentUser?.id ?? currentUser?.id_usuario;
   try {
-    const usuarios = await api.get('/usuarios');
+    const endpoint = includeInactive ? '/usuarios?includeInactive=true' : '/usuarios';
+    const usuarios = await api.get(endpoint);
     tbody.innerHTML = usuarios.map(u => {
       const isMe = u.id_usuario === myId;
       let actions = '';
@@ -894,14 +908,15 @@ async function renderUsuariosTable() {
         }
       }
 
+      const isInativo = u.ativo === false;
       return `
-      <tr>
+      <tr style="${isInativo ? 'opacity:0.5' : ''}">
         <td data-label="Nome">${u.nome}${isMe ? ' <span style="font-size:11px;color:var(--paragrafo)">(você)</span>' : ''}</td>
         <td data-label="Função">${nivelLabel[u.nivel_acesso] ?? 'Voluntário'}</td>
         <td data-label="Email"><a href="mailto:${u.email}" style="color:var(--paragrafo)">${u.email}</a></td>
-        <td data-label="Status"><span class="badge badge-ativo">Ativo</span></td>
+        <td data-label="Status"><span class="badge ${isInativo ? 'badge-inativo' : 'badge-ativo'}">${isInativo ? 'Inativo' : 'Ativo'}</span></td>
         <td data-label="Ações">
-          <div class="action-btns">${actions || '<span style="color:var(--paragrafo);font-size:12px">—</span>'}</div>
+          <div class="action-btns">${isInativo ? '<span style="color:var(--paragrafo);font-size:12px">Excluido</span>' : (actions || '<span style="color:var(--paragrafo);font-size:12px">—</span>')}</div>
         </td>
       </tr>`;
     }).join('');

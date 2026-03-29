@@ -98,6 +98,9 @@
         <input id="search-criancas" type="text" class="form-input" placeholder="Buscar por nome da criança">
       </div>
       <button class="btn btn-primary btn-sm">Filtrar</button>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--paragrafo);margin-left:auto;cursor:pointer">
+        <input type="checkbox" id="toggle-inativos-criancas" onchange="renderCadastrTable(this.checked)"> Ver excluidos
+      </label>
     </div>
 
     <!-- Tabela -->
