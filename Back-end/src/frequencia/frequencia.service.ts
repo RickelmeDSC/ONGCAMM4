@@ -34,6 +34,8 @@ export class FrequenciaService {
         id_matricula: dto.id_matricula,
         status: dto.status,
         ...(dto.data_registro && { data_registro: new Date(dto.data_registro) }),
+        ...(dto.turno && { turno: dto.turno }),
+        ...(dto.observacao && { observacao: dto.observacao }),
       },
       include: { crianca: true },
     });

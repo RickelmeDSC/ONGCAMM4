@@ -855,7 +855,7 @@ async function renderFreqTable() {
             <button class="freq-btn presente">Presente</button>
             <button class="freq-btn ausente">Ausente</button>
           </div>
-          <input class="obs-falta form-input" type="text" placeholder="Justificativa da falta" style="display:none;margin-top:6px;font-size:12px;padding:6px 10px">
+          <input class="obs-falta form-input" type="text" placeholder="Motivo da falta (ex: consulta medica)" style="display:none;margin-top:8px;font-size:13px;padding:8px 12px;border:2px solid #FFA726;border-radius:8px;width:100%;max-width:300px">
         </td>
         <td data-label="Visualizar">
           <button class="btn btn-outline btn-sm" onclick="window.location.href='historico-presenca.html?id=${c.id_matricula}'">Ver histórico</button>
@@ -1035,6 +1035,8 @@ async function carregarHistoricoPresenca() {
     const mapped = registros.map(r => ({
       data:   r.data_registro ? r.data_registro.split('T')[0] : '',
       status: r.status.toLowerCase(),
+      turno:  r.turno || '',
+      observacao: r.observacao || '',
     }));
     CalendarioPresenca.setData(mapped);
 
@@ -1065,7 +1067,7 @@ async function carregarHistoricoPresenca() {
           <div class="log-row">
             <div class="log-date">${dia} ${mesAbrev}<br>${ano}</div>
             <div><span class="badge" style="background:${isPres ? 'var(--ativo-badge)' : '#FEE2E2'};color:${isPres ? '#1a6b0a' : 'var(--ausente)'}">${isPres ? 'Presente' : 'Ausente'}</span></div>
-            <div class="log-obs">—</div>
+            <div class="log-obs${!isPres && r.observacao ? ' alert' : ''}">${r.observacao || '—'}${r.turno ? ` <span style="font-size:11px;color:#94a3b8">(${r.turno})</span>` : ''}</div>
           </div>`;
       }).join('');
       // Manter h3 e substituir log-rows
