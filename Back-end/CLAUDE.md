@@ -166,8 +166,12 @@ O sistema usa **dois tokens**:
 - **Limpeza automática**: tokens expirados são removidos do banco a cada login
 - **Proteção contra replay**: refresh_token só pode ser usado uma vez
 - **Cascade delete**: ao deletar um usuário, todos os refresh_tokens são removidos
-- **Validação de sessão**: ao carregar qualquer página, `validateSession()` faz `GET /auth/me` em background (timeout 10s); se 401, tenta refresh; se refresh falhar, redireciona para login; se timeout (Render dormindo), ignora e espera interação do usuário
-- **_fetchWithRefresh**: toda requisição que retorna 401 tenta refresh automático; se o refresh também falhar, limpa localStorage e redireciona para login imediatamente
+- **Rate limiting**: `@nestjs/throttler` — 5 tentativas/min no login, 10/min no refresh, 30/min global
+- **CORS seguro**: em produção bloqueia se `FRONTEND_URL` não definida; em dev libera tudo
+- **Bcrypt**: salt rounds = 12 (padrão segurança 2026)
+- **Login falho logado**: `Logger.warn` com email para auditoria de brute-force
+- **CAPTCHA**: Cloudflare Turnstile validado no backend via `TURNSTILE_SECRET`
+- **_fetchWithRefresh**: toda requisição que retorna 401 tenta refresh automático; só redireciona para login se o servidor CONFIRMOU que o token expirou (não por erro de rede)
 
 ### 4.6 Endpoints de Auth
 
@@ -316,6 +320,7 @@ model Doacao {
   tipo        String
   valor       Decimal? @db.Decimal(10, 2)
   data_doacao DateTime @default(now())
+  ativo       Boolean  @default(true)
   @@map("doacao")
 }
 
@@ -559,7 +564,18 @@ O `LoggingInterceptor` registra automaticamente toda operação de escrita (POST
 - `ip`: endereço IP do cliente
 - `data_hora`: timestamp automático
 
-### 10.3 Observações do Build
+### 10.3 Segurança do Backend
+
+- **Rate Limiting** (`@nestjs/throttler`): global 30 req/min, login 5/min, refresh 10/min
+- **CORS**: `origin: false` em produção se `FRONTEND_URL` ausente (bloqueia tudo)
+- **Soft Delete**: Usuario, Crianca e Doacao usam campo `ativo` — nunca são deletados permanentemente
+- **Race Conditions**: `create()` usa try-catch no Prisma P2002/P2003 em vez de check-then-create
+- **Validação de CPF**: MinLength(11) MaxLength(14) nos DTOs
+- **Foreign Keys**: catch P2003 retorna NotFoundException com mensagem clara
+- **Login falho**: Logger.warn registra email para detecção de brute-force
+- **Bcrypt**: salt rounds = 12
+
+### 10.4 Observações do Build
 
 - O `tsconfig.build.json` exclui `prisma.config.ts` para evitar que o TypeScript gere `dist/src/main.js` ao invés de `dist/main.js`
 - O Dockerfile do backend usa multi-stage build (builder → production)
@@ -609,4 +625,4 @@ Configuradas no painel do Render (Environment → Environment Variables):
 
 ---
 
-*Documento atualizado em 2026-03-29. Toda alteração estrutural deve ser refletida aqui antes de ser implementada.*
+*Documento atualizado em 2026-03-30. Toda alteração estrutural deve ser refletida aqui antes de ser implementada.*
