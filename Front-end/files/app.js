@@ -638,13 +638,14 @@ async function handleSalvarDoacao(e) {
   const tipo = document.getElementById('d-tipo')?.value;
   if (!Validate.required(tipo, 'Tipo')) return;
 
-  const valorRaw = document.getElementById('d-quantidade')?.value || document.getElementById('d-valor')?.value;
-  const valor = parseFloat(String(valorRaw).replace(',', '.')) || 0;
+  const valorRaw = (document.getElementById('d-quantidade')?.value || document.getElementById('d-valor')?.value || '').trim();
+  const valorParsed = parseFloat(String(valorRaw).replace(',', '.'));
+  const valor = isNaN(valorParsed) ? undefined : valorParsed;
 
   const body = {
     doador,
     tipo,
-    valor,
+    ...(valor !== undefined && { valor }),
     data_doacao: toISO(document.getElementById('d-data')?.value) || undefined,
   };
 
