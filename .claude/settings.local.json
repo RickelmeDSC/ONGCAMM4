@@ -8,7 +8,16 @@
       "Bash(node -e \"const fs=require\\(''fs''\\); const c=fs.readFileSync\\(''C:/Users/rickm/ONGCAMM4/Back-end/CLAUDE.md'',''utf8''\\); console.log\\(''size:'', c.length, ''chars''\\); console.log\\(''last 100:'', c.slice\\(-100\\)\\);\")",
       "Bash(npx prisma:*)",
       "Bash(del \"c:\\\\Users\\\\rickm\\\\ONGCAMM4\\\\Back-end\\\\prisma.config.ts\")",
-      "Bash(find c:/Users/rickm/ONGCAMM4/Back-end/src -name *.ts)"
+      "Bash(find c:/Users/rickm/ONGCAMM4/Back-end/src -name *.ts)",
+      "Bash(docker run:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(for f:*)",
+      "Bash(do sed:*)",
+      "Bash(echo \"Updated $f\")",
+      "Bash(done)",
+      "Bash(git pull:*)"
     ]
   }
 }

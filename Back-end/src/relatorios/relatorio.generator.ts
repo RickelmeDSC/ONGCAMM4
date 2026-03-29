@@ -23,9 +23,9 @@ export async function gerarRelatorioFrequencia(dados: any[]): Promise<Uint8Array
 
   for (const f of dados) {
     if (y < 50) break;
-    page.drawText(f.crianca?.nome ?? '-', { x: 50, y, size: 10, font });
-    page.drawText(new Date(f.data_registro).toLocaleDateString('pt-BR'), { x: 250, y, size: 10, font });
-    page.drawText(f.status, { x: 400, y, size: 10, font });
+    page.drawText(String(f.crianca?.nome ?? '-'), { x: 50, y, size: 10, font });
+    page.drawText(f.data_registro ? new Date(f.data_registro).toLocaleDateString('pt-BR') : '-', { x: 250, y, size: 10, font });
+    page.drawText(String(f.status ?? '-'), { x: 400, y, size: 10, font });
     y -= 18;
   }
 

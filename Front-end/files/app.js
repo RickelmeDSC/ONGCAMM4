@@ -666,7 +666,7 @@ async function _baixarPdf(endpoint, filename, btnId) {
   if (btn) { btn.disabled = true; btn.textContent = 'Gerando...'; }
   try {
     const token = Auth.getToken();
-    const res = await fetch(`${API_BASE_URL}/relatorios/${endpoint}`, {
+    const res = await _fetchWithRefresh(`${API_BASE_URL}/relatorios/${endpoint}`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` },
     });
