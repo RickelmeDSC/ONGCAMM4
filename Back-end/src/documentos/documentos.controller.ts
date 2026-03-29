@@ -12,7 +12,7 @@ export class DocumentosController {
   constructor(private readonly service: DocumentosService) {}
 
   @Post('upload/foto/:id')
-  @Roles(2)
+  @Roles(1)
   @UseInterceptors(FileInterceptor('file', multerConfig('fotos')))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } })
@@ -22,7 +22,7 @@ export class DocumentosController {
   }
 
   @Post('upload/certidao/:id')
-  @Roles(2)
+  @Roles(1)
   @UseInterceptors(FileInterceptor('file', multerConfig('certidoes')))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } })
@@ -32,7 +32,7 @@ export class DocumentosController {
   }
 
   @Post('upload/vacina/:id')
-  @Roles(2)
+  @Roles(1)
   @UseInterceptors(FileInterceptor('file', multerConfig('cartoes-vacina')))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } })

@@ -881,16 +881,14 @@ async function renderUsuariosTable() {
       const isMe = u.id_usuario === myId;
       let actions = '';
 
-      if (myNivel === 3) {
-        // Diretor: editar todos, redefinir senha, excluir (menos a si mesmo)
+      if (myNivel >= 2) {
+        // Gestor+Diretor: editar e excluir usuarios (menos a si mesmo)
         actions += `<button class="action-btn" title="Editar" onclick="abrirEditarUsuario(${u.id_usuario},'${u.nome}','${u.email}',${u.nivel_acesso})"><i data-lucide="pencil" style="width:14px;height:14px"></i></button>`;
-        actions += `<button class="action-btn" title="Redefinir senha" onclick="abrirResetSenha(${u.id_usuario},'${u.nome}')"><i data-lucide="key-round" style="width:14px;height:14px"></i></button>`;
-        if (!isMe) {
-          actions += `<button class="action-btn delete" title="Excluir" onclick="confirmarExclusao(${u.id_usuario},'${u.nome}','usuario')"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>`;
+        if (myNivel === 3) {
+          // Somente Diretor: redefinir senha
+          actions += `<button class="action-btn" title="Redefinir senha" onclick="abrirResetSenha(${u.id_usuario},'${u.nome}')"><i data-lucide="key-round" style="width:14px;height:14px"></i></button>`;
         }
-      } else if (myNivel === 2) {
-        // Gestor: pode excluir voluntarios (nivel 1) com confirmacao
-        if (u.nivel_acesso === 1) {
+        if (!isMe) {
           actions += `<button class="action-btn delete" title="Excluir" onclick="confirmarExclusao(${u.id_usuario},'${u.nome}','usuario')"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>`;
         }
       }

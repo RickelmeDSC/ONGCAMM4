@@ -39,14 +39,14 @@ export class UsuariosController {
   }
 
   @Post()
-  @Roles(3)
+  @Roles(2)
   @ApiOperation({ summary: 'Criar novo usuário' })
   create(@Body() dto: CreateUsuarioDto) {
     return this.usuariosService.create(dto);
   }
 
   @Patch(':id')
-  @Roles(3)
+  @Roles(2)
   @ApiOperation({ summary: 'Atualizar usuário' })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUsuarioDto) {
     return this.usuariosService.update(id, dto);
@@ -63,7 +63,7 @@ export class UsuariosController {
   }
 
   @Delete(':id')
-  @Roles(3)
+  @Roles(2)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Remover usuário' })
   remove(@Param('id', ParseIntPipe) id: number) {
