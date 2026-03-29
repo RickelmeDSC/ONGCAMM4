@@ -221,16 +221,16 @@ providers: [
 
 | Operação | Voluntário (1) | Gestor (2) | Diretor (3) |
 |---|---|---|---|
-| Visualizar crianças | Sim | Sim | Sim |
-| Cadastrar crianças | Não | Sim | Sim |
-| Excluir crianças | Não | Não | Sim |
-| Registrar frequência | Sim | Sim | Sim |
-| Gerar declaração | Não | Não | Sim |
-| Gerenciar usuários | Não | Não | Sim |
-| Redefinir senha | Não | Não | Sim |
-| Excluir voluntários | Não | Apenas nível 1 | Todos (menos si mesmo) |
-| Visualizar logs | Não | Não | Sim |
+| Cadastrar/editar/excluir crianças | Sim | Sim | Sim |
+| Registrar/visualizar frequência | Sim | Sim | Sim |
+| Upload de documentos | Sim | Sim | Sim |
+| Criar/editar/excluir usuários | Não | Sim | Sim |
 | Gerar relatórios (PDF) | Não | Sim | Sim |
+| Redefinir senha | Não | Não | Sim |
+| Gerar declaração | Não | Não | Sim |
+| Auditoria / Logs | Não | Não | Sim |
+| Menu Administrativo visível | Não | Sim | Sim |
+| Ver excluídos (soft delete) | Não | Sim | Sim |
 
 ---
 
@@ -384,31 +384,31 @@ Prefixo global: `/api/v1`. Todos (exceto login e refresh) exigem `Authorization:
 
 | Método | Rota | Acesso Mínimo | Descrição |
 |---|---|---|---|
-| GET | /usuarios | Gestor (2) | Lista todos |
+| GET | /usuarios | Gestor (2) | Lista todos (?includeInactive=true para ver excluídos) |
 | GET | /usuarios/:id | Gestor (2) | Por ID |
-| POST | /usuarios | Diretor (3) | Criar |
-| PATCH | /usuarios/:id | Diretor (3) | Atualizar |
+| POST | /usuarios | Gestor (2) | Criar |
+| PATCH | /usuarios/:id | Gestor (2) | Atualizar |
 | PATCH | /usuarios/:id/reset-senha | Diretor (3) | Redefinir senha |
-| DELETE | /usuarios/:id | Diretor (3) | Remover |
+| DELETE | /usuarios/:id | Gestor (2) | Desativar (soft delete) |
 
 ### 7.3 Crianças
 
 | Método | Rota | Acesso Mínimo | Descrição |
 |---|---|---|---|
-| GET | /criancas | Voluntário (1) | Lista todas |
+| GET | /criancas | Voluntário (1) | Lista todas (?includeInactive=true para ver excluídas) |
 | GET | /criancas/:id | Voluntário (1) | Por ID |
-| POST | /criancas | Gestor (2) | Cadastrar |
-| PATCH | /criancas/:id | Gestor (2) | Atualizar |
-| DELETE | /criancas/:id | Diretor (3) | Remover |
+| POST | /criancas | Voluntário (1) | Cadastrar |
+| PATCH | /criancas/:id | Voluntário (1) | Atualizar |
+| DELETE | /criancas/:id | Voluntário (1) | Desativar (soft delete) |
 
 ### 7.4 Responsáveis
 
 | Método | Rota | Acesso Mínimo | Descrição |
 |---|---|---|---|
 | GET | /responsaveis | Voluntário (1) | Lista todos |
-| POST | /responsaveis | Gestor (2) | Cadastrar |
-| PATCH | /responsaveis/:id | Gestor (2) | Atualizar |
-| DELETE | /responsaveis/:id | Diretor (3) | Remover |
+| POST | /responsaveis | Voluntário (1) | Cadastrar |
+| PATCH | /responsaveis/:id | Voluntário (1) | Atualizar |
+| DELETE | /responsaveis/:id | Voluntário (1) | Remover |
 
 ### 7.5 Frequência
 
@@ -609,4 +609,4 @@ Configuradas no painel do Render (Environment → Environment Variables):
 
 ---
 
-*Documento atualizado em 2026-03-27. Toda alteração estrutural deve ser refletida aqui antes de ser implementada.*
+*Documento atualizado em 2026-03-29. Toda alteração estrutural deve ser refletida aqui antes de ser implementada.*
