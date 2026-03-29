@@ -34,15 +34,19 @@ export class CriancasService {
   }
 
   async create(dto: CreateCriancaDto) {
-    const exists = await this.prisma.crianca.findUnique({ where: { cpf: dto.cpf } });
-    if (exists) throw new ConflictException('CPF já cadastrado');
-    return this.prisma.crianca.create({
-      data: {
-        ...dto,
-        data_nascimento: new Date(dto.data_nascimento),
-      },
-      include: { responsavel: true },
-    });
+    try {
+      return await this.prisma.crianca.create({
+        data: {
+          ...dto,
+          data_nascimento: new Date(dto.data_nascimento),
+        },
+        include: { responsavel: true },
+      });
+    } catch (error: any) {
+      if (error.code === 'P2002') throw new ConflictException('CPF já cadastrado');
+      if (error.code === 'P2003') throw new NotFoundException('Responsável não encontrado');
+      throw error;
+    }
   }
 
   async update(id: number, dto: UpdateCriancaDto) {

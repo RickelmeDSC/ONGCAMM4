@@ -1,6 +1,7 @@
 import {
   Injectable,
   UnauthorizedException,
+  Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
@@ -10,6 +11,7 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger('Auth');
   // Refresh token dura 8 horas (1 expediente)
   private readonly REFRESH_EXPIRATION_HOURS = 8;
 
@@ -34,10 +36,16 @@ export class AuthService {
       where: { email: dto.email },
     });
 
-    if (!usuario) throw new UnauthorizedException('Credenciais inválidas');
+    if (!usuario) {
+      this.logger.warn(`Login falho — email nao encontrado: ${dto.email}`);
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
 
     const senhaValida = await bcrypt.compare(dto.senha, usuario.senha_hash);
-    if (!senhaValida) throw new UnauthorizedException('Credenciais inválidas');
+    if (!senhaValida) {
+      this.logger.warn(`Login falho — senha incorreta para: ${dto.email}`);
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
 
     const tokens = await this.generateTokens(usuario);
 

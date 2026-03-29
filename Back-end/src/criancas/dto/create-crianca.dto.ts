@@ -1,9 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsInt, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class CreateCriancaDto {
   @ApiProperty({ example: 'Lucas Oliveira' })
   @IsString()
+  @MinLength(2)
+  @MaxLength(150)
   nome: string;
 
   @ApiProperty({ example: '2015-06-15' })
@@ -12,6 +14,8 @@ export class CreateCriancaDto {
 
   @ApiProperty({ example: '111.222.333-44' })
   @IsString()
+  @MinLength(11)
+  @MaxLength(14)
   cpf: string;
 
   @ApiPropertyOptional({ example: 'Masculino', enum: ['Masculino', 'Feminino'] })

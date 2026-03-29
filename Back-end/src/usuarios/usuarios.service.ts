@@ -36,22 +36,21 @@ export class UsuariosService {
   }
 
   async create(dto: CreateUsuarioDto) {
-    const exists = await this.prisma.usuario.findUnique({
-      where: { email: dto.email },
-    });
-    if (exists) throw new ConflictException('E-mail já cadastrado');
-
-    const senha_hash = await bcrypt.hash(dto.senha, 10);
-
-    return this.prisma.usuario.create({
-      data: {
-        nome: dto.nome,
-        email: dto.email,
-        senha_hash,
-        nivel_acesso: dto.nivel_acesso,
-      },
-      select: SELECT_FIELDS,
-    });
+    const senha_hash = await bcrypt.hash(dto.senha, 12);
+    try {
+      return await this.prisma.usuario.create({
+        data: {
+          nome: dto.nome,
+          email: dto.email,
+          senha_hash,
+          nivel_acesso: dto.nivel_acesso,
+        },
+        select: { ...SELECT_FIELDS, ativo: true },
+      });
+    } catch (error: any) {
+      if (error.code === 'P2002') throw new ConflictException('E-mail já cadastrado');
+      throw error;
+    }
   }
 
   async update(id: number, dto: UpdateUsuarioDto) {

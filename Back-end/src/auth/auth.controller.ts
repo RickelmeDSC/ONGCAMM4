@@ -1,5 +1,6 @@
 import { Controller, Post, Get, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -13,6 +14,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
+  @Throttle({ default: { ttl: 60000, limit: 5 } }) // 5 tentativas por minuto
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Autenticar usuário e obter access_token + refresh_token' })
   login(@Body() dto: LoginDto) {
@@ -21,6 +23,7 @@ export class AuthController {
 
   @Public()
   @Post('refresh')
+  @Throttle({ default: { ttl: 60000, limit: 10 } }) // 10 por minuto
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Renovar access_token usando refresh_token' })
   refresh(@Body() dto: RefreshTokenDto) {

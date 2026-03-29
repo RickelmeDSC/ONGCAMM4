@@ -134,6 +134,7 @@ model Doacao {
   tipo        String
   valor       Decimal? @db.Decimal(10, 2)
   data_doacao DateTime @default(now())
+  ativo       Boolean  @default(true)
 
   @@index([data_doacao])
   @@map("doacao")

@@ -19,11 +19,13 @@ async function bootstrap() {
     }),
   );
 
-  // CORS — em produção usa FRONTEND_URL, em dev libera tudo
+  // CORS — em produção exige FRONTEND_URL, em dev libera tudo
+  const isProduction = process.env.NODE_ENV === 'production';
   app.enableCors({
-    origin: process.env.FRONTEND_URL || '*',
+    origin: isProduction ? (process.env.FRONTEND_URL || false) : '*',
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   });
 
   // Swagger / OpenAPI — disponível em /api/docs
