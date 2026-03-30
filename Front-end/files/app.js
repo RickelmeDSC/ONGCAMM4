@@ -832,8 +832,10 @@ async function renderCadastrTable(includeInactive = false) {
     const ativosEl = document.getElementById('stat-ativos');
     const mesEl = document.getElementById('stat-mes');
     if (totalEl) totalEl.textContent = criancas.length;
-    if (ativosEl) ativosEl.textContent = criancas.length;
+    if (ativosEl) ativosEl.textContent = criancas.filter(c => c.ativo !== false).length;
     if (mesEl) mesEl.textContent = criancas.length;
+    const countEl = document.getElementById('cadastros-count');
+    if (countEl) countEl.textContent = `${criancas.length} criança(s) encontrada(s)`;
   } catch (err) {
     tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--paragrafo)">Erro ao carregar dados.</td></tr>';
     console.error(err);
@@ -907,6 +909,8 @@ async function renderUsuariosTable(includeInactive = false) {
       </tr>`;
     }).join('');
     lucide.createIcons();
+    const countEl = document.getElementById('usuarios-count');
+    if (countEl) countEl.textContent = `${usuarios.length} usuário(s)`;
   } catch (err) {
     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--paragrafo)">Erro ao carregar dados.</td></tr>';
     console.error(err);
