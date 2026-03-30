@@ -268,6 +268,13 @@ function fillSidebarUser() {
 // ── Renderizar ícones Lucide ──────────────────────
 function refreshIcons() { if (window.lucide) lucide.createIcons(); }
 
+// ── Escapar HTML para prevenir XSS ───────────────
+function esc(text) {
+  if (!text) return '';
+  const map = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'};
+  return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
 // ── Conversão de datas ────────────────────────────
 // DD/MM/AAAA ou YYYY-MM-DD → YYYY-MM-DD (formato ISO para a API)
 function toISO(dateStr) {
@@ -803,14 +810,14 @@ async function renderCadastrTable(includeInactive = false) {
         <tr style="${isInativo ? 'opacity:0.5' : ''}">
           <td data-label="Foto"><div class="table-avatar">${c.nome.charAt(0)}</div></td>
           <td data-label="Matrícula">${c.id_matricula}</td>
-          <td data-label="Nome">${c.nome}</td>
+          <td data-label="Nome">${esc(c.nome)}</td>
           <td data-label="Nascimento">${nascimento}</td>
           <td data-label="Status"><span class="badge ${isInativo ? 'badge-inativo' : 'badge-ativo'}">${isInativo ? 'Inativo' : 'Ativo'}</span></td>
           <td data-label="Ações">
             <div class="action-btns">
               ${isInativo ? '<span style="color:var(--paragrafo);font-size:12px">Excluido</span>' : `
               <button class="action-btn" title="Editar" onclick="window.location.href='cadastrar-crianca.html?id=${c.id_matricula}'"><i data-lucide="pencil" style="width:14px;height:14px"></i></button>
-              <button class="action-btn delete" title="Excluir" onclick="confirmarExclusao(${c.id_matricula},'${c.nome}','criança')"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>`}
+              <button class="action-btn delete" title="Excluir" onclick="confirmarExclusao(${c.id_matricula},'${esc(c.nome)}','criança')"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>`}
             </div>
           </td>
         </tr>`;
@@ -837,7 +844,7 @@ async function renderFreqTable() {
     tbody.innerHTML = criancas.map(c => `
       <tr data-matricula="${c.id_matricula}" data-status="">
         <td data-label="Matrícula">${c.id_matricula}</td>
-        <td data-label="Nome">${c.nome}</td>
+        <td data-label="Nome">${esc(c.nome)}</td>
         <td data-label="Última Presença">—</td>
         <td data-label="Status">
           <div class="freq-btn-group">
@@ -873,22 +880,22 @@ async function renderUsuariosTable(includeInactive = false) {
 
       if (myNivel >= 2) {
         // Gestor+Diretor: editar e excluir usuarios (menos a si mesmo)
-        actions += `<button class="action-btn" title="Editar" onclick="abrirEditarUsuario(${u.id_usuario},'${u.nome}','${u.email}',${u.nivel_acesso})"><i data-lucide="pencil" style="width:14px;height:14px"></i></button>`;
+        actions += `<button class="action-btn" title="Editar" onclick="abrirEditarUsuario(${u.id_usuario},'${esc(u.nome)}','${esc(u.email)}',${u.nivel_acesso})"><i data-lucide="pencil" style="width:14px;height:14px"></i></button>`;
         if (myNivel === 3) {
           // Somente Diretor: redefinir senha
-          actions += `<button class="action-btn" title="Redefinir senha" onclick="abrirResetSenha(${u.id_usuario},'${u.nome}')"><i data-lucide="key-round" style="width:14px;height:14px"></i></button>`;
+          actions += `<button class="action-btn" title="Redefinir senha" onclick="abrirResetSenha(${u.id_usuario},'${esc(u.nome)}')"><i data-lucide="key-round" style="width:14px;height:14px"></i></button>`;
         }
         if (!isMe) {
-          actions += `<button class="action-btn delete" title="Excluir" onclick="confirmarExclusao(${u.id_usuario},'${u.nome}','usuario')"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>`;
+          actions += `<button class="action-btn delete" title="Excluir" onclick="confirmarExclusao(${u.id_usuario},'${esc(u.nome)}','usuario')"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>`;
         }
       }
 
       const isInativo = u.ativo === false;
       return `
       <tr style="${isInativo ? 'opacity:0.5' : ''}">
-        <td data-label="Nome">${u.nome}${isMe ? ' <span style="font-size:11px;color:var(--paragrafo)">(você)</span>' : ''}</td>
+        <td data-label="Nome">${esc(u.nome)}${isMe ? ' <span style="font-size:11px;color:var(--paragrafo)">(você)</span>' : ''}</td>
         <td data-label="Função">${nivelLabel[u.nivel_acesso] ?? 'Voluntário'}</td>
-        <td data-label="Email"><a href="mailto:${u.email}" style="color:var(--paragrafo)">${u.email}</a></td>
+        <td data-label="Email"><a href="mailto:${esc(u.email)}" style="color:var(--paragrafo)">${esc(u.email)}</a></td>
         <td data-label="Status"><span class="badge ${isInativo ? 'badge-inativo' : 'badge-ativo'}">${isInativo ? 'Inativo' : 'Ativo'}</span></td>
         <td data-label="Ações">
           <div class="action-btns">${isInativo ? '<span style="color:var(--paragrafo);font-size:12px">Excluido</span>' : (actions || '<span style="color:var(--paragrafo);font-size:12px">—</span>')}</div>
@@ -909,8 +916,8 @@ async function renderPermissoesTable() {
     const usuarios = await api.get('/usuarios');
     tbody.innerHTML = usuarios.map(u => `
       <tr>
-        <td data-label="Usuário"><strong>${u.nome}</strong></td>
-        <td data-label="Email" style="color:var(--paragrafo)">${u.email}</td>
+        <td data-label="Usuário"><strong>${esc(u.nome)}</strong></td>
+        <td data-label="Email" style="color:var(--paragrafo)">${esc(u.email)}</td>
         <td data-label="Nível">
           <select class="form-select" data-userid="${u.id_usuario}" onchange="handleNivelChange(this)" style="max-width:200px">
             <option value="1" ${u.nivel_acesso === 1 ? 'selected' : ''}>Voluntário (1)</option>
@@ -935,9 +942,9 @@ async function renderAtividadesRecentes() {
       return `
         <tr>
           <td data-label="Atividade">
-            <div style="font-weight:700;color:var(--titulo)">${a.titulo}</div>
+            <div style="font-weight:700;color:var(--titulo)">${esc(a.titulo)}</div>
           </td>
-          <td data-label="Responsável">${a.responsavel?.nome ?? '—'}</td>
+          <td data-label="Responsável">${esc(a.responsavel?.nome ?? '—')}</td>
           <td data-label="Data">${data}</td>
           <td data-label="Participantes" style="color:var(--paragrafo)">—</td>
           <td data-label="Status">
@@ -966,10 +973,10 @@ async function renderDoacoes() {
           <td data-label="Doador">
             <div class="donor-cell">
               <div class="donor-avatar">${initials}</div>
-              ${d.doador}
+              ${esc(d.doador)}
             </div>
           </td>
-          <td data-label="Tipo"><span class="donation-type-badge tipo-${d.tipo.toLowerCase()}">${d.tipo.charAt(0).toUpperCase()+d.tipo.slice(1)}</span></td>
+          <td data-label="Tipo"><span class="donation-type-badge tipo-${esc(d.tipo).toLowerCase()}">${esc(d.tipo).charAt(0).toUpperCase()+esc(d.tipo).slice(1)}</span></td>
           <td data-label="Valor/Qtd">${valor}</td>
           <td data-label="Ações">
             <div class="action-btns">
@@ -993,7 +1000,7 @@ async function carregarSelectResponsaveis() {
     const usuarios = await api.get('/usuarios');
     select.innerHTML = '<option value="">Selecione um voluntário/colaborador</option>';
     usuarios.forEach(u => {
-      select.innerHTML += `<option value="${u.id_usuario}">${u.nome}</option>`;
+      select.innerHTML += `<option value="${u.id_usuario}">${esc(u.nome)}</option>`;
     });
   } catch (err) { console.error(err); }
 }
