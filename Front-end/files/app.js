@@ -503,6 +503,9 @@ async function handleCadastrarCrianca(e) {
   const data_nascimento = document.getElementById('c-nascimento')?.value;
   const foto            = document.getElementById('c-foto')?.files[0];
 
+  if (!Validate.required(data_nascimento, 'Data de nascimento')) return;
+  if (!Validate.required(cpf, 'CPF da criança')) return;
+
   const resp_nome = document.getElementById('r-nome')?.value.trim();
   const resp_cpf  = document.getElementById('r-cpf')?.value;
   const resp_tel  = document.getElementById('r-tel')?.value;
@@ -510,6 +513,7 @@ async function handleCadastrarCrianca(e) {
 
   if (!Validate.required(resp_nome, 'Nome do responsável')) return;
   if (!Validate.required(resp_cpf,  'CPF do responsável'))  return;
+  if (!Validate.required(resp_tel,  'Telefone do responsável')) return;
 
   try {
     // 1. Cadastrar responsável
