@@ -251,10 +251,11 @@ function fillSidebarUser() {
     const btn = document.createElement('button');
     btn.id = 'btn-logout';
     btn.className = 'btn btn-sm';
-    btn.innerHTML = '<i data-lucide="log-out" style="width:14px;height:14px"></i> Sair';
-    btn.style.cssText = 'margin-top:8px;width:100%;font-size:12px;padding:8px;background:rgba(255,255,255,0.5);color:#3D2800;border:1px solid rgba(0,0,0,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;gap:6px';
+    btn.innerHTML = '<i data-lucide="log-out" style="width:14px;height:14px;flex-shrink:0"></i> <span>Sair</span>';
+    btn.style.cssText = 'margin-top:8px;width:100%;font-size:13px;font-weight:600;padding:10px;background:rgba(255,255,255,0.5);color:#3D2800;border:1px solid rgba(0,0,0,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center';
     btn.addEventListener('click', Auth.logout);
     footer.appendChild(btn);
+    refreshIcons();
   }
 
   // Esconder menu Administrativo para voluntários (nivel 1)
