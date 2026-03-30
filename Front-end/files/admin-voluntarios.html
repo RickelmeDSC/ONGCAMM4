@@ -254,10 +254,10 @@
           nivel_acesso: parseInt(document.getElementById('edit-cargo').value),
         });
         document.getElementById('modal-editar').classList.remove('open');
-        showToast('Usuário atualizado com sucesso', 'success');
+        Toast.success('Usuário atualizado com sucesso');
         renderUsuariosTable();
       } catch (err) {
-        showToast('Erro ao atualizar usuário', 'error');
+        Toast.error('Erro ao atualizar usuário');
       }
     });
 
@@ -272,13 +272,13 @@
       e.preventDefault();
       const id = document.getElementById('reset-id').value;
       const novaSenha = document.getElementById('reset-nova-senha').value;
-      if (novaSenha.length < 8) { showToast('Senha deve ter no mínimo 8 caracteres', 'error'); return; }
+      if (novaSenha.length < 8) { Toast.error('Senha deve ter no mínimo 8 caracteres'); return; }
       try {
         await api.patch(`/usuarios/${id}/reset-senha`, { nova_senha: novaSenha });
         document.getElementById('modal-reset-senha').classList.remove('open');
-        showToast('Senha redefinida com sucesso', 'success');
+        Toast.success('Senha redefinida com sucesso');
       } catch (err) {
-        showToast('Erro ao redefinir senha', 'error');
+        Toast.error('Erro ao redefinir senha');
       }
     });
 
