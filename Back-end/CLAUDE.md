@@ -495,6 +495,9 @@ Todas as chamadas HTTP passam por `_fetchWithRefresh()` que:
 - **Soft delete**: exclusão de usuários e crianças faz `UPDATE ativo=false`; query param `?includeInactive=true` para ver excluídos
 - **Frequência**: inclui turno (Manhã/Tarde/Integral) e campo de justificativa de falta (observação)
 - **Visibilidade**: menu Administrativo oculto para voluntários (nível < 2)
+- **Proteção XSS**: função `esc()` escapa dados do usuário em todos os templates HTML dinâmicos
+- **Validação de formulários**: todos os campos obrigatórios são validados no frontend antes de enviar à API
+- **Contadores dinâmicos**: tabelas mostram total de registros em vez de paginação estática
 
 ---
 
@@ -574,6 +577,9 @@ O `LoggingInterceptor` registra automaticamente toda operação de escrita (POST
 - **Foreign Keys**: catch P2003 retorna NotFoundException com mensagem clara
 - **Login falho**: Logger.warn registra email para detecção de brute-force
 - **Bcrypt**: salt rounds = 12
+- **XSS Frontend**: função `esc()` escapa &, <, >, ", ' em todos os templates dinâmicos (nomes, emails, doadores, títulos)
+- **Validação Frontend**: campos obrigatórios validados antes de enviar à API (nome, CPF, data nascimento, telefone)
+- **Toast**: todas as páginas usam `Toast.success()` / `Toast.error()` — sem funções indefinidas
 
 ### 10.4 Observações do Build
 

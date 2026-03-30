@@ -94,11 +94,14 @@ Desenvolvedor focado em **Backend Engineering** e **Data Analytics**, construind
 Sistema real em producao para o Centro de Atendimento a Meninos e a Meninas.
 
 - Backend profissional com **NestJS + Prisma + PostgreSQL (Neon)**
-- Autenticacao robusta (**JWT + Refresh Token** com rotacao)
-- Controle de acesso por nivel (**RBAC** com Guards)
+- Autenticacao robusta (**JWT 1h + Refresh Token 8h** com rotacao)
+- Controle de acesso por nivel (**RBAC** com Guards) — 3 niveis
+- **Rate limiting** anti brute-force (`@nestjs/throttler`)
+- **Protecao XSS** com escaping em todos os templates dinamicos
 - Auditoria completa com logs (entidade, IP, timestamp)
-- Geracao de **relatorios em PDF**
-- **CAPTCHA** (Cloudflare Turnstile)
+- Geracao de **relatorios em PDF** (em memoria, sem disco)
+- **Soft delete** — registros nunca sao apagados permanentemente
+- **CAPTCHA** (Cloudflare Turnstile) + **CORS seguro**
 - Deploy: **Render** (API) + **Vercel** (Frontend) + **Neon** (DB)
 
 ---
