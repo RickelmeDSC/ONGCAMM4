@@ -619,12 +619,9 @@ Configuradas no painel do Render (Environment → Environment Variables):
 
 ### Rickelme
 - Inicialização do projeto, configuração base
-- Módulos: prisma, auth, usuarios, common (guards, decorators, interceptors, filters)
-- Setup do Swagger, .env, main.ts, app.module.ts
-
-### Mike
-- Módulos: criancas, responsaveis, documentos
+- Módulos: prisma, auth, usuarios, criancas, responsaveis, documentos, common (guards, decorators, interceptors, filters)
 - Validação de CPF, busca por nome/matrícula
+- Setup do Swagger, .env, main.ts, app.module.ts
 
 ### Lucas
 - Módulos: frequencia, atividades, eventos, doacoes, declaracoes, relatorios, auditoria

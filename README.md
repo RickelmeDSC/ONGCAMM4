@@ -212,8 +212,7 @@ Auto-deploy: push na `main` atualiza Vercel e Render automaticamente.
 
 | Membro | Responsabilidade |
 |--------|-----------------|
-| **Rickelme** | Arquitetura, auth, usuarios, infra, deploy |
-| **Mike** | Criancas, responsaveis, documentos |
+| **Rickelme** | Arquitetura, auth, usuarios, criancas, responsaveis, documentos, infra, deploy |
 | **Lucas** | Frequencia, atividades, eventos, doacoes, declaracoes, relatorios, auditoria |
 
 ### Autor Principal
