@@ -812,7 +812,9 @@ async function renderCadastrTable(includeInactive = false) {
       const isInativo = c.ativo === false;
       return `
         <tr style="${isInativo ? 'opacity:0.5' : ''}">
-          <td data-label="Foto"><div class="table-avatar">${c.nome.charAt(0)}</div></td>
+          <td data-label="Foto">${c.foto_path
+            ? `<img src="${API_BASE_URL.replace('/api/v1','')}/${c.foto_path}" class="table-avatar" style="object-fit:cover" onerror="this.outerHTML='<div class=table-avatar>${esc(c.nome).charAt(0)}</div>'">`
+            : `<div class="table-avatar">${esc(c.nome).charAt(0)}</div>`}</td>
           <td data-label="Matrícula">${c.id_matricula}</td>
           <td data-label="Nome">${esc(c.nome)}</td>
           <td data-label="Nascimento">${nascimento}</td>
@@ -1177,6 +1179,32 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('c-cpf').value = c.cpf || '';
             const generoSelect = document.getElementById('c-genero');
             if (generoSelect && c.genero) generoSelect.value = c.genero;
+            // Preencher foto (se existir)
+            if (c.foto_path) {
+              const photoUpload = document.querySelector('.photo-upload');
+              if (photoUpload) {
+                const img = document.createElement('img');
+                img.className = 'preview';
+                img.src = `${API_BASE_URL.replace('/api/v1', '')}/${c.foto_path}`;
+                img.onerror = () => img.remove(); // Se arquivo nao existe no servidor
+                photoUpload.appendChild(img);
+                const icon = photoUpload.querySelector('.photo-upload-icon');
+                const text = photoUpload.querySelector('.photo-upload-text');
+                if (icon) icon.style.display = 'none';
+                if (text) text.style.display = 'none';
+              }
+            }
+            // Mostrar documentos ja importados
+            const docsContainer = document.getElementById('c-docs')?.closest('.form-group');
+            if (docsContainer && (c.certidao_nasc || c.cartao_vacina)) {
+              const baseUrl = API_BASE_URL.replace('/api/v1', '');
+              let docsHtml = '<div style="margin-top:8px;font-size:12px">';
+              docsHtml += '<strong style="color:var(--titulo)">Documentos importados:</strong><ul style="margin:4px 0;padding-left:16px">';
+              if (c.certidao_nasc) docsHtml += `<li><a href="${baseUrl}/${c.certidao_nasc}" target="_blank" style="color:#FFA726">Certidao de nascimento</a></li>`;
+              if (c.cartao_vacina) docsHtml += `<li><a href="${baseUrl}/${c.cartao_vacina}" target="_blank" style="color:#FFA726">Cartao de vacina</a></li>`;
+              docsHtml += '</ul></div>';
+              docsContainer.insertAdjacentHTML('beforeend', docsHtml);
+            }
             // Preencher dados do responsavel
             if (c.responsavel) {
               document.getElementById('r-nome').value = c.responsavel.nome || '';
