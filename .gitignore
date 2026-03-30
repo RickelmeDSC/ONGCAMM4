@@ -1,0 +1,26 @@
+# Dependencias
+node_modules/
+.package-lock.json
+
+# Frontend — nao precisa de npm
+Front-end/files/node_modules/
+Front-end/files/package.json
+Front-end/files/package-lock.json
+Front-end/node_modules/
+Front-end/.package-lock.json
+
+# Backend
+Back-end/node_modules/
+Back-end/dist/
+Back-end/.env
+Back-end/uploads/
+
+# IDE
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Claude
+.claude/settings.local.json
