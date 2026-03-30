@@ -33,10 +33,21 @@ export class CriancasService {
     });
   }
 
+  private async gerarMatricula(): Promise<number> {
+    for (let i = 0; i < 50; i++) {
+      const matricula = Math.floor(1000 + Math.random() * 9000); // 1000-9999
+      const exists = await this.prisma.crianca.findUnique({ where: { id_matricula: matricula } });
+      if (!exists) return matricula;
+    }
+    throw new ConflictException('Não foi possível gerar matrícula única. Tente novamente.');
+  }
+
   async create(dto: CreateCriancaDto) {
+    const id_matricula = await this.gerarMatricula();
     try {
       return await this.prisma.crianca.create({
         data: {
+          id_matricula,
           ...dto,
           data_nascimento: new Date(dto.data_nascimento),
         },

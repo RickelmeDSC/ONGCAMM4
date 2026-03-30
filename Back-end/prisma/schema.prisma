@@ -56,7 +56,7 @@ model Responsavel {
 // CRIANCA — Criança matriculada na ONG
 // =============================================================
 model Crianca {
-  id_matricula    Int      @id @default(autoincrement())
+  id_matricula    Int      @id
   nome            String
   data_nascimento DateTime
   cpf             String   @unique
