@@ -1,6 +1,3 @@
 {
-  "outputDirectory": "Front-end/files",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "outputDirectory": "Front-end/files"
 }
