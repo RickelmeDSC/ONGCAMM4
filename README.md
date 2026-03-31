@@ -71,8 +71,8 @@ flowchart TD
 | Operacao | Voluntario (1) | Gestor (2) | Diretor (3) |
 |----------|---------------|-----------|------------|
 | Visualizar criancas | Sim | Sim | Sim |
-| Cadastrar criancas | — | Sim | Sim |
-| Excluir criancas | — | — | Sim |
+| Cadastrar criancas | Sim | Sim | Sim |
+| Excluir criancas | Sim | Sim | Sim |
 | Registrar frequencia | Sim | Sim | Sim |
 | Gerar relatorios PDF | — | Sim | Sim |
 | Gerenciar usuarios | — | — | Sim |
