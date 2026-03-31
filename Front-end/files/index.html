@@ -265,22 +265,38 @@
 
     /* ── Responsivo ── */
     @media (max-width: 900px) {
-      .split-container { flex-direction: column; }
+      body { min-height: 100vh; overflow: hidden; }
+      .split-container {
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+      }
       .split-left {
         min-height: auto;
-        padding: 40px 24px 36px;
+        flex: 0 0 auto;
+        padding: 24px 24px 20px;
       }
-      .left-logo { width: 180px; margin-bottom: 16px; }
-      .left-title { font-size: 24px; }
+      .left-logo { width: 120px; margin-bottom: 10px; }
+      .left-title { font-size: 20px; margin-bottom: 8px; }
+      .left-subtitle { font-size: 13px; display: none; }
       .left-features { display: none; }
-      .split-right { padding: 24px 16px 40px; }
-      .login-card { padding: 28px 24px; }
+      .split-right {
+        flex: 1;
+        padding: 16px 16px 20px;
+        overflow-y: auto;
+      }
+      .login-card { padding: 24px 20px; }
+      .login-card h2 { font-size: 22px; margin-bottom: 4px; }
+      .login-subtitle { margin-bottom: 18px; }
+      .btn-login { padding: 12px; }
     }
 
     @media (max-width: 480px) {
-      .left-title { font-size: 20px; }
-      .left-subtitle { font-size: 14px; }
-      .login-card h2 { font-size: 22px; }
+      .split-left { padding: 20px 20px 16px; }
+      .left-logo { width: 100px; margin-bottom: 8px; }
+      .left-title { font-size: 18px; }
+      .login-card { padding: 20px 16px; }
+      .login-card h2 { font-size: 20px; }
     }
   </style>
 </head>
