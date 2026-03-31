@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Res, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Res, Query, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { Response } from 'express';
 import { RelatoriosService } from './relatorios.service';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -25,9 +25,15 @@ export class RelatoriosController {
   @Post('frequencia')
   @Roles(2)
   @ApiOperation({ summary: 'Gerar relatório de frequência em PDF' })
-  async gerarFrequencia(@Res() res: Response) {
+  @ApiQuery({ name: 'data', required: false, description: 'Data no formato YYYY-MM-DD' })
+  @ApiQuery({ name: 'turno', required: false, description: 'Manhã, Tarde ou Integral' })
+  async gerarFrequencia(
+    @Res() res: Response,
+    @Query('data') data?: string,
+    @Query('turno') turno?: string,
+  ) {
     try {
-      const buffer = await this.service.gerarFrequenciaBuffer();
+      const buffer = await this.service.gerarFrequenciaBuffer(data, turno);
       this.sendPdf(res, buffer, 'relatorio-frequencia');
     } catch (err) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Erro ao gerar PDF de frequência', error: err.message });

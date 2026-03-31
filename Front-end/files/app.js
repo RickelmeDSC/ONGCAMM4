@@ -687,7 +687,13 @@ async function _baixarPdf(endpoint, filename, btnId) {
   }
 }
 
-async function gerarRelatorioFrequencia() { return _baixarPdf('frequencia', 'relatorio-frequencia', 'btn-relatorio-freq'); }
+async function gerarRelatorioFrequencia() {
+  const date = document.getElementById('freq-date')?.value;
+  const turno = document.getElementById('freq-turno')?.value || '';
+  if (!date) { Toast.error('Selecione uma data para gerar o PDF.'); return; }
+  const params = `?data=${date}${turno ? '&turno=' + encodeURIComponent(turno) : ''}`;
+  return _baixarPdf('frequencia' + params, 'relatorio-frequencia', 'btn-relatorio-freq');
+}
 async function gerarRelatorioCriancas() { return _baixarPdf('criancas', 'relatorio-criancas', 'btn-relatorio'); }
 
 // ── EXCLUIR CRIANÇA ───────────────────────────────
@@ -1052,11 +1058,22 @@ async function renderFreqTable() {
   if (!tbody) return;
   try {
     const criancas = await api.get('/criancas');
-    tbody.innerHTML = criancas.map(c => `
+    // Buscar ultima frequencia de cada crianca
+    const freqPromises = criancas.map(c =>
+      api.get(`/frequencia/crianca/${c.id_matricula}`).catch(() => [])
+    );
+    const freqResults = await Promise.all(freqPromises);
+
+    tbody.innerHTML = criancas.map((c, i) => {
+      const registros = freqResults[i] || [];
+      // Ultimo registro presente
+      const ultimoPresente = registros.find(r => r.status?.toLowerCase() === 'presente');
+      const ultimaData = ultimoPresente?.data_registro ? toBR(ultimoPresente.data_registro) : '—';
+      return `
       <tr data-matricula="${c.id_matricula}" data-status="">
         <td data-label="Matrícula">${c.id_matricula}</td>
         <td data-label="Nome">${esc(c.nome)}</td>
-        <td data-label="Última Presença">—</td>
+        <td data-label="Última Presença">${ultimaData}</td>
         <td data-label="Status">
           <div class="freq-btn-group">
             <button class="freq-btn presente">Presente</button>
@@ -1067,7 +1084,8 @@ async function renderFreqTable() {
         <td data-label="Visualizar">
           <button class="btn btn-outline btn-sm" onclick="window.location.href='historico-presenca.html?id=${c.id_matricula}'">Ver histórico</button>
         </td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
     initFreqButtons();
   } catch (err) {
     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--paragrafo)">Erro ao carregar dados.</td></tr>';

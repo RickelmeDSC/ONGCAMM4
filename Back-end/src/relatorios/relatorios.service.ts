@@ -24,8 +24,23 @@ export class RelatoriosService {
     return Buffer.from(await gerarRelatorioCriancas(dados));
   }
 
-  async gerarFrequenciaBuffer(): Promise<Buffer> {
+  async gerarFrequenciaBuffer(data?: string, turno?: string): Promise<Buffer> {
+    const where: any = {};
+
+    // Filtrar por data especifica (YYYY-MM-DD)
+    if (data) {
+      const inicio = new Date(data + 'T00:00:00.000Z');
+      const fim = new Date(data + 'T23:59:59.999Z');
+      where.data_registro = { gte: inicio, lte: fim };
+    }
+
+    // Filtrar por turno
+    if (turno) {
+      where.turno = turno;
+    }
+
     const dados = await this.prisma.frequencia.findMany({
+      where,
       include: { crianca: true },
       orderBy: { data_registro: 'desc' },
     });
