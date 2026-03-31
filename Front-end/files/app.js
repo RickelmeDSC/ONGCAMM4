@@ -545,10 +545,46 @@ async function handleCadastrarCrianca(e) {
       await api.postForm(`/documentos/upload/foto/${criancaData.id_matricula}`, formData);
     }
 
-    Toast.success('Criança cadastrada com sucesso!');
-    setTimeout(() => window.location.href = 'cadastros.html', 1000);
+    // 4. Declaração de responsabilidade (se ativada)
+    const declAtivo = document.getElementById('decl-ativar')?.checked;
+    if (declAtivo) {
+      const declNome = document.getElementById('decl-nome-cadastro')?.value.trim();
+      const declParentesco = document.getElementById('decl-parentesco-cadastro')?.value;
+      if (declNome && declParentesco) {
+        try {
+          const user = Auth.getUser();
+          const decl = await api.post('/declaracoes', {
+            id_matricula: criancaData.id_matricula,
+            id_usuario_autorizador: user?.id ?? user?.id_usuario,
+            nome_parente: declNome,
+            parentesco: declParentesco,
+          });
+          // Baixar PDF da declaração
+          const token = Auth.getToken();
+          const res = await _fetchWithRefresh(`${API_BASE_URL}/declaracoes/${decl.id_declaracao}/pdf`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+          });
+          if (res.ok) {
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `declaracao-responsabilidade-${criancaData.id_matricula}.pdf`;
+            a.click();
+            URL.revokeObjectURL(url);
+          }
+          Toast.success('Declaracao de responsabilidade gerada!');
+        } catch (declErr) {
+          console.error('Erro ao gerar declaracao:', declErr);
+          Toast.error('Crianca cadastrada, mas erro ao gerar declaracao.');
+        }
+      }
+    }
+
+    Toast.success('Crianca cadastrada com sucesso!');
+    setTimeout(() => window.location.href = 'cadastros.html', 1500);
   } catch (err) {
-    Toast.error('Erro ao cadastrar criança. Verifique os dados e tente novamente.');
+    Toast.error('Erro ao cadastrar crianca. Verifique os dados e tente novamente.');
     console.error(err);
   }
 }

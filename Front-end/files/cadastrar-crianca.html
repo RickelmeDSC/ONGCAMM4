@@ -154,6 +154,43 @@
         </div>
       </div>
 
+      <!-- DECLARAÇÃO DE RESPONSABILIDADE -->
+      <div class="card" style="margin-top:24px">
+        <div class="section-header">
+          <div class="section-header-icon"><i data-lucide="file-signature" style="width:20px;height:20px;color:#e8872a"></i></div>
+          <h2>Declaracao de Responsabilidade</h2>
+        </div>
+
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:16px">
+          <input type="checkbox" id="decl-ativar" onchange="document.getElementById('decl-campos').style.display = this.checked ? 'flex' : 'none'">
+          <span style="font-size:13px;color:var(--paragrafo)">O responsavel nao e pai/mae — gerar declaracao para terceiro autorizado</span>
+        </label>
+
+        <div id="decl-campos" style="display:none;flex-direction:column;gap:16px">
+          <p style="font-size:12px;color:var(--paragrafo);line-height:1.6;background:#FFF8E1;padding:12px 16px;border-radius:8px;border-left:3px solid #FFA726">
+            Quando os pais estao impossibilitados de fazer o cadastro, o parentesco mais proximo e de maior idade assume a responsabilidade pela crianca na ONG.
+          </p>
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label class="form-label">Nome do responsavel (terceiro)</label>
+              <input id="decl-nome-cadastro" type="text" class="form-input" placeholder="Nome completo do parente">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Parentesco</label>
+              <select id="decl-parentesco-cadastro" class="form-select">
+                <option value="">Selecione</option>
+                <option value="Tio(a)">Tio(a)</option>
+                <option value="Avo(a)">Avo(a)</option>
+                <option value="Irmao(a)">Irmao(a)</option>
+                <option value="Padrinho/Madrinha">Padrinho/Madrinha</option>
+                <option value="Vizinho(a)">Vizinho(a)</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </form>
   </main>
 
