@@ -1284,6 +1284,11 @@ input, textarea, select { font-family: var(--font-body); }
   gap: 8px;
   margin-bottom: 16px;
 }
+.dash-chart-wrap {
+  position: relative;
+  height: 220px;
+  width: 100%;
+}
 
 /* ── Dashboard Bottom (Activity + Alerts) ── */
 .dash-bottom {
