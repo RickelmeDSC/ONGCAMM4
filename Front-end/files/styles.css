@@ -33,7 +33,7 @@
   --laranja:      #FFA726;
   --sidebar-bg:   #FFFFFF;
   --sidebar-text: #64748B;
-  --header-h:     88px;
+  --header-h:     130px;
 }
 
 /* ── Reset ── */
@@ -81,12 +81,12 @@ input, textarea, select { font-family: var(--font-body); }
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #FFD45E 0%, #FFA726 100%);
-  height: var(--header-h, 88px);
-  padding: 0 20px;
+  height: var(--header-h);
+  padding: 16px 20px;
 }
 .sidebar-logo img {
-  width: 68px;
-  height: 68px;
+  width: 90px;
+  height: 90px;
   object-fit: contain;
   filter: drop-shadow(0 2px 8px rgba(0,0,0,0.12));
 }
