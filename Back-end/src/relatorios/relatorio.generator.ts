@@ -17,40 +17,46 @@ function dataBR(): string {
 }
 
 async function header(pdfDoc: any, page: any, font: any, bold: any, titulo: string) {
+  const pageWidth = 595;
+  const logoSize = 90;
+
+  // Bloco centralizado: logo (90) + gap (14) + texto (~280) = ~384 total
+  const blocoWidth = 384;
+  const blocoX = (pageWidth - blocoWidth) / 2;
+
   // Embed logo
   try {
     const logoPath = path.join(__dirname, 'logo-camm.png');
     const logoBytes = fs.readFileSync(logoPath);
     const logoImage = await pdfDoc.embedPng(logoBytes);
-    const logoDims = logoImage.scale(0.5);
     page.drawImage(logoImage, {
-      x: 50,
-      y: 740,
-      width: 90,
-      height: 90,
+      x: blocoX,
+      y: 738,
+      width: logoSize,
+      height: logoSize,
     });
   } catch (_) {
-    // Se logo nao existe, usa texto fallback
-    page.drawText('CAMM', { x: 50, y: 790, size: 24, font: bold, color: rgb(0.16, 0.5, 0.73) });
+    page.drawText('CAMM', { x: blocoX, y: 790, size: 24, font: bold, color: rgb(0.16, 0.5, 0.73) });
   }
 
-  // Titulo ao lado do logo
-  page.drawText('Centro de atendimento a', { x: 150, y: 805, size: 20, font: bold, color: rgb(0.1, 0.1, 0.1) });
-  page.drawText('meninos e meninas', { x: 150, y: 780, size: 20, font: bold, color: rgb(0.1, 0.1, 0.1) });
+  // Titulo ao lado do logo (centralizado junto com o logo)
+  const textoX = blocoX + logoSize + 14;
+  page.drawText('Centro de atendimento a', { x: textoX, y: 803, size: 20, font: bold, color: rgb(0.1, 0.1, 0.1) });
+  page.drawText('meninos e meninas', { x: textoX, y: 778, size: 20, font: bold, color: rgb(0.1, 0.1, 0.1) });
 
   // Subtitulo do relatorio
-  page.drawText(titulo, { x: 50, y: 725, size: 13, font: bold, color: rgb(0.1, 0.1, 0.1) });
-  page.drawText(`Gerado em: ${dataBR()}`, { x: 50, y: 708, size: 10, font, color: rgb(0.35, 0.35, 0.35) });
+  page.drawText(titulo, { x: 50, y: 722, size: 13, font: bold, color: rgb(0.1, 0.1, 0.1) });
+  page.drawText(`Gerado em: ${dataBR()}`, { x: 50, y: 705, size: 10, font, color: rgb(0.35, 0.35, 0.35) });
 
   // Linha amarela
   page.drawLine({
-    start: { x: 50, y: 698 },
-    end: { x: 545, y: 698 },
+    start: { x: 50, y: 695 },
+    end: { x: 545, y: 695 },
     thickness: 3,
     color: AMARELO,
   });
 
-  return 680; // Y position apos o header
+  return 677; // Y position apos o header
 }
 
 export async function gerarRelatorioFrequencia(dados: any[]): Promise<Uint8Array> {
