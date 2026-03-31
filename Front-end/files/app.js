@@ -696,6 +696,58 @@ async function gerarRelatorioFrequencia() {
 }
 async function gerarRelatorioCriancas() { return _baixarPdf('criancas', 'relatorio-criancas', 'btn-relatorio'); }
 
+// ── DECLARAÇÃO DE RESPONSABILIDADE ───────────────
+function abrirDeclaracao(matricula, nome) {
+  document.getElementById('decl-matricula').value = matricula;
+  document.getElementById('decl-crianca-nome').textContent = nome;
+  document.getElementById('decl-nome').value = '';
+  document.getElementById('decl-parentesco').value = '';
+  openModal('modal-declaracao');
+}
+
+async function handleDeclaracao(e) {
+  e.preventDefault();
+  const matricula = parseInt(document.getElementById('decl-matricula').value);
+  const nome_parente = document.getElementById('decl-nome').value.trim();
+  const parentesco = document.getElementById('decl-parentesco').value;
+
+  if (!nome_parente) { Toast.error('Informe o nome do responsavel.'); return; }
+  if (!parentesco) { Toast.error('Selecione o parentesco.'); return; }
+
+  const user = Auth.getUser();
+  const id_usuario_autorizador = user?.id ?? user?.id_usuario;
+
+  try {
+    // 1. Criar declaracao no banco
+    const decl = await api.post('/declaracoes', {
+      id_matricula: matricula,
+      id_usuario_autorizador,
+      nome_parente,
+      parentesco,
+    });
+
+    // 2. Baixar PDF
+    const token = Auth.getToken();
+    const res = await _fetchWithRefresh(`${API_BASE_URL}/declaracoes/${decl.id_declaracao}/pdf`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error(`Erro ${res.status}`);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `declaracao-responsabilidade-${matricula}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    closeModal('modal-declaracao');
+    Toast.success('Declaracao gerada com sucesso!');
+  } catch (err) {
+    Toast.error('Erro ao gerar declaracao.');
+    console.error(err);
+  }
+}
+
 // ── EXCLUIR CRIANÇA ───────────────────────────────
 function confirmarExclusao(id, nome, tipo = 'criança') {
   const modal = document.getElementById('modal-confirmar');
@@ -1032,6 +1084,7 @@ async function renderCadastrTable(includeInactive = false) {
             <div class="action-btns">
               ${isInativo ? '<span style="color:var(--paragrafo);font-size:12px">Excluido</span>' : `
               <button class="action-btn" title="Editar" onclick="window.location.href='cadastrar-crianca.html?id=${c.id_matricula}'"><i data-lucide="pencil" style="width:14px;height:14px"></i></button>
+              <button class="action-btn" title="Declaracao" onclick="abrirDeclaracao(${c.id_matricula},'${esc(c.nome)}')"><i data-lucide="file-signature" style="width:14px;height:14px"></i></button>
               <button class="action-btn delete" title="Excluir" onclick="confirmarExclusao(${c.id_matricula},'${esc(c.nome)}','criança')"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>`}
             </div>
           </td>
@@ -1341,6 +1394,7 @@ document.addEventListener('DOMContentLoaded', () => {
       setActiveNav('cadastros');
       renderCadastrTable();
       initSearch('search-criancas', 'cadastros-tbody', [1, 2]);
+      document.getElementById('form-declaracao')?.addEventListener('submit', handleDeclaracao);
       break;
 
     case 'frequencia':

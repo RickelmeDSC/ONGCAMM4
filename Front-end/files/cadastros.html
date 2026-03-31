@@ -127,6 +127,42 @@
     </div>
   </main>
 
+  <!-- Modal Declaração de Responsabilidade -->
+  <div class="modal-overlay" id="modal-declaracao">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Declaracao de Responsabilidade</h3>
+        <button class="modal-close" data-modal-close="modal-declaracao">&#10005;</button>
+      </div>
+      <p style="color:var(--paragrafo);font-size:13px;margin-bottom:16px">
+        Gerar declaracao para terceiro responsavel pela crianca <strong id="decl-crianca-nome"></strong>.
+      </p>
+      <form id="form-declaracao" style="display:flex;flex-direction:column;gap:14px">
+        <input type="hidden" id="decl-matricula">
+        <div class="form-group">
+          <label class="form-label">Nome do responsavel</label>
+          <input id="decl-nome" type="text" class="form-input" placeholder="Nome completo do parente" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Parentesco</label>
+          <select id="decl-parentesco" class="form-select" required>
+            <option value="">Selecione</option>
+            <option value="Tio(a)">Tio(a)</option>
+            <option value="Avo(a)">Avo(a)</option>
+            <option value="Irmao(a)">Irmao(a)</option>
+            <option value="Padrinho/Madrinha">Padrinho/Madrinha</option>
+            <option value="Vizinho(a)">Vizinho(a)</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" data-modal-close="modal-declaracao">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Gerar PDF</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Modal confirmação exclusão -->
   <div class="modal-overlay" id="modal-confirmar">
     <div class="modal">
