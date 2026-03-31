@@ -888,7 +888,8 @@ async function renderDashboard() {
 function animateCounter(elementId, targetValue, suffix = '') {
   const el = document.getElementById(elementId);
   if (!el) return;
-  const target = Math.round(targetValue);
+  const target = Math.round(targetValue || 0);
+  if (isNaN(target)) { el.textContent = '0' + suffix; return; }
   const duration = 800;
   const start = performance.now();
 
@@ -902,16 +903,21 @@ function animateCounter(elementId, targetValue, suffix = '') {
   requestAnimationFrame(step);
 }
 
+// Instâncias dos gráficos (para destruir antes de recriar)
+let _chartFreq = null;
+let _chartDoac = null;
+
 // Gráfico de frequência semanal (barras)
 function renderChartFrequencia(dados) {
   const canvas = document.getElementById('chart-frequencia');
   if (!canvas || !window.Chart) return;
+  if (_chartFreq) { _chartFreq.destroy(); _chartFreq = null; }
   const diasSemana = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
   const labels = dados.map(d => {
     const date = new Date(d.dia + 'T00:00:00');
     return diasSemana[date.getDay()] + ' ' + String(date.getDate()).padStart(2,'0');
   });
-  new Chart(canvas, {
+  _chartFreq = new Chart(canvas, {
     type: 'bar',
     data: {
       labels,
@@ -925,7 +931,7 @@ function renderChartFrequencia(dados) {
       maintainAspectRatio: false,
       plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16, font: { family: "'Nunito', sans-serif", weight: '600', size: 12 } } } },
       scales: {
-        y: { beginAtZero: true, ticks: { font: { family: "'Nunito Sans', sans-serif", size: 11 } }, grid: { color: 'rgba(0,0,0,0.04)' } },
+        y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: "'Nunito Sans', sans-serif", size: 11 } }, grid: { color: 'rgba(0,0,0,0.04)' } },
         x: { ticks: { font: { family: "'Nunito Sans', sans-serif", size: 11 } }, grid: { display: false } }
       }
     }
@@ -936,12 +942,13 @@ function renderChartFrequencia(dados) {
 function renderChartDoacoes(dados) {
   const canvas = document.getElementById('chart-doacoes');
   if (!canvas || !window.Chart) return;
+  if (_chartDoac) { _chartDoac.destroy(); _chartDoac = null; }
   const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   const labels = dados.map(d => {
     const [y, m] = d.mes.split('-');
     return meses[parseInt(m) - 1] + '/' + y.slice(2);
   });
-  new Chart(canvas, {
+  _chartDoac = new Chart(canvas, {
     type: 'line',
     data: {
       labels,
@@ -985,8 +992,8 @@ function _tempoRelativo(dataISO) {
 
 // Formatar ação do log para texto legível
 function _formatarAcao(acao, entidade) {
-  const metodo = acao.split(' ')[0];
-  const entidadeLabel = entidade || 'registro';
+  const metodo = (acao || '').split(' ')[0];
+  const entidadeLabel = esc(entidade || 'registro');
   const acoes = {
     'POST': 'cadastrou',
     'PATCH': 'atualizou',
