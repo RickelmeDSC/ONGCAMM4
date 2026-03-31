@@ -31,7 +31,7 @@
 
   <main class="main-content">
     <div class="page-header">
-      <h1 class="page-title">Registro de atividades</h1>
+      <h1 class="page-title">Registro de Atividades e Eventos</h1>
       <div style="display:flex;gap:10px">
         <button class="btn btn-outline" onclick="window.location.href='admin.html'">Cancelar</button>
         <button class="btn btn-primary" form="form-atividade" type="submit"><i data-lucide="save" style="width:14px;height:14px"></i> Salvar Atividade</button>
@@ -65,9 +65,14 @@
             </div>
           </div>
 
+          <div class="form-group">
+            <label class="form-label">Local <span class="optional">(Opcional — preencha para eventos externos)</span></label>
+            <input id="a-local" type="text" class="form-input" placeholder="Ex: Quadra poliesportiva, Salao comunitario">
+          </div>
+
           <div class="form-row cols-2">
             <div class="form-group">
-              <label class="form-label">Crianças Participantes <span class="optional">(Opcional)</span></label>
+              <label class="form-label">Criancas Participantes <span class="optional">(Opcional)</span></label>
               <input id="a-participantes" type="number" min="0" class="form-input" placeholder="Quantidade">
             </div>
             <div class="form-group">
@@ -75,9 +80,10 @@
               <select id="a-categoria" class="form-select">
                 <option value="Educativa">Educativa</option>
                 <option value="Esportiva">Esportiva</option>
-                <option value="Alimentação">Alimentação</option>
+                <option value="Alimentacao">Alimentacao</option>
                 <option value="Cultural">Cultural</option>
                 <option value="Social">Social</option>
+                <option value="Evento">Evento</option>
               </select>
             </div>
           </div>
