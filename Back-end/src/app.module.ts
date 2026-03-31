@@ -15,6 +15,7 @@ import { DoacoesModule } from './doacoes/doacoes.module';
 import { DeclaracoesModule } from './declaracoes/declaracoes.module';
 import { RelatoriosModule } from './relatorios/relatorios.module';
 import { AuditoriaModule } from './auditoria/auditoria.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -37,6 +38,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     DeclaracoesModule,
     RelatoriosModule,
     AuditoriaModule,
+    DashboardModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

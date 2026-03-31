@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAMM — Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body data-page="dashboard">
+
+  <button class="hamburger" id="hamburger"><i data-lucide="menu" style="width:22px;height:22px"></i></button>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="logo-camm.png" alt="CAMM" style="width:100px;height:auto;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.15))">
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item" data-page="home" onclick="window.location.href='home.html'"><span class="nav-icon"><i data-lucide="home" style="width:18px;height:18px"></i></span> Home</button>
+      <button class="nav-item active" data-page="dashboard" onclick="window.location.href='dashboard.html'"><span class="nav-icon"><i data-lucide="layout-dashboard" style="width:18px;height:18px"></i></span> Dashboard</button>
+      <button class="nav-item" data-page="cadastros" onclick="window.location.href='cadastros.html'"><span class="nav-icon"><i data-lucide="user-round" style="width:18px;height:18px"></i></span> Cadastros</button>
+      <button class="nav-item" data-page="frequencia" onclick="window.location.href='frequencia.html'"><span class="nav-icon"><i data-lucide="clipboard-list" style="width:18px;height:18px"></i></span> Frequencia</button>
+      <button class="nav-item" data-page="admin" onclick="window.location.href='admin.html'"><span class="nav-icon"><i data-lucide="settings" style="width:18px;height:18px"></i></span> Administrativo</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-avatar" id="sidebar-avatar">U</div>
+      <span class="sidebar-user-name" id="sidebar-username">Usuario</span>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Dashboard</h1>
+        <p style="color:rgba(61,40,0,0.6);font-size:14px;margin-top:4px">Visao geral do sistema CAMM</p>
+      </div>
+    </div>
+
+    <!-- Cards de Resumo -->
+    <div class="dash-cards" style="padding-left:40px;padding-right:40px;padding-top:28px;">
+      <div class="dash-card dash-card-coral">
+        <div class="dash-card-icon"><i data-lucide="users" style="width:24px;height:24px"></i></div>
+        <div class="dash-card-info">
+          <span class="dash-card-label">Criancas Ativas</span>
+          <span class="dash-card-value" id="dash-criancas">--</span>
+        </div>
+      </div>
+      <div class="dash-card dash-card-verde">
+        <div class="dash-card-icon"><i data-lucide="clipboard-check" style="width:24px;height:24px"></i></div>
+        <div class="dash-card-info">
+          <span class="dash-card-label">Frequencia Hoje</span>
+          <span class="dash-card-value" id="dash-frequencia">--%</span>
+        </div>
+      </div>
+      <div class="dash-card dash-card-azul">
+        <div class="dash-card-icon"><i data-lucide="heart-handshake" style="width:24px;height:24px"></i></div>
+        <div class="dash-card-info">
+          <span class="dash-card-label">Doacoes do Mes</span>
+          <span class="dash-card-value" id="dash-doacoes">--</span>
+        </div>
+      </div>
+      <div class="dash-card dash-card-laranja">
+        <div class="dash-card-icon"><i data-lucide="hand-helping" style="width:24px;height:24px"></i></div>
+        <div class="dash-card-info">
+          <span class="dash-card-label">Voluntarios Ativos</span>
+          <span class="dash-card-value" id="dash-voluntarios">--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Graficos -->
+    <div class="dash-charts" style="padding-left:40px;padding-right:40px;margin-top:24px;">
+      <div class="dash-chart-card">
+        <h3 class="dash-chart-title"><i data-lucide="bar-chart-3" style="width:18px;height:18px;color:var(--verde)"></i> Frequencia Semanal</h3>
+        <canvas id="chart-frequencia" height="220"></canvas>
+      </div>
+      <div class="dash-chart-card">
+        <h3 class="dash-chart-title"><i data-lucide="trending-up" style="width:18px;height:18px;color:var(--azul)"></i> Doacoes Mensais</h3>
+        <canvas id="chart-doacoes" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- Atividade Recente + Alertas -->
+    <div class="dash-bottom" style="padding-left:40px;padding-right:40px;margin-top:24px;margin-bottom:32px;">
+      <!-- Atividade Recente (logs) -->
+      <div class="dash-activity-card" id="dash-activity-card">
+        <h3 class="dash-chart-title"><i data-lucide="activity" style="width:18px;height:18px;color:var(--coral)"></i> Atividade Recente</h3>
+        <div id="dash-logs" class="dash-logs">
+          <p style="color:var(--paragrafo);font-size:13px">Carregando...</p>
+        </div>
+      </div>
+
+      <!-- Alertas -->
+      <div class="dash-alerts-card">
+        <h3 class="dash-chart-title"><i data-lucide="bell" style="width:18px;height:18px;color:var(--laranja)"></i> Alertas</h3>
+
+        <!-- Aniversariantes -->
+        <div class="dash-alert-section">
+          <h4 class="dash-alert-subtitle"><i data-lucide="cake" style="width:14px;height:14px"></i> Aniversariantes da Semana</h4>
+          <div id="dash-aniversarios" class="dash-alert-list">
+            <p style="color:var(--paragrafo);font-size:13px">Carregando...</p>
+          </div>
+        </div>
+
+        <!-- Sem frequencia -->
+        <div class="dash-alert-section">
+          <h4 class="dash-alert-subtitle"><i data-lucide="alert-triangle" style="width:14px;height:14px"></i> Sem Frequencia (14 dias)</h4>
+          <div id="dash-sem-freq" class="dash-alert-list">
+            <p style="color:var(--paragrafo);font-size:13px">Carregando...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="app.js"></script>
+  <script>lucide.createIcons();</script>
+  <script src="https://va.vercel-scripts.com/v1/speed-insights/script.js" defer></script>
+  <script src="https://va.vercel-scripts.com/v1/analytics/script.js" defer></script>
+</body>
+</html>

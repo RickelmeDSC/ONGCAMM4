@@ -80,6 +80,7 @@ Request HTTP
 Front-end/files/
 ├── index.html              ← Login (split-screen) + CAPTCHA Turnstile + Termos
 ├── home.html               ← Página inicial (Nossa História, Missão, Valores)
+├── dashboard.html          ← Dashboard com métricas, gráficos Chart.js e alertas
 ├── cadastros.html          ← Lista de crianças + botão Gerar PDF
 ├── cadastrar-crianca.html  ← Formulário de cadastro (com gênero)
 ├── frequencia.html         ← Registro de frequência + botão Gerar PDF
@@ -89,8 +90,8 @@ Front-end/files/
 ├── admin-permissoes.html   ← Controle de acessos (select de nível por usuário)
 ├── admin-atividades.html   ← Registro de atividades
 ├── admin-doacoes.html      ← Registro de doações (modal)
-├── styles.css              ← Estilos globais
-├── app.js                  ← Lógica JS + integração com API
+├── styles.css              ← Estilos globais + glassmorphism dashboard
+├── app.js                  ← Lógica JS + integração com API + Chart.js
 ├── logo-camm.png           ← Logo da ONG (PNG com fundo transparente)
 └── home-banner.png         ← Banner da página Home (crianças CAMM)
 ```
@@ -101,6 +102,8 @@ Front-end/files/
 index.html (Login)
     ↓ login bem-sucedido
 home.html (Página Inicial)
+    ↓
+dashboard.html (Dashboard — métricas, gráficos, alertas)
     ↓
 cadastros.html (Cadastros)
     ├── cadastrar-crianca.html
@@ -437,7 +440,15 @@ Prefixo global: `/api/v1`. Todos (exceto login e refresh) exigem `Authorization:
 | POST | /relatorios/auditoria | Diretor (3) | Gerar PDF de auditoria |
 | GET | /relatorios/:id/download | Gestor (2) | Download do PDF gerado |
 
-### 7.7 Atividades, Eventos, Doações, Declarações, Auditoria
+### 7.7 Dashboard
+
+| Método | Rota | Acesso Mínimo | Descrição |
+|---|---|---|---|
+| GET | /dashboard/metrics | Voluntário (1) | Métricas agregadas (crianças, frequência, doações, logs, alertas) |
+
+Retorna JSON com: `criancas_ativas`, `frequencia_hoje` (presentes/total/percentual), `doacoes_mes` (total/valor/quantidade), `voluntarios_ativos`, `frequencia_semanal` (7 dias), `doacoes_mensais` (6 meses), `logs_recentes` (10 últimos), `aniversariantes_semana`, `criancas_sem_frequencia` (14 dias).
+
+### 7.8 Atividades, Eventos, Doações, Declarações, Auditoria
 
 Seguem o mesmo padrão CRUD. Consultar Swagger em `/api/docs` para detalhes.
 
@@ -478,6 +489,7 @@ Todas as chamadas HTTP passam por `_fetchWithRefresh()` que:
 
 - **Lucide Icons** — `https://unpkg.com/lucide@latest` (carregado em todas as páginas)
 - **Google Fonts** — Nunito + Nunito Sans
+- **Chart.js** — `https://cdn.jsdelivr.net/npm/chart.js@4.4.7` (carregado apenas no dashboard)
 - **Cloudflare Turnstile** — CAPTCHA na tela de login (site key no HTML, secret key no backend)
 
 ### 8.5 Design System
@@ -494,6 +506,10 @@ Todas as chamadas HTTP passam por `_fetchWithRefresh()` que:
 - **Relatórios PDF**: botão "Gerar PDF" em cadastros e frequência, gerados em memória (buffer) e retornados direto na response
 - **Soft delete**: exclusão de usuários e crianças faz `UPDATE ativo=false`; query param `?includeInactive=true` para ver excluídos
 - **Frequência**: inclui turno (Manhã/Tarde/Integral) e campo de justificativa de falta (observação)
+- **Dashboard**: página com cards glassmorphism (crianças, frequência, doações, voluntários), gráficos Chart.js (frequência semanal barras, doações mensais linha), logs recentes, aniversariantes da semana e alertas de crianças sem frequência. Cards com animação de entrada escalonada e contagem animada. Logs visíveis apenas para gestores/diretores (nível >= 2).
+- **Glassmorphism**: cards do dashboard usam `backdrop-filter: blur()`, bordas translúcidas, sombras coloridas por categoria
+- **Chart.js**: CDN v4.4.7, carregado apenas no dashboard.html
+- **Sidebar**: navegação inclui Home, Dashboard, Cadastros, Frequência e Administrativo
 - **Visibilidade**: menu Administrativo oculto para voluntários (nível < 2)
 - **Proteção XSS**: função `esc()` escapa dados do usuário em todos os templates HTML dinâmicos
 - **Validação de formulários**: todos os campos obrigatórios são validados no frontend antes de enviar à API
@@ -617,15 +633,66 @@ Configuradas no painel do Render (Environment → Environment Variables):
 
 ## 12. DIVISÃO DE RESPONSABILIDADES
 
-### Rickelme
+### Back-end
+
+#### Rickelme
 - Inicialização do projeto, configuração base
 - Módulos: prisma, auth, usuarios, criancas, responsaveis, documentos, common (guards, decorators, interceptors, filters)
 - Validação de CPF, busca por nome/matrícula
 - Setup do Swagger, .env, main.ts, app.module.ts
 
-### Lucas
+#### Lucas
 - Módulos: frequencia, atividades, eventos, doacoes, declaracoes, relatorios, auditoria
+
+### Front-end
+
+#### Sergio
+- Estrutura inicial do frontend (pasta `Front-end/files/`): HTML base, CSS base, layout geral
+
+#### Rickelme
+- Redesign completo da sidebar (cores, gradientes, logo, footer com avatar/logout)
+- Integração total com a API (app.js): Auth, _fetchWithRefresh, refresh token, CORS
+- Dashboard: página, gráficos Chart.js, glassmorphism, animações, endpoint backend
+- Segurança frontend: função `esc()` (XSS), validações, CAPTCHA Turnstile
+- Correções de bugs (11+ itens reportados da ONG): soft delete, modais, permissões, PDF em memória, session handling
+- Funcionalidades adicionadas: gênero, turno/justificativa na frequência, matrícula aleatória, foto/documentos, contadores dinâmicos, histórico de presença com calendário
+- Páginas novas/reescritas: home.html, dashboard.html, admin-permissoes.html
+- Deploy: configuração Vercel + Render + Docker, Speed Insights/Analytics
+- Documentação: CLAUDE.md, README.md
 
 ---
 
 *Documento atualizado em 2026-03-30. Toda alteração estrutural deve ser refletida aqui antes de ser implementada.*
+
+---
+
+## 13. DASHBOARD
+
+### 13.1 Visão Geral
+
+O Dashboard é a página central de métricas do sistema. Acessível por todos os usuários autenticados, exibe dados agregados em tempo real via endpoint `GET /dashboard/metrics`.
+
+### 13.2 Componentes
+
+| Componente | Descrição | Permissão |
+|---|---|---|
+| Cards de Resumo | 4 cards glassmorphism: Crianças Ativas, Frequência Hoje (%), Doações do Mês, Voluntários Ativos | Todos |
+| Gráfico Frequência | Barras (Chart.js) — presentes vs ausentes nos últimos 7 dias | Todos |
+| Gráfico Doações | Linha (Chart.js) — valor de doações nos últimos 6 meses | Todos |
+| Atividade Recente | Últimos 10 registros do LogSistema com tempo relativo | Gestor+ (nível >= 2) |
+| Aniversariantes | Crianças com aniversário nos próximos 7 dias | Todos |
+| Alertas Frequência | Crianças sem registro de frequência há 14+ dias | Todos |
+
+### 13.3 Visual
+
+- **Glassmorphism**: `backdrop-filter: blur(16px)`, bordas semi-transparentes, sombras coloridas por categoria (coral, verde, azul, laranja)
+- **Animações**: entrada escalonada dos cards (`dashCardIn`), contagem animada dos números (`animateCounter`), fade slide dos logs (`fadeSlideUp`)
+- **Chart.js**: CDN v4.4.7, gráficos responsivos com `maintainAspectRatio: false`
+- **Responsivo**: 4 cols → 2 cols → 1 col; gráficos e alertas empilham em mobile
+
+### 13.4 Backend
+
+- **Módulo**: `DashboardModule` (controller + service)
+- **Endpoint**: `GET /dashboard/metrics` — retorna todas as métricas em uma única chamada
+- **Queries**: usa Prisma `count`, `findMany`, `aggregate` e lógica de agrupamento em JS
+- **Performance**: todas as queries são executadas em paralelo via `Promise.all` no service

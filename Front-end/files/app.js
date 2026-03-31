@@ -803,6 +803,199 @@ const CalendarioPresenca = {
 
 // ── Dados MOCK removidos — tudo vem da API agora ─
 
+// ── DASHBOARD ────────────────────────────────────
+async function renderDashboard() {
+  try {
+    const data = await api.get('/dashboard/metrics');
+    const user = Auth.getUser();
+    const nivel = user?.nivel_acesso ?? 1;
+
+    // Cards de resumo com animação de contagem
+    animateCounter('dash-criancas', data.criancas_ativas);
+    animateCounter('dash-frequencia', data.frequencia_hoje.percentual, '%');
+    animateCounter('dash-doacoes', data.doacoes_mes.quantidade);
+    animateCounter('dash-voluntarios', data.voluntarios_ativos);
+
+    // Gráfico de frequência semanal
+    renderChartFrequencia(data.frequencia_semanal);
+
+    // Gráfico de doações mensais
+    renderChartDoacoes(data.doacoes_mensais);
+
+    // Logs recentes (nivel >= 2 vê logs, nivel 1 vê mensagem)
+    const logsContainer = document.getElementById('dash-logs');
+    if (logsContainer) {
+      if (nivel >= 2 && data.logs_recentes && data.logs_recentes.length > 0) {
+        logsContainer.innerHTML = data.logs_recentes.map(log => {
+          const inicial = (log.usuario_nome || 'U').charAt(0).toUpperCase();
+          const tempo = _tempoRelativo(log.data_hora);
+          const acao = _formatarAcao(log.acao, log.entidade);
+          return `
+            <div class="dash-log-item">
+              <div class="dash-log-avatar">${inicial}</div>
+              <div class="dash-log-text"><strong>${esc(log.usuario_nome)}</strong> ${acao}</div>
+              <span class="dash-log-time">${tempo}</span>
+            </div>`;
+        }).join('');
+      } else if (nivel < 2) {
+        logsContainer.innerHTML = '<p class="dash-alert-empty">Disponivel para gestores e diretores.</p>';
+      } else {
+        logsContainer.innerHTML = '<p class="dash-alert-empty">Nenhuma atividade recente.</p>';
+      }
+    }
+
+    // Aniversariantes da semana
+    const anivContainer = document.getElementById('dash-aniversarios');
+    if (anivContainer) {
+      if (data.aniversariantes_semana && data.aniversariantes_semana.length > 0) {
+        anivContainer.innerHTML = data.aniversariantes_semana.map(a => {
+          const dia = new Date(a.data_nascimento).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', timeZone: 'UTC' });
+          return `
+            <div class="dash-alert-item dash-alert-birthday">
+              <div class="dash-alert-icon">🎂</div>
+              <span><span class="dash-alert-name">${esc(a.nome)}</span> — ${dia}</span>
+            </div>`;
+        }).join('');
+      } else {
+        anivContainer.innerHTML = '<p class="dash-alert-empty">Nenhum aniversariante esta semana.</p>';
+      }
+    }
+
+    // Crianças sem frequência
+    const semFreqContainer = document.getElementById('dash-sem-freq');
+    if (semFreqContainer) {
+      if (data.criancas_sem_frequencia && data.criancas_sem_frequencia.length > 0) {
+        semFreqContainer.innerHTML = data.criancas_sem_frequencia.slice(0, 5).map(c => {
+          const ultimo = c.ultimo_registro ? toBR(c.ultimo_registro) : 'Nunca';
+          return `
+            <div class="dash-alert-item dash-alert-warning">
+              <div class="dash-alert-icon">⚠</div>
+              <span><span class="dash-alert-name">${esc(c.nome)}</span> — ultimo: ${ultimo}</span>
+            </div>`;
+        }).join('');
+      } else {
+        semFreqContainer.innerHTML = '<p class="dash-alert-empty">Todas as criancas com frequencia em dia!</p>';
+      }
+    }
+
+  } catch (err) {
+    console.error('Erro ao carregar dashboard:', err);
+    Toast.error('Erro ao carregar dashboard. O servidor pode estar iniciando.');
+  }
+}
+
+// Animação de contagem nos cards
+function animateCounter(elementId, targetValue, suffix = '') {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const target = Math.round(targetValue);
+  const duration = 800;
+  const start = performance.now();
+
+  function step(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+    const current = Math.round(target * eased);
+    el.textContent = current + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// Gráfico de frequência semanal (barras)
+function renderChartFrequencia(dados) {
+  const canvas = document.getElementById('chart-frequencia');
+  if (!canvas || !window.Chart) return;
+  const diasSemana = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
+  const labels = dados.map(d => {
+    const date = new Date(d.dia + 'T00:00:00');
+    return diasSemana[date.getDay()] + ' ' + String(date.getDate()).padStart(2,'0');
+  });
+  new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Presentes', data: dados.map(d => d.presentes), backgroundColor: 'rgba(102,187,106,0.7)', borderRadius: 6, borderSkipped: false },
+        { label: 'Ausentes', data: dados.map(d => d.ausentes), backgroundColor: 'rgba(224,82,82,0.5)', borderRadius: 6, borderSkipped: false },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16, font: { family: "'Nunito', sans-serif", weight: '600', size: 12 } } } },
+      scales: {
+        y: { beginAtZero: true, ticks: { font: { family: "'Nunito Sans', sans-serif", size: 11 } }, grid: { color: 'rgba(0,0,0,0.04)' } },
+        x: { ticks: { font: { family: "'Nunito Sans', sans-serif", size: 11 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+// Gráfico de doações mensais (linha)
+function renderChartDoacoes(dados) {
+  const canvas = document.getElementById('chart-doacoes');
+  if (!canvas || !window.Chart) return;
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const labels = dados.map(d => {
+    const [y, m] = d.mes.split('-');
+    return meses[parseInt(m) - 1] + '/' + y.slice(2);
+  });
+  new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Valor (R$)',
+        data: dados.map(d => d.valor),
+        borderColor: '#42A5F5',
+        backgroundColor: 'rgba(66,165,245,0.1)',
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#42A5F5',
+        pointRadius: 5,
+        pointHoverRadius: 7,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16, font: { family: "'Nunito', sans-serif", weight: '600', size: 12 } } } },
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: v => 'R$' + v, font: { family: "'Nunito Sans', sans-serif", size: 11 } }, grid: { color: 'rgba(0,0,0,0.04)' } },
+        x: { ticks: { font: { family: "'Nunito Sans', sans-serif", size: 11 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+// Tempo relativo (ex: "há 2h", "há 3 dias")
+function _tempoRelativo(dataISO) {
+  const agora = new Date();
+  const data = new Date(dataISO);
+  const diffMs = agora - data;
+  const minutos = Math.floor(diffMs / 60000);
+  if (minutos < 1) return 'agora';
+  if (minutos < 60) return `ha ${minutos}min`;
+  const horas = Math.floor(minutos / 60);
+  if (horas < 24) return `ha ${horas}h`;
+  const dias = Math.floor(horas / 24);
+  return `ha ${dias}d`;
+}
+
+// Formatar ação do log para texto legível
+function _formatarAcao(acao, entidade) {
+  const metodo = acao.split(' ')[0];
+  const entidadeLabel = entidade || 'registro';
+  const acoes = {
+    'POST': 'cadastrou',
+    'PATCH': 'atualizou',
+    'PUT': 'atualizou',
+    'DELETE': 'excluiu',
+  };
+  return `${acoes[metodo] || 'alterou'} ${entidadeLabel}`;
+}
+
 // ── Renderização de tabelas com dados da API ─────
 async function renderCadastrTable(includeInactive = false) {
   const tbody = document.getElementById('cadastros-tbody');
@@ -1110,6 +1303,12 @@ document.addEventListener('DOMContentLoaded', () => {
     case 'home':
       if (!Auth.requireAuth()) break;
       setActiveNav('home');
+      break;
+
+    case 'dashboard':
+      if (!Auth.requireAuth()) break;
+      setActiveNav('dashboard');
+      renderDashboard();
       break;
 
     case 'cadastros':
