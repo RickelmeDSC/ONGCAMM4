@@ -88,6 +88,7 @@ flowchart TD
 - **Painel administrativo** — gestao de voluntarios, permissoes por nivel, atividades e doacoes
 - **Relatorios em PDF** — criancas, frequencia, doacoes, atividades e auditoria (gerados em memoria)
 - **Soft delete** — usuarios e criancas desativados podem ser visualizados com filtro
+- **Dashboard** — metricas em tempo real, graficos de frequencia e doacoes (Chart.js), logs recentes, aniversariantes e alertas
 - **Pagina Home** — Nossa Historia, Missao e Valores com banner institucional
 - **Autenticacao segura** — JWT (1h) + Refresh Token (8h) com rotacao e validacao de sessao
 - **Auditoria completa** — log automatico com entidade, entidade_id, IP e timestamp
@@ -114,6 +115,7 @@ ONGCAMM4/
 │   │   ├── doacoes/           # Registro de doacoes
 │   │   ├── declaracoes/       # Declaracoes (PDF)
 │   │   ├── relatorios/        # Relatorios em PDF
+│   │   ├── dashboard/          # Metricas agregadas
 │   │   ├── auditoria/         # Logs do sistema
 │   │   ├── documentos/        # Upload de fotos/docs
 │   │   ├── prisma/            # Prisma Service
@@ -140,6 +142,7 @@ Prefixo global: `/api/v1` | Swagger: `/api/docs`
 | Modulo | Endpoints | Acesso |
 |--------|----------|--------|
 | Auth | `POST /login`, `/refresh`, `/logout`, `GET /me` | Publico / Autenticado |
+| Dashboard | `GET /dashboard/metrics` | Voluntario+ |
 | Usuarios | CRUD + `PATCH /:id/reset-senha` | Gestor / Diretor |
 | Criancas | CRUD completo | Voluntario+ |
 | Responsaveis | CRUD completo | Voluntario+ |
@@ -201,6 +204,7 @@ Auto-deploy: push na `main` atualiza Vercel e Render automaticamente.
 - Banco serverless (Neon)
 - Separacao clara: Controller / Service / ORM
 - CAPTCHA anti-bot (Cloudflare Turnstile)
+- Dashboard com metricas, graficos Chart.js e design glassmorphism
 - Relatorios PDF gerados em memoria (sem dependencia de disco)
 - Soft delete com filtro de excluidos
 - Frequencia com turno e justificativa de falta
@@ -210,10 +214,19 @@ Auto-deploy: push na `main` atualiza Vercel e Render automaticamente.
 
 ## Equipe
 
+**Back-end**
+
 | Membro | Responsabilidade |
 |--------|-----------------|
-| **Rickelme** | Arquitetura, auth, usuarios, criancas, responsaveis, documentos, infra, deploy |
+| **Rickelme** | Arquitetura, auth, usuarios, criancas, responsaveis, documentos, dashboard, infra, deploy |
 | **Lucas** | Frequencia, atividades, eventos, doacoes, declaracoes, relatorios, auditoria |
+
+**Front-end**
+
+| Membro | Responsabilidade |
+|--------|-----------------|
+| **Sergio** | Estrutura inicial do frontend (HTML, CSS, layout base) |
+| **Rickelme** | Redesign UI/UX, integracao com API, dashboard, seguranca (XSS, CAPTCHA), correcoes, funcionalidades novas, deploy |
 
 ### Autor Principal
 
