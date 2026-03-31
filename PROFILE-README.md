@@ -99,6 +99,7 @@ Sistema real em producao para o Centro de Atendimento a Meninos e a Meninas.
 - **Rate limiting** anti brute-force (`@nestjs/throttler`)
 - **Protecao XSS** com escaping em todos os templates dinamicos
 - Auditoria completa com logs (entidade, IP, timestamp)
+- **Dashboard** com metricas, graficos **Chart.js** e design **glassmorphism**
 - Geracao de **relatorios em PDF** (em memoria, sem disco)
 - **Soft delete** — registros nunca sao apagados permanentemente
 - **CAPTCHA** (Cloudflare Turnstile) + **CORS seguro**
