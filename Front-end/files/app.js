@@ -1076,12 +1076,23 @@ function _tempoRelativo(dataISO) {
   const data = new Date(dataISO);
   const diffMs = agora - data;
   const minutos = Math.floor(diffMs / 60000);
+
+  // Horário real formatado
+  const h = String(data.getHours()).padStart(2, '0');
+  const m = String(data.getMinutes()).padStart(2, '0');
+  const dia = String(data.getDate()).padStart(2, '0');
+  const mes = String(data.getMonth() + 1).padStart(2, '0');
+
   if (minutos < 1) return 'agora';
   if (minutos < 60) return `ha ${minutos}min`;
   const horas = Math.floor(minutos / 60);
-  if (horas < 24) return `ha ${horas}h`;
+  const minRestantes = minutos % 60;
+  if (horas < 24) {
+    const txt = minRestantes > 0 ? `${horas}h${minRestantes}min` : `${horas}h`;
+    return `${txt} (${h}:${m})`;
+  }
   const dias = Math.floor(horas / 24);
-  return `ha ${dias}d`;
+  return `${dia}/${mes} ${h}:${m}`;
 }
 
 // Formatar ação do log para texto legível
