@@ -77,23 +77,31 @@ Request HTTP
 ### 3.2 Frontend — Estrutura de Arquivos
 
 ```
-Front-end/files/
-├── index.html              ← Login (split-screen) + CAPTCHA Turnstile + Termos
-├── home.html               ← Página inicial (Nossa História, Missão, Valores)
-├── dashboard.html          ← Dashboard com métricas, gráficos Chart.js e alertas
-├── cadastros.html          ← Lista de crianças + botão Gerar PDF
-├── cadastrar-crianca.html  ← Formulário de cadastro (com gênero)
-├── frequencia.html         ← Registro de frequência + botão Gerar PDF
-├── historico-presenca.html ← Histórico individual com calendário
-├── admin.html              ← Painel administrativo (cards)
-├── admin-voluntarios.html  ← Lista de voluntários + modal cadastro/editar/reset senha
-├── admin-permissoes.html   ← Controle de acessos (select de nível por usuário)
-├── admin-atividades.html   ← Registro de atividades
-├── admin-doacoes.html      ← Registro de doações (modal)
-├── styles.css              ← Estilos globais + glassmorphism dashboard
-├── app.js                  ← Lógica JS + integração com API + Chart.js
-├── logo-camm.png           ← Logo da ONG (PNG com fundo transparente)
-└── home-banner.png         ← Banner da página Home (crianças CAMM)
+Front-end/
+├── Dockerfile              ← Nginx Alpine (serve estáticos + proxy reverso)
+├── nginx.conf              ← Proxy /api/* → backend:3000
+└── files/
+    ├── index.html              ← Login (split-screen) + CAPTCHA Turnstile + Termos
+    ├── home.html               ← Página inicial (Nossa História, Missão, Valores)
+    ├── dashboard.html          ← Dashboard com métricas, gráficos Chart.js e alertas
+    ├── cadastros.html          ← Lista de crianças + botão Gerar PDF
+    ├── cadastrar-crianca.html  ← Formulário de cadastro (com gênero)
+    ├── frequencia.html         ← Registro de frequência + botão Gerar PDF
+    ├── historico-presenca.html ← Histórico individual com calendário
+    ├── admin.html              ← Painel administrativo (cards)
+    ├── admin-voluntarios.html  ← Lista de voluntários + modal editar/reset senha
+    ├── admin-cadastrar-voluntario.html ← Cadastro de novo voluntário
+    ├── admin-permissoes.html   ← Controle de acessos (select de nível por usuário)
+    ├── admin-atividades.html   ← Registro de atividades
+    ├── admin-doacoes.html      ← Registro de doações (modal)
+    ├── styles.css              ← Estilos globais + glassmorphism dashboard
+    ├── app.js                  ← Lógica JS + integração com API + Chart.js
+    ├── assets/
+    │   ├── logo-camm.png       ← Logo da ONG (PNG com fundo transparente)
+    │   ├── favicon.ico         ← Favicon da logo CAMM
+    │   └── home-banner.png     ← Banner da página Home (crianças CAMM)
+    ├── package.json            ← Dependências Vercel (analytics/speed-insights)
+    └── package-lock.json
 ```
 
 ### 3.3 Frontend — Fluxo de Navegação
