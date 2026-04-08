@@ -1,10 +1,12 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsInt, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class UpdateAtividadeDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MinLength(2)
+  @MaxLength(255)
   titulo?: string;
 
   @ApiPropertyOptional()

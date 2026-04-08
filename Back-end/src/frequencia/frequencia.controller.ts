@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, HttpCode, HttpStatus, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { FrequenciaService } from './frequencia.service';
 import { CreateFrequenciaDto } from './dto/create-frequencia.dto';
@@ -26,7 +26,7 @@ export class FrequenciaController {
   @Get('crianca/:id')
   @Roles(1)
   @ApiOperation({ summary: 'Histórico de frequência por criança' })
-  findByCrianca(@Param('id') id: string) { return this.service.findByCrianca(+id); }
+  findByCrianca(@Param('id', ParseIntPipe) id: number) { return this.service.findByCrianca(id); }
 
   @Get('data/:data')
   @Roles(1)
@@ -41,11 +41,11 @@ export class FrequenciaController {
   @Patch(':id')
   @Roles(2)
   @ApiOperation({ summary: 'Corrigir registro de frequência' })
-  update(@Param('id') id: string, @Body() dto: UpdateFrequenciaDto) { return this.service.update(+id, dto.status); }
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateFrequenciaDto) { return this.service.update(id, dto.status); }
 
   @Delete(':id')
   @Roles(3)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Remover registro de frequência' })
-  remove(@Param('id') id: string) { return this.service.remove(+id); }
+  remove(@Param('id', ParseIntPipe) id: number) { return this.service.remove(id); }
 }

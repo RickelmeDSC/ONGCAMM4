@@ -65,7 +65,7 @@ export class UsuariosService {
 
     const data: any = { ...dto };
     if (dto.senha) {
-      data.senha_hash = await bcrypt.hash(dto.senha, 10);
+      data.senha_hash = await bcrypt.hash(dto.senha, 12);
       delete data.senha;
     }
 
@@ -78,7 +78,7 @@ export class UsuariosService {
 
   async resetSenha(id: number, novaSenha: string) {
     await this.findOne(id);
-    const senha_hash = await bcrypt.hash(novaSenha, 10);
+    const senha_hash = await bcrypt.hash(novaSenha, 12);
     await this.prisma.usuario.update({
       where: { id_usuario: id },
       data: { senha_hash },
