@@ -976,6 +976,8 @@ async function renderDashboard() {
     }
 
   } catch (err) {
+    // Remove skeleton mesmo em caso de erro
+    document.querySelectorAll('.dash-card.loading, .dash-chart-card.loading').forEach(el => el.classList.remove('loading'));
     console.error('Erro ao carregar dashboard:', err);
     Toast.error('Erro ao carregar dashboard. O servidor pode estar iniciando.');
   }

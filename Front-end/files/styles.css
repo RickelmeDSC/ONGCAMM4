@@ -1549,6 +1549,15 @@ input, textarea, select { font-family: var(--font-body); }
   to { transform: rotate(360deg); }
 }
 
+/* ── Acessibilidade: reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* ── Dashboard Responsive ── */
 @media (max-width: 1100px) {
   .dash-cards { grid-template-columns: repeat(2, 1fr); }
