@@ -904,6 +904,9 @@ async function renderDashboard() {
     const user = Auth.getUser();
     const nivel = user?.nivel_acesso ?? 1;
 
+    // Remove skeleton loading dos cards e graficos
+    document.querySelectorAll('.dash-card.loading, .dash-chart-card.loading').forEach(el => el.classList.remove('loading'));
+
     // Cards de resumo com animação de contagem
     animateCounter('dash-criancas', data.criancas_ativas);
     animateCounter('dash-frequencia', data.frequencia_hoje.percentual, '%');

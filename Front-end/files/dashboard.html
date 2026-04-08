@@ -41,43 +41,43 @@
 
     <!-- Cards de Resumo -->
     <div class="dash-cards" style="padding-left:40px;padding-right:40px;padding-top:28px;">
-      <div class="dash-card dash-card-coral">
+      <div class="dash-card dash-card-coral loading">
         <div class="dash-card-icon"><i data-lucide="users" style="width:24px;height:24px"></i></div>
         <div class="dash-card-info">
           <span class="dash-card-label">Criancas Ativas</span>
-          <span class="dash-card-value" id="dash-criancas">--</span>
+          <span class="dash-card-value" id="dash-criancas">&nbsp;</span>
         </div>
       </div>
-      <div class="dash-card dash-card-verde">
+      <div class="dash-card dash-card-verde loading">
         <div class="dash-card-icon"><i data-lucide="clipboard-check" style="width:24px;height:24px"></i></div>
         <div class="dash-card-info">
           <span class="dash-card-label">Frequencia Hoje</span>
-          <span class="dash-card-value" id="dash-frequencia">--%</span>
+          <span class="dash-card-value" id="dash-frequencia">&nbsp;</span>
         </div>
       </div>
-      <div class="dash-card dash-card-azul">
+      <div class="dash-card dash-card-azul loading">
         <div class="dash-card-icon"><i data-lucide="heart-handshake" style="width:24px;height:24px"></i></div>
         <div class="dash-card-info">
           <span class="dash-card-label">Doacoes do Mes</span>
-          <span class="dash-card-value" id="dash-doacoes">--</span>
+          <span class="dash-card-value" id="dash-doacoes">&nbsp;</span>
         </div>
       </div>
-      <div class="dash-card dash-card-laranja">
+      <div class="dash-card dash-card-laranja loading">
         <div class="dash-card-icon"><i data-lucide="handshake" style="width:24px;height:24px"></i></div>
         <div class="dash-card-info">
           <span class="dash-card-label">Voluntarios Ativos</span>
-          <span class="dash-card-value" id="dash-voluntarios">--</span>
+          <span class="dash-card-value" id="dash-voluntarios">&nbsp;</span>
         </div>
       </div>
     </div>
 
     <!-- Graficos -->
     <div class="dash-charts" style="padding-left:40px;padding-right:40px;margin-top:24px;">
-      <div class="dash-chart-card">
+      <div class="dash-chart-card loading">
         <h3 class="dash-chart-title"><i data-lucide="bar-chart-3" style="width:18px;height:18px;color:var(--verde)"></i> Frequencia Semanal</h3>
         <div class="dash-chart-wrap"><canvas id="chart-frequencia"></canvas></div>
       </div>
-      <div class="dash-chart-card">
+      <div class="dash-chart-card loading">
         <h3 class="dash-chart-title"><i data-lucide="trending-up" style="width:18px;height:18px;color:var(--azul)"></i> Doacoes Mensais</h3>
         <div class="dash-chart-wrap"><canvas id="chart-doacoes"></canvas></div>
       </div>
@@ -89,7 +89,7 @@
       <div class="dash-activity-card" id="dash-activity-card">
         <h3 class="dash-chart-title"><i data-lucide="activity" style="width:18px;height:18px;color:var(--coral)"></i> Atividade Recente</h3>
         <div id="dash-logs" class="dash-logs">
-          <p style="color:var(--paragrafo);font-size:13px">Carregando...</p>
+          <div class="dash-loading-text"><div class="dash-loading-spinner"></div>Carregando atividades...</div>
         </div>
       </div>
 
@@ -101,7 +101,7 @@
         <div class="dash-alert-section">
           <h4 class="dash-alert-subtitle"><i data-lucide="cake" style="width:14px;height:14px"></i> Aniversariantes da Semana</h4>
           <div id="dash-aniversarios" class="dash-alert-list">
-            <p style="color:var(--paragrafo);font-size:13px">Carregando...</p>
+            <div class="dash-loading-text"><div class="dash-loading-spinner"></div>Carregando...</div>
           </div>
         </div>
 
@@ -109,7 +109,7 @@
         <div class="dash-alert-section">
           <h4 class="dash-alert-subtitle"><i data-lucide="alert-triangle" style="width:14px;height:14px"></i> Sem Frequencia (14 dias)</h4>
           <div id="dash-sem-freq" class="dash-alert-list">
-            <p style="color:var(--paragrafo);font-size:13px">Carregando...</p>
+            <div class="dash-loading-text"><div class="dash-loading-spinner"></div>Carregando...</div>
           </div>
         </div>
       </div>

@@ -735,4 +735,56 @@ Veja `.claude/skills-setup-prompt.md` para o mapa de composição entre elas.
 
 ---
 
+## 15. ATUALIZAÇÕES FUTURAS
+
+Melhorias planejadas para evolução do projeto após a entrega atual.
+
+### 15.1 Migração do Frontend para Vue.js + PrimeVue
+
+**Stack proposta:**
+- Vue 3 (Composition API)
+- Vite (build tooling)
+- Vue Router (navegação SPA)
+- Pinia (gerenciamento de estado / auth)
+- PrimeVue (biblioteca de UI)
+- Chart.js + vue-chartjs (gráficos reativos)
+
+**Benefícios:**
+- Componentes reutilizáveis (sidebar, header, modais, tabelas feitos uma vez)
+- Reatividade automática (sem manipulação DOM manual)
+- Roteamento SPA (navegação sem reload de página)
+- Componentes PrimeVue prontos (DataTable com filtro/ordenação/paginação, Dialog, Forms)
+- Build otimizado com tree-shaking e code-splitting
+
+**Plano de migração:**
+1. Setup Vite + Vue, migrar layout (sidebar/header) para componentes
+2. Migrar páginas mais simples (admin, cadastros)
+3. Migrar dashboard (integrar Chart.js com vue-chartjs)
+4. Migrar auth e lógica do `_fetchWithRefresh` para Pinia
+
+### 15.2 Paginação no Backend
+
+Endpoints que retornam datasets completos (`findAll`) devem implementar paginação com `skip` e `take`:
+- `GET /criancas` — retorna todas as crianças
+- `GET /frequencia` — retorna todos os registros
+- `GET /auditoria/logs` — retorna todos os logs
+- Relatórios PDF — queries sem limite
+
+### 15.3 Testes Automatizados
+
+O projeto não possui testes. Prioridade de implementação:
+1. **Auth** — login, refresh, logout, guards (módulo mais crítico)
+2. **Criancas/Frequencia** — CRUD principal
+3. **Dashboard** — endpoint de métricas
+4. Stack sugerida: Jest + Supertest (já inclusos no NestJS)
+
+### 15.4 Domínio Próprio
+
+Registro de domínio `.org.br` via registro.br com o CNPJ da ONG. Após registro:
+- Configurar DNS no Vercel (frontend) e Render (backend)
+- Atualizar `FRONTEND_URL` no Render
+- Atualizar CORS e CAPTCHA para o novo domínio
+
+---
+
 *Documento atualizado em 2026-04-08. Toda alteração estrutural deve ser refletida aqui antes de ser implementada.*
