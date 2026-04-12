@@ -485,6 +485,8 @@ Todas as chamadas HTTP passam por `_fetchWithRefresh()` que:
 3. Se o refresh funcionar, refaz a requisição original
 4. Se o refresh falhar, redireciona para login
 
+A resposta é processada por `_parseOrThrow()`, que em caso de erro lê o body JSON da API e lança um `Error` enriquecido com `err.status` (status HTTP) e `err.apiMessage` (mensagem real do backend, ex: "CPF já cadastrado"). Os toasts de erro mostram essa mensagem em vez de um texto genérico, e os handlers podem ramificar pelo `err.status` (ex: 409 → reusar entidade existente).
+
 ### 8.3 Armazenamento Local
 
 | Key | Conteúdo |
@@ -508,7 +510,8 @@ Todas as chamadas HTTP passam por `_fetchWithRefresh()` que:
 - **Cores primárias**: amarelo (#FFD45E), laranja (#FFA726), coral (#F4845F)
 - **Cores de apoio**: rosa (#F48FB1), verde (#66BB6A), azul (#42A5F5)
 - **Fundo geral**: #F8F9FC (cinza claro neutro)
-- **Datas**: inputs `type="date"` (calendário nativo do navegador), formato ISO (YYYY-MM-DD)
+- **Datas**: inputs `type="date"` (calendário nativo do navegador), formato ISO (YYYY-MM-DD). Em campos como `data_nascimento` o atributo `max` é setado dinamicamente para ontem, com validação extra no submit.
+- **Botões com loading**: classe `.btn.is-loading` exibe spinner girando, oculta o texto e bloqueia cliques. Usada em operações longas (cadastro de criança, etc.) para feedback enquanto o backend (Render free tier) responde.
 - **Login**: inclui Cloudflare Turnstile CAPTCHA e link para Termos de Responsabilidade e Uso de Imagem
 - **Formulários modais**: cadastro de voluntário e doação usam modais com overlay opaco (65%)
 - **Relatórios PDF**: botão "Gerar PDF" em cadastros e frequência, gerados em memória (buffer) e retornados direto na response
@@ -602,8 +605,9 @@ O `LoggingInterceptor` registra automaticamente toda operação de escrita (POST
 - **Login falho**: Logger.warn registra email para detecção de brute-force
 - **Bcrypt**: salt rounds = 12
 - **XSS Frontend**: função `esc()` escapa &, <, >, ", ' em todos os templates dinâmicos (nomes, emails, doadores, títulos)
-- **Validação Frontend**: campos obrigatórios validados antes de enviar à API (nome, CPF, data nascimento, telefone)
-- **Toast**: todas as páginas usam `Toast.success()` / `Toast.error()` — sem funções indefinidas
+- **Validação Frontend**: campos obrigatórios validados antes de enviar à API (nome, CPF, data nascimento, telefone). Data de nascimento bloqueia hoje e datas futuras (atributo `max` + check no submit).
+- **Toast**: todas as páginas usam `Toast.success()` / `Toast.error()` — sem funções indefinidas. Toasts de erro mostram a mensagem real da API via `err.apiMessage` (parsed em `_parseOrThrow`).
+- **Cadastro de criança resiliente**: se POST `/responsaveis` retornar 409 (CPF já cadastrado), o frontend busca o responsável existente e reusa o `id_responsavel`. O upload de foto roda em try-catch isolado: falha não derruba o cadastro da criança.
 
 ### 10.4 Observações do Build
 
