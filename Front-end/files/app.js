@@ -533,6 +533,9 @@ async function handleCadastrarCrianca(e) {
   if (!Validate.required(resp_cpf,  'CPF do responsável'))  return;
   if (!Validate.required(resp_tel,  'Telefone do responsável')) return;
 
+  const btn = document.getElementById('btn-finalizar');
+  if (btn) { btn.classList.add('is-loading'); btn.disabled = true; }
+
   try {
     // 1. Cadastrar responsável — se CPF já existe (409), reusa o existente
     let responsavel;
@@ -617,6 +620,7 @@ async function handleCadastrarCrianca(e) {
   } catch (err) {
     console.error(err);
     Toast.error(err?.apiMessage || err?.message || 'Erro ao cadastrar crianca.');
+    if (btn) { btn.classList.remove('is-loading'); btn.disabled = false; }
   }
 }
 

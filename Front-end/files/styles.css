@@ -310,6 +310,30 @@ input, textarea, select { font-family: var(--font-body); }
   font-size: 13px;
 }
 
+.btn.is-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+  opacity: 0.85;
+}
+.btn.is-loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid rgba(0,0,0,0.2);
+  border-top-color: var(--titulo, #3D2800);
+  border-radius: 50%;
+  animation: btnSpin 0.7s linear infinite;
+}
+@keyframes btnSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .btn.is-loading::after { animation: none; }
+}
+
 /* ================================================
    CARDS
    ================================================ */
