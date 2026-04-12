@@ -507,6 +507,11 @@ async function handleCadastrarCrianca(e) {
   const foto            = document.getElementById('c-foto')?.files[0];
 
   if (!Validate.required(data_nascimento, 'Data de nascimento')) return;
+  const _hoje = new Date(); _hoje.setHours(0, 0, 0, 0);
+  if (new Date(data_nascimento + 'T00:00:00') >= _hoje) {
+    Toast.error('Data de nascimento deve ser anterior a hoje');
+    return;
+  }
   if (!Validate.required(cpf, 'CPF da criança')) return;
 
   const resp_nome = document.getElementById('r-nome')?.value.trim();
@@ -1499,6 +1504,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!Auth.requireAuth()) break;
       setActiveNav('cadastros');
       initPhotoUpload();
+      // Bloqueia data de nascimento >= hoje
+      const _nascInput = document.getElementById('c-nascimento');
+      if (_nascInput) {
+        const _ontem = new Date();
+        _ontem.setDate(_ontem.getDate() - 1);
+        _nascInput.max = _ontem.toISOString().slice(0, 10);
+      }
       document.getElementById('form-crianca')?.addEventListener('submit', handleCadastrarCrianca);
       // Se tem ?id=X, preenche o formulario com dados do BD (edicao)
       const editId = new URLSearchParams(window.location.search).get('id');
