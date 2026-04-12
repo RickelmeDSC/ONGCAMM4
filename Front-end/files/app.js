@@ -129,9 +129,20 @@ async function _fetchWithRefresh(url, options) {
   return res;
 }
 
-function _check(res, label) {
-  if (!res.ok) throw new Error(`${label} → ${res.status}`);
-  return res;
+async function _parseOrThrow(res, label) {
+  if (!res.ok) {
+    let apiMsg = '';
+    try {
+      const body = await res.json();
+      apiMsg = Array.isArray(body?.message) ? body.message.join(', ') : (body?.message || '');
+    } catch (_) { /* sem body JSON */ }
+    const err = new Error(apiMsg || `${label} → ${res.status}`);
+    err.status = res.status;
+    err.apiMessage = apiMsg;
+    throw err;
+  }
+  if (res.status === 204) return null;
+  return res.json();
 }
 
 const api = {
@@ -140,7 +151,7 @@ const api = {
     const res = await _fetchWithRefresh(`${API_BASE_URL}${endpoint}`, {
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
     });
-    return _check(res, `GET ${endpoint}`).json();
+    return _parseOrThrow(res, `GET ${endpoint}`);
   },
   async post(endpoint, body) {
     const token = Auth.getToken();
@@ -149,7 +160,7 @@ const api = {
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
-    return _check(res, `POST ${endpoint}`).json();
+    return _parseOrThrow(res, `POST ${endpoint}`);
   },
   async put(endpoint, body) {
     const token = Auth.getToken();
@@ -158,7 +169,7 @@ const api = {
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
-    return _check(res, `PUT ${endpoint}`).json();
+    return _parseOrThrow(res, `PUT ${endpoint}`);
   },
   async patch(endpoint, body) {
     const token = Auth.getToken();
@@ -167,7 +178,7 @@ const api = {
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
-    return _check(res, `PATCH ${endpoint}`).json();
+    return _parseOrThrow(res, `PATCH ${endpoint}`);
   },
   async delete(endpoint) {
     const token = Auth.getToken();
@@ -175,8 +186,7 @@ const api = {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    _check(res, `DELETE ${endpoint}`);
-    return res.status !== 204 ? res.json() : null;
+    return _parseOrThrow(res, `DELETE ${endpoint}`);
   },
   async postForm(endpoint, formData) {
     const token = Auth.getToken();
@@ -185,7 +195,7 @@ const api = {
       headers: { 'Authorization': `Bearer ${token}` },
       body: formData
     });
-    return _check(res, `POST form ${endpoint}`).json();
+    return _parseOrThrow(res, `POST form ${endpoint}`);
   }
 };
 
@@ -524,13 +534,24 @@ async function handleCadastrarCrianca(e) {
   if (!Validate.required(resp_tel,  'Telefone do responsável')) return;
 
   try {
-    // 1. Cadastrar responsável
-    const responsavel = await api.post('/responsaveis', {
-      nome:     resp_nome,
-      cpf:      resp_cpf,
-      contato:  resp_tel || '',
-      endereco: resp_end || '',
-    });
+    // 1. Cadastrar responsável — se CPF já existe (409), reusa o existente
+    let responsavel;
+    try {
+      responsavel = await api.post('/responsaveis', {
+        nome:     resp_nome,
+        cpf:      resp_cpf,
+        contato:  resp_tel || '',
+        endereco: resp_end || '',
+      });
+    } catch (respErr) {
+      if (respErr.status === 409) {
+        const lista = await api.get('/responsaveis');
+        responsavel = lista.find(r => r.cpf === resp_cpf);
+        if (!responsavel) throw respErr;
+      } else {
+        throw respErr;
+      }
+    }
 
     // 2. Cadastrar criança vinculando ao responsável
     const genero = document.getElementById('c-genero')?.value || undefined;
@@ -543,11 +564,16 @@ async function handleCadastrarCrianca(e) {
     if (genero) criancaBody.genero = genero;
     const criancaData = await api.post('/criancas', criancaBody);
 
-    // 3. Upload da foto (se houver)
+    // 3. Upload da foto (se houver) — falha NÃO derruba o cadastro
     if (foto) {
-      const formData = new FormData();
-      formData.append('file', foto);
-      await api.postForm(`/documentos/upload/foto/${criancaData.id_matricula}`, formData);
+      try {
+        const formData = new FormData();
+        formData.append('file', foto);
+        await api.postForm(`/documentos/upload/foto/${criancaData.id_matricula}`, formData);
+      } catch (fotoErr) {
+        console.error('Erro ao enviar foto:', fotoErr);
+        Toast.error('Crianca cadastrada, mas falhou o upload da foto.');
+      }
     }
 
     // 4. Declaração de responsabilidade (se ativada)
@@ -589,8 +615,8 @@ async function handleCadastrarCrianca(e) {
     Toast.success('Crianca cadastrada com sucesso!');
     setTimeout(() => window.location.href = 'cadastros.html', 1500);
   } catch (err) {
-    Toast.error('Erro ao cadastrar crianca. Verifique os dados e tente novamente.');
     console.error(err);
+    Toast.error(err?.apiMessage || err?.message || 'Erro ao cadastrar crianca.');
   }
 }
 
