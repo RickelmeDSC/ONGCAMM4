@@ -14,7 +14,7 @@
 | Antes | Depois |
 |-------|--------|
 | Controle manual de presenca | Sistema centralizado e auditavel |
-| Documentos fisicos | Upload digital com rastreabilidade |
+| Documentos fisicos | Upload digital (certidao, vacina) com rastreabilidade |
 | Falta de rastreabilidade | Historico completo de acoes (LogSistema) |
 | Risco de perda de dados | Banco PostgreSQL em nuvem (Neon) |
 
@@ -83,11 +83,11 @@ flowchart TD
 
 ## Funcionalidades
 
-- **Cadastro de criancas** — dados pessoais, foto 3x4, genero, documentos e responsavel legal
+- **Cadastro de criancas** — dados pessoais, genero, documentos e responsavel legal (avatar com iniciais do nome)
 - **Controle de frequencia** — registro diario com turno (Manha/Tarde/Integral) e justificativa de falta
 - **Painel administrativo** — gestao de voluntarios, permissoes por nivel, atividades e doacoes
 - **Relatorios em PDF** — criancas, frequencia, doacoes, atividades e auditoria (gerados em memoria)
-- **Soft delete** — usuarios e criancas desativados podem ser visualizados com filtro
+- **Hard delete** — exclusao de usuarios, criancas e doacoes remove permanentemente do banco
 - **Dashboard** — metricas em tempo real, graficos de frequencia e doacoes (Chart.js), logs recentes, aniversariantes e alertas
 - **Pagina Home** — Nossa Historia, Missao e Valores com banner institucional
 - **Autenticacao segura** — JWT (1h) + Refresh Token (8h) com rotacao e validacao de sessao
@@ -117,7 +117,7 @@ ONGCAMM4/
 │   │   ├── relatorios/        # Relatorios em PDF
 │   │   ├── dashboard/          # Metricas agregadas
 │   │   ├── auditoria/         # Logs do sistema
-│   │   ├── documentos/        # Upload de fotos/docs
+│   │   ├── documentos/        # Upload de certidao e cartao de vacina
 │   │   ├── prisma/            # Prisma Service
 │   │   └── common/            # Guards, decorators, interceptors
 │   ├── prisma/
@@ -206,7 +206,7 @@ Auto-deploy: push na `main` atualiza Vercel e Render automaticamente.
 - CAPTCHA anti-bot (Cloudflare Turnstile)
 - Dashboard com metricas, graficos Chart.js e design glassmorphism
 - Relatorios PDF gerados em memoria (sem dependencia de disco)
-- Soft delete com filtro de excluidos
+- Avatar com iniciais geradas dinamicamente (sem dependencia de disco)
 - Frequencia com turno e justificativa de falta
 - Controle de visibilidade do menu por nivel de acesso
 

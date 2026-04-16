@@ -37,7 +37,7 @@ O sistema ONG CAMM4 — **Centro de Atendimento a Meninos e a Meninas** — é u
 | ORM | Prisma | 6.19+ |
 | Banco de Dados | PostgreSQL | Neon (serverless) |
 | Autenticação | JWT (access) + Refresh Token (banco) | passport-jwt + bcryptjs |
-| Upload | Multer | salva caminho no banco |
+| Upload | Multer | documentos (certidão, vacina) — foto da criança removida por limitação do disco efêmero |
 | PDF | pdf-lib | >= 1.17 |
 | Validação | class-validator + class-transformer | >= 0.14 |
 | Documentação | Swagger (OpenAPI) | @nestjs/swagger |
@@ -50,7 +50,7 @@ O sistema ONG CAMM4 — **Centro de Atendimento a Meninos e a Meninas** — é u
 | Ícones | Lucide Icons (CDN) |
 | Fontes | Nunito + Nunito Sans (Google Fonts) |
 | Servidor local | Live Server (VSCode) ou npx serve |
-| Estilo | CSS custom properties, sidebar escura (#2B2D42), header gradiente amarelo, layout responsivo |
+| Estilo | CSS custom properties, sidebar e header em gradiente amarelo, layout responsivo |
 
 ---
 
@@ -79,13 +79,13 @@ Request HTTP
 ```
 Front-end/
 ├── Dockerfile              ← Nginx Alpine (serve estáticos + proxy reverso)
-├── nginx.conf              ← Proxy /api/* → backend:3000
+├── nginx.conf              ← Proxy /api/* e /uploads/* → backend:3000
 └── files/
     ├── index.html              ← Login (split-screen) + CAPTCHA Turnstile + Termos
     ├── home.html               ← Página inicial (Nossa História, Missão, Valores)
     ├── dashboard.html          ← Dashboard com métricas, gráficos Chart.js e alertas
     ├── cadastros.html          ← Lista de crianças + botão Gerar PDF
-    ├── cadastrar-crianca.html  ← Formulário de cadastro (com gênero)
+    ├── cadastrar-crianca.html  ← Formulário de cadastro (sem foto, avatar com iniciais)
     ├── frequencia.html         ← Registro de frequência + botão Gerar PDF
     ├── historico-presenca.html ← Histórico individual com calendário
     ├── admin.html              ← Painel administrativo (cards)

@@ -101,7 +101,7 @@ Sistema real em producao para o Centro de Atendimento a Meninos e a Meninas.
 - Auditoria completa com logs (entidade, IP, timestamp)
 - **Dashboard** com metricas, graficos **Chart.js** e design **glassmorphism**
 - Geracao de **relatorios em PDF** (em memoria, sem disco)
-- **Soft delete** — registros nunca sao apagados permanentemente
+- **Hard delete** auditavel — exclusao definitiva com log de acao e IP
 - **CAPTCHA** (Cloudflare Turnstile) + **CORS seguro**
 - Deploy: **Render** (API) + **Vercel** (Frontend) + **Neon** (DB)
 
