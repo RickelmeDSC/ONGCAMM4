@@ -603,7 +603,8 @@ O `LoggingInterceptor` registra automaticamente toda operação de escrita (POST
 - **XSS Frontend**: função `esc()` escapa &, <, >, ", ' em todos os templates dinâmicos (nomes, emails, doadores, títulos)
 - **Validação Frontend**: campos obrigatórios validados antes de enviar à API (nome, CPF, data nascimento, telefone). Data de nascimento bloqueia hoje e datas futuras (atributo `max` + check no submit).
 - **Toast**: todas as páginas usam `Toast.success()` / `Toast.error()` — sem funções indefinidas. Toasts de erro mostram a mensagem real da API via `err.apiMessage` (parsed em `_parseOrThrow`).
-- **Cadastro de criança resiliente**: se POST `/responsaveis` retornar 409 (CPF já cadastrado), o frontend busca o responsável existente e reusa o `id_responsavel`. O upload de foto roda em try-catch isolado: falha não derruba o cadastro da criança.
+- **Cadastro de criança resiliente**: se POST `/responsaveis` retornar 409 (CPF já cadastrado), o frontend busca o responsável existente e reusa o `id_responsavel`.
+- **Avatar com iniciais**: a tabela de cadastros exibe um círculo com as iniciais (primeiro + segundo nome) via helper `iniciais()` em `app.js`, com gradiente amarelo/laranja. O upload de foto da criança foi removido do frontend enquanto o projeto usa Render free tier (disco efêmero).
 
 ### 10.4 Observações do Build
 
@@ -780,7 +781,7 @@ O projeto não possui testes. Prioridade de implementação:
 
 ### 15.4 Armazenamento Externo de Arquivos
 
-O Render (free tier) usa disco efêmero — uploads de fotos e documentos são perdidos a cada redeploy. Para persistir arquivos em produção, migrar o upload para um serviço externo:
+O Render (free tier) usa disco efêmero — uploads de fotos e documentos são perdidos a cada redeploy. Por isso o upload de foto da criança foi removido do cadastro (substituído por avatar com iniciais) e o upload de documentos continua no backend mas deve ser migrado. Para persistir arquivos em produção, migrar o upload para um serviço externo:
 
 **Opções recomendadas:**
 - **Cloudinary** — plano free com 25GB, SDK Node.js, transformações de imagem automáticas
@@ -793,6 +794,7 @@ O Render (free tier) usa disco efêmero — uploads de fotos e documentos são p
 3. Salvar URL pública no campo `foto_path` (em vez de caminho local)
 4. Remover `useStaticAssets` do `main.ts` e proxy `/uploads/` do Nginx
 5. Atualizar variáveis de ambiente no Render
+6. Reabilitar o upload de foto no formulário de cadastro de criança
 
 ### 15.5 Domínio Próprio
 

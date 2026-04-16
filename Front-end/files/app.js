@@ -282,6 +282,15 @@ function fillSidebarUser() {
 function refreshIcons() { if (window.lucide) lucide.createIcons(); }
 
 // ── Escapar HTML para prevenir XSS ───────────────
+// Iniciais: primeiro + segundo nome (ex: "Maria Clara Silva" → "MC")
+function iniciais(nome) {
+  if (!nome) return '?';
+  const partes = String(nome).trim().split(/\s+/);
+  const a = partes[0]?.[0] ?? '';
+  const b = partes[1]?.[0] ?? '';
+  return (a + b).toUpperCase() || '?';
+}
+
 function esc(text) {
   if (!text) return '';
   const map = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'};
@@ -453,27 +462,6 @@ async function salvarChamada() {
   }
 }
 
-// ── Upload de foto: preview ───────────────────────
-function initPhotoUpload() {
-  document.querySelectorAll('.photo-upload').forEach(area => {
-    const input = area.querySelector('input[type=file]');
-    if (!input) return;
-    input.addEventListener('change', () => {
-      const file = input.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        let img = area.querySelector('img.preview');
-        if (!img) { img = document.createElement('img'); img.className = 'preview'; area.appendChild(img); }
-        img.src = e.target.result;
-        area.querySelector('.photo-upload-icon')?.remove();
-        area.querySelector('.photo-upload-text')?.remove();
-      };
-      reader.readAsDataURL(file);
-    });
-  });
-}
-
 // ── LOGIN ─────────────────────────────────────────
 async function handleLogin(e) {
   e.preventDefault();
@@ -514,7 +502,6 @@ async function handleCadastrarCrianca(e) {
 
   const cpf             = document.getElementById('c-cpf')?.value;
   const data_nascimento = document.getElementById('c-nascimento')?.value;
-  const foto            = document.getElementById('c-foto')?.files[0];
 
   if (!Validate.required(data_nascimento, 'Data de nascimento')) return;
   const _hoje = new Date(); _hoje.setHours(0, 0, 0, 0);
@@ -567,19 +554,7 @@ async function handleCadastrarCrianca(e) {
     if (genero) criancaBody.genero = genero;
     const criancaData = await api.post('/criancas', criancaBody);
 
-    // 3. Upload da foto (se houver) — falha NÃO derruba o cadastro
-    if (foto) {
-      try {
-        const formData = new FormData();
-        formData.append('file', foto);
-        await api.postForm(`/documentos/upload/foto/${criancaData.id_matricula}`, formData);
-      } catch (fotoErr) {
-        console.error('Erro ao enviar foto:', fotoErr);
-        Toast.error('Crianca cadastrada, mas falhou o upload da foto.');
-      }
-    }
-
-    // 4. Declaração de responsabilidade (se ativada)
+    // 3. Declaração de responsabilidade (se ativada)
     const declAtivo = document.getElementById('decl-ativar')?.checked;
     if (declAtivo) {
       const declNome = document.getElementById('decl-nome-cadastro')?.value.trim();
@@ -1158,9 +1133,7 @@ async function renderCadastrTable() {
       const nascimento = toBR(c.data_nascimento);
       return `
         <tr>
-          <td data-label="Foto">${c.foto_path
-            ? `<img src="${API_BASE_URL.replace('/api/v1','')}/${c.foto_path}" class="table-avatar" style="object-fit:cover" onerror="this.outerHTML='<div class=table-avatar>${esc(c.nome).charAt(0)}</div>'">`
-            : `<div class="table-avatar">${esc(c.nome).charAt(0)}</div>`}</td>
+          <td data-label="Foto"><div class="table-avatar">${esc(iniciais(c.nome))}</div></td>
           <td data-label="Matrícula">${c.id_matricula}</td>
           <td data-label="Nome">${esc(c.nome)}</td>
           <td data-label="Nascimento">${nascimento}</td>
@@ -1522,7 +1495,6 @@ document.addEventListener('DOMContentLoaded', () => {
     case 'cadastrar-crianca':
       if (!Auth.requireAuth()) break;
       setActiveNav('cadastros');
-      initPhotoUpload();
       // Bloqueia data de nascimento >= hoje
       const _nascInput = document.getElementById('c-nascimento');
       if (_nascInput) {
@@ -1543,21 +1515,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('c-cpf').value = c.cpf || '';
             const generoSelect = document.getElementById('c-genero');
             if (generoSelect && c.genero) generoSelect.value = c.genero;
-            // Preencher foto (se existir)
-            if (c.foto_path) {
-              const photoUpload = document.querySelector('.photo-upload');
-              if (photoUpload) {
-                const img = document.createElement('img');
-                img.className = 'preview';
-                img.src = `${API_BASE_URL.replace('/api/v1', '')}/${c.foto_path}`;
-                img.onerror = () => img.remove(); // Se arquivo nao existe no servidor
-                photoUpload.appendChild(img);
-                const icon = photoUpload.querySelector('.photo-upload-icon');
-                const text = photoUpload.querySelector('.photo-upload-text');
-                if (icon) icon.style.display = 'none';
-                if (text) text.style.display = 'none';
-              }
-            }
             // Mostrar documentos ja importados
             const docsContainer = document.getElementById('c-docs')?.closest('.form-group');
             if (docsContainer && (c.certidao_nasc || c.cartao_vacina)) {
