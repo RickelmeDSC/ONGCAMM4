@@ -33,23 +33,23 @@ export class DashboardService {
       criancasAtivas,
       criancasComFreqRecente,
     ] = await Promise.all([
-      this.prisma.crianca.count({ where: { ativo: true } }),
+      this.prisma.crianca.count(),
       this.prisma.crianca.count(),
       this.prisma.frequencia.findMany({
         where: { data_registro: { gte: hoje, lt: amanha } },
         select: { status: true },
       }),
       this.prisma.doacao.findMany({
-        where: { data_doacao: { gte: inicioMes, lt: fimMes }, ativo: true },
+        where: { data_doacao: { gte: inicioMes, lt: fimMes } },
         select: { valor: true },
       }),
-      this.prisma.usuario.count({ where: { ativo: true } }),
+      this.prisma.usuario.count(),
       this.prisma.frequencia.findMany({
         where: { data_registro: { gte: seteDiasAtras, lt: amanha } },
         select: { data_registro: true, status: true },
       }),
       this.prisma.doacao.findMany({
-        where: { data_doacao: { gte: seisMesesAtras, lt: fimMes }, ativo: true },
+        where: { data_doacao: { gte: seisMesesAtras, lt: fimMes } },
         select: { data_doacao: true, valor: true },
       }),
       this.prisma.logSistema.findMany({
@@ -58,7 +58,6 @@ export class DashboardService {
         include: { usuario: { select: { nome: true } } },
       }),
       this.prisma.crianca.findMany({
-        where: { ativo: true },
         select: { id_matricula: true, nome: true, data_nascimento: true },
       }),
       this.prisma.frequencia.findMany({

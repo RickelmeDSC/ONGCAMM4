@@ -245,7 +245,6 @@ providers: [
 | Gerar declaração | Não | Não | Sim |
 | Auditoria / Logs | Não | Não | Sim |
 | Menu Administrativo visível | Não | Sim | Sim |
-| Ver excluídos (soft delete) | Não | Sim | Sim |
 
 ---
 
@@ -258,7 +257,6 @@ model Usuario {
   email        String  @unique
   senha_hash   String
   nivel_acesso Int     @default(1)
-  ativo        Boolean @default(true)
   logs           LogSistema[]
   eventos        Evento[]
   atividades     Atividade[]
@@ -287,7 +285,6 @@ model Crianca {
   certidao_nasc   String?
   cartao_vacina   String?
   data_entrada    DateTime @default(now())
-  ativo           Boolean  @default(true)
   id_responsavel  Int
   responsavel     Responsavel  @relation(fields: [id_responsavel], references: [id_responsavel])
   frequencias     Frequencia[]
@@ -331,7 +328,6 @@ model Doacao {
   tipo        String
   valor       Decimal? @db.Decimal(10, 2)
   data_doacao DateTime @default(now())
-  ativo       Boolean  @default(true)
   @@map("doacao")
 }
 
@@ -400,22 +396,22 @@ Prefixo global: `/api/v1`. Todos (exceto login e refresh) exigem `Authorization:
 
 | Método | Rota | Acesso Mínimo | Descrição |
 |---|---|---|---|
-| GET | /usuarios | Gestor (2) | Lista todos (?includeInactive=true para ver excluídos) |
+| GET | /usuarios | Gestor (2) | Lista todos |
 | GET | /usuarios/:id | Gestor (2) | Por ID |
 | POST | /usuarios | Gestor (2) | Criar |
 | PATCH | /usuarios/:id | Gestor (2) | Atualizar |
 | PATCH | /usuarios/:id/reset-senha | Diretor (3) | Redefinir senha |
-| DELETE | /usuarios/:id | Gestor (2) | Desativar (soft delete) |
+| DELETE | /usuarios/:id | Gestor (2) | Remover permanentemente |
 
 ### 7.3 Crianças
 
 | Método | Rota | Acesso Mínimo | Descrição |
 |---|---|---|---|
-| GET | /criancas | Voluntário (1) | Lista todas (?includeInactive=true para ver excluídas) |
+| GET | /criancas | Voluntário (1) | Lista todas |
 | GET | /criancas/:id | Voluntário (1) | Por ID |
 | POST | /criancas | Voluntário (1) | Cadastrar |
 | PATCH | /criancas/:id | Voluntário (1) | Atualizar |
-| DELETE | /criancas/:id | Voluntário (1) | Desativar (soft delete) |
+| DELETE | /criancas/:id | Voluntário (1) | Remover permanentemente |
 
 ### 7.4 Responsáveis
 
@@ -454,7 +450,7 @@ Prefixo global: `/api/v1`. Todos (exceto login e refresh) exigem `Authorization:
 |---|---|---|---|
 | GET | /dashboard/metrics | Voluntário (1) | Métricas agregadas (crianças, frequência, doações, logs, alertas) |
 
-Retorna JSON com: `criancas_ativas`, `frequencia_hoje` (presentes/total/percentual), `doacoes_mes` (total/valor/quantidade), `voluntarios_ativos`, `frequencia_semanal` (7 dias), `doacoes_mensais` (6 meses), `logs_recentes` (10 últimos), `aniversariantes_semana`, `criancas_sem_frequencia` (14 dias).
+Retorna JSON com: `criancas_ativas` (total), `frequencia_hoje` (presentes/total/percentual), `doacoes_mes` (total/valor/quantidade), `voluntarios_ativos` (total), `frequencia_semanal` (7 dias), `doacoes_mensais` (6 meses), `logs_recentes` (10 últimos), `aniversariantes_semana`, `criancas_sem_frequencia` (14 dias).
 
 ### 7.8 Atividades, Eventos, Doações, Declarações, Auditoria
 
@@ -515,7 +511,7 @@ A resposta é processada por `_parseOrThrow()`, que em caso de erro lê o body J
 - **Login**: inclui Cloudflare Turnstile CAPTCHA e link para Termos de Responsabilidade e Uso de Imagem
 - **Formulários modais**: cadastro de voluntário e doação usam modais com overlay opaco (65%)
 - **Relatórios PDF**: botão "Gerar PDF" em cadastros e frequência, gerados em memória (buffer) e retornados direto na response
-- **Soft delete**: exclusão de usuários e crianças faz `UPDATE ativo=false`; query param `?includeInactive=true` para ver excluídos
+- **Hard delete**: exclusão de usuários, crianças e doações remove permanentemente do banco de dados
 - **Frequência**: inclui turno (Manhã/Tarde/Integral) e campo de justificativa de falta (observação)
 - **Dashboard**: página com cards glassmorphism (crianças, frequência, doações, voluntários), gráficos Chart.js (frequência semanal barras, doações mensais linha), logs recentes, aniversariantes da semana e alertas de crianças sem frequência. Cards com animação de entrada escalonada e contagem animada. Logs visíveis apenas para gestores/diretores (nível >= 2).
 - **Glassmorphism**: cards do dashboard usam `backdrop-filter: blur()`, bordas translúcidas, sombras coloridas por categoria
@@ -598,7 +594,7 @@ O `LoggingInterceptor` registra automaticamente toda operação de escrita (POST
 
 - **Rate Limiting** (`@nestjs/throttler`): global 30 req/min, login 5/min, refresh 10/min
 - **CORS**: `origin: false` em produção se `FRONTEND_URL` ausente (bloqueia tudo)
-- **Soft Delete**: Usuario, Crianca e Doacao usam campo `ativo` — nunca são deletados permanentemente
+- **Hard Delete**: Usuario, Crianca e Doacao são removidos permanentemente do banco (sem soft delete)
 - **Race Conditions**: `create()` usa try-catch no Prisma P2002/P2003 em vez de check-then-create
 - **Validação de CPF**: MinLength(11) MaxLength(14) nos DTOs
 - **Foreign Keys**: catch P2003 retorna NotFoundException com mensagem clara
@@ -666,7 +662,7 @@ Configuradas no painel do Render (Environment → Environment Variables):
 - Integração total com a API (app.js): Auth, _fetchWithRefresh, refresh token, CORS
 - Dashboard: página, gráficos Chart.js, glassmorphism, animações, endpoint backend
 - Segurança frontend: função `esc()` (XSS), validações, CAPTCHA Turnstile
-- Correções de bugs (11+ itens reportados da ONG): soft delete, modais, permissões, PDF em memória, session handling
+- Correções de bugs (11+ itens reportados da ONG): modais, permissões, PDF em memória, session handling
 - Funcionalidades adicionadas: gênero, turno/justificativa na frequência, matrícula aleatória, foto/documentos, contadores dinâmicos, histórico de presença com calendário
 - Páginas novas/reescritas: home.html, dashboard.html, admin-permissoes.html
 - Deploy: configuração Vercel + Render + Docker, Speed Insights/Analytics
@@ -782,7 +778,23 @@ O projeto não possui testes. Prioridade de implementação:
 3. **Dashboard** — endpoint de métricas
 4. Stack sugerida: Jest + Supertest (já inclusos no NestJS)
 
-### 15.4 Domínio Próprio
+### 15.4 Armazenamento Externo de Arquivos
+
+O Render (free tier) usa disco efêmero — uploads de fotos e documentos são perdidos a cada redeploy. Para persistir arquivos em produção, migrar o upload para um serviço externo:
+
+**Opções recomendadas:**
+- **Cloudinary** — plano free com 25GB, SDK Node.js, transformações de imagem automáticas
+- **AWS S3** — custo baixo, SDK `@aws-sdk/client-s3`, integração com Multer via `multer-s3`
+- **Supabase Storage** — gratuito até 1GB, API REST compatível com S3
+
+**Plano de migração:**
+1. Criar conta no serviço escolhido e configurar bucket/pasta
+2. Substituir `multer diskStorage` por upload direto ao serviço (ex: `multer-s3` ou Cloudinary SDK)
+3. Salvar URL pública no campo `foto_path` (em vez de caminho local)
+4. Remover `useStaticAssets` do `main.ts` e proxy `/uploads/` do Nginx
+5. Atualizar variáveis de ambiente no Render
+
+### 15.5 Domínio Próprio
 
 Registro de domínio `.org.br` via registro.br com o CNPJ da ONG. Após registro:
 - Configurar DNS no Vercel (frontend) e Render (backend)
@@ -791,4 +803,4 @@ Registro de domínio `.org.br` via registro.br com o CNPJ da ONG. Após registro
 
 ---
 
-*Documento atualizado em 2026-04-08. Toda alteração estrutural deve ser refletida aqui antes de ser implementada.*
+*Documento atualizado em 2026-04-12. Toda alteração estrutural deve ser refletida aqui antes de ser implementada.*

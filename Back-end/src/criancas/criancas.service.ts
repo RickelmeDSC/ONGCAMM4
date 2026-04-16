@@ -7,9 +7,8 @@ import { UpdateCriancaDto } from './dto/update-crianca.dto';
 export class CriancasService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findAll(includeInactive = false) {
+  findAll() {
     return this.prisma.crianca.findMany({
-      where: includeInactive ? {} : { ativo: true },
       include: { responsavel: true },
     });
   }
@@ -79,10 +78,7 @@ export class CriancasService {
 
   async remove(id: number) {
     await this.findOne(id);
-    await this.prisma.crianca.update({
-      where: { id_matricula: id },
-      data: { ativo: false },
-    });
-    return { message: `Criança ${id} desativada com sucesso` };
+    await this.prisma.crianca.delete({ where: { id_matricula: id } });
+    return { message: `Criança ${id} removida com sucesso` };
   }
 }

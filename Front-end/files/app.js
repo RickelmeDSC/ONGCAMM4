@@ -1149,30 +1149,26 @@ function _formatarAcao(acao, entidade) {
 }
 
 // ── Renderização de tabelas com dados da API ─────
-async function renderCadastrTable(includeInactive = false) {
+async function renderCadastrTable() {
   const tbody = document.getElementById('cadastros-tbody');
   if (!tbody) return;
   try {
-    const endpoint = includeInactive ? '/criancas?includeInactive=true' : '/criancas';
-    const criancas = await api.get(endpoint);
+    const criancas = await api.get('/criancas');
     tbody.innerHTML = criancas.map(c => {
       const nascimento = toBR(c.data_nascimento);
-      const isInativo = c.ativo === false;
       return `
-        <tr style="${isInativo ? 'opacity:0.5' : ''}">
+        <tr>
           <td data-label="Foto">${c.foto_path
             ? `<img src="${API_BASE_URL.replace('/api/v1','')}/${c.foto_path}" class="table-avatar" style="object-fit:cover" onerror="this.outerHTML='<div class=table-avatar>${esc(c.nome).charAt(0)}</div>'">`
             : `<div class="table-avatar">${esc(c.nome).charAt(0)}</div>`}</td>
           <td data-label="Matrícula">${c.id_matricula}</td>
           <td data-label="Nome">${esc(c.nome)}</td>
           <td data-label="Nascimento">${nascimento}</td>
-          <td data-label="Status"><span class="badge ${isInativo ? 'badge-inativo' : 'badge-ativo'}">${isInativo ? 'Inativo' : 'Ativo'}</span></td>
           <td data-label="Ações">
             <div class="action-btns">
-              ${isInativo ? '<span style="color:var(--paragrafo);font-size:12px">Excluido</span>' : `
               <button class="action-btn" title="Editar" onclick="window.location.href='cadastrar-crianca.html?id=${c.id_matricula}'"><i data-lucide="pencil" style="width:14px;height:14px"></i></button>
               <button class="action-btn" title="Declaracao" onclick="abrirDeclaracao(${c.id_matricula},'${esc(c.nome)}')"><i data-lucide="file-signature" style="width:14px;height:14px"></i></button>
-              <button class="action-btn delete" title="Excluir" onclick="confirmarExclusao(${c.id_matricula},'${esc(c.nome)}','criança')"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>`}
+              <button class="action-btn delete" title="Excluir" onclick="confirmarExclusao(${c.id_matricula},'${esc(c.nome)}','criança')"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>
             </div>
           </td>
         </tr>`;
@@ -1180,10 +1176,8 @@ async function renderCadastrTable(includeInactive = false) {
     refreshIcons();
     // Preencher stats
     const totalEl = document.getElementById('stat-total');
-    const ativosEl = document.getElementById('stat-ativos');
     const mesEl = document.getElementById('stat-mes');
     if (totalEl) totalEl.textContent = criancas.length;
-    if (ativosEl) ativosEl.textContent = criancas.filter(c => c.ativo !== false).length;
     if (mesEl) mesEl.textContent = criancas.length;
     const countEl = document.getElementById('cadastros-count');
     if (countEl) countEl.textContent = `${criancas.length} criança(s) encontrada(s)`;
@@ -1233,7 +1227,7 @@ async function renderFreqTable() {
   }
 }
 
-async function renderUsuariosTable(includeInactive = false) {
+async function renderUsuariosTable() {
   const tbody = document.getElementById('usuarios-tbody');
   if (!tbody) return;
   const nivelLabel = { 1: 'Voluntário', 2: 'Gestor', 3: 'Diretor' };
@@ -1241,17 +1235,14 @@ async function renderUsuariosTable(includeInactive = false) {
   const myNivel = currentUser?.nivel_acesso ?? 1;
   const myId = currentUser?.id ?? currentUser?.id_usuario;
   try {
-    const endpoint = includeInactive ? '/usuarios?includeInactive=true' : '/usuarios';
-    const usuarios = await api.get(endpoint);
+    const usuarios = await api.get('/usuarios');
     tbody.innerHTML = usuarios.map(u => {
       const isMe = u.id_usuario === myId;
       let actions = '';
 
       if (myNivel >= 2) {
-        // Gestor+Diretor: editar e excluir usuarios (menos a si mesmo)
         actions += `<button class="action-btn" title="Editar" onclick="abrirEditarUsuario(${u.id_usuario},'${esc(u.nome)}','${esc(u.email)}',${u.nivel_acesso})"><i data-lucide="pencil" style="width:14px;height:14px"></i></button>`;
         if (myNivel === 3) {
-          // Somente Diretor: redefinir senha
           actions += `<button class="action-btn" title="Redefinir senha" onclick="abrirResetSenha(${u.id_usuario},'${esc(u.nome)}')"><i data-lucide="key-round" style="width:14px;height:14px"></i></button>`;
         }
         if (!isMe) {
@@ -1259,15 +1250,13 @@ async function renderUsuariosTable(includeInactive = false) {
         }
       }
 
-      const isInativo = u.ativo === false;
       return `
-      <tr style="${isInativo ? 'opacity:0.5' : ''}">
+      <tr>
         <td data-label="Nome">${esc(u.nome)}${isMe ? ' <span style="font-size:11px;color:var(--paragrafo)">(você)</span>' : ''}</td>
         <td data-label="Função">${nivelLabel[u.nivel_acesso] ?? 'Voluntário'}</td>
         <td data-label="Email"><a href="mailto:${esc(u.email)}" style="color:var(--paragrafo)">${esc(u.email)}</a></td>
-        <td data-label="Status"><span class="badge ${isInativo ? 'badge-inativo' : 'badge-ativo'}">${isInativo ? 'Inativo' : 'Ativo'}</span></td>
         <td data-label="Ações">
-          <div class="action-btns">${isInativo ? '<span style="color:var(--paragrafo);font-size:12px">Excluido</span>' : (actions || '<span style="color:var(--paragrafo);font-size:12px">—</span>')}</div>
+          <div class="action-btns">${actions || '<span style="color:var(--paragrafo);font-size:12px">—</span>'}</div>
         </td>
       </tr>`;
     }).join('');

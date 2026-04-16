@@ -19,10 +19,9 @@ const SELECT_FIELDS = {
 export class UsuariosService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(includeInactive = false) {
+  async findAll() {
     return this.prisma.usuario.findMany({
-      where: includeInactive ? {} : { ativo: true },
-      select: { ...SELECT_FIELDS, ativo: true },
+      select: SELECT_FIELDS,
     });
   }
 
@@ -45,7 +44,7 @@ export class UsuariosService {
           senha_hash,
           nivel_acesso: dto.nivel_acesso,
         },
-        select: { ...SELECT_FIELDS, ativo: true },
+        select: SELECT_FIELDS,
       });
     } catch (error: any) {
       if (error.code === 'P2002') throw new ConflictException('E-mail já cadastrado');
@@ -88,10 +87,7 @@ export class UsuariosService {
 
   async remove(id: number) {
     await this.findOne(id);
-    await this.prisma.usuario.update({
-      where: { id_usuario: id },
-      data: { ativo: false },
-    });
-    return { message: `Usuário ${id} desativado com sucesso` };
+    await this.prisma.usuario.delete({ where: { id_usuario: id } });
+    return { message: `Usuário ${id} removido com sucesso` };
   }
 }

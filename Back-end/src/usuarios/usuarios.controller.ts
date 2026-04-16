@@ -6,7 +6,6 @@ import {
   Delete,
   Body,
   Param,
-  Query,
   ParseIntPipe,
   HttpCode,
   HttpStatus,
@@ -27,8 +26,8 @@ export class UsuariosController {
   @Get()
   @Roles(2)
   @ApiOperation({ summary: 'Listar todos os usuários' })
-  findAll(@Query('includeInactive') includeInactive?: string) {
-    return this.usuariosService.findAll(includeInactive === 'true');
+  findAll() {
+    return this.usuariosService.findAll();
   }
 
   @Get(':id')

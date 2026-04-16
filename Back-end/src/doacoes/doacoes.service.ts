@@ -6,9 +6,8 @@ import { CreateDoacaoDto } from './dto/create-doacao.dto';
 export class DoacoesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findAll(includeInactive = false) {
+  findAll() {
     return this.prisma.doacao.findMany({
-      where: includeInactive ? {} : { ativo: true },
       orderBy: { data_doacao: 'desc' },
     });
   }
@@ -39,10 +38,7 @@ export class DoacoesService {
 
   async remove(id: number) {
     await this.findOne(id);
-    await this.prisma.doacao.update({
-      where: { id_doacao: id },
-      data: { ativo: false },
-    });
-    return { message: `Doação ${id} desativada com sucesso` };
+    await this.prisma.doacao.delete({ where: { id_doacao: id } });
+    return { message: `Doação ${id} removida com sucesso` };
   }
 }
