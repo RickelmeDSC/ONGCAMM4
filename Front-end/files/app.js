@@ -1296,6 +1296,12 @@ async function renderDoacoes() {
   if (!tbody) return;
   try {
     const doacoes = await api.get('/doacoes');
+    const countEl = document.getElementById('doacoes-count');
+    if (countEl) countEl.textContent = `${doacoes.length} doação(ões) registrada(s)`;
+    if (doacoes.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--paragrafo);padding:24px">Nenhuma doação cadastrada ainda.</td></tr>';
+      return;
+    }
     tbody.innerHTML = doacoes.map(d => {
       const initials = d.doador.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
       const data = toBR(d.data_doacao);
@@ -1319,6 +1325,7 @@ async function renderDoacoes() {
           </td>
         </tr>`;
     }).join('');
+    refreshIcons();
   } catch (err) {
     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--paragrafo)">Erro ao carregar dados.</td></tr>';
     console.error(err);
