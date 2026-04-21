@@ -21,7 +21,7 @@ O sistema ONG CAMM4 — **Centro de Atendimento a Meninos e a Meninas** — é u
 |---|---|---|
 | Diretor | 3 | Acesso irrestrito a todas as funcionalidades |
 | Gestor | 2 | Gerenciamento geral com restrições em operações críticas |
-| Voluntário | 1 | Acesso somente leitura e operações básicas |
+| Voluntário | 1 | Cadastra/edita crianças e responsáveis, registra frequência e faz upload de documentos — sem acesso a usuários, relatórios ou logs |
 
 ---
 
@@ -140,12 +140,12 @@ O sistema usa **dois tokens**:
 
 ```
 1. POST /auth/login { email, senha, turnstile_token }
-2. Backend valida CAPTCHA Turnstile (se TURNSTILE_SECRET configurado)
+2. Backend valida CAPTCHA Turnstile (se TURNSTILE_SECRET configurado — token obrigatório)
 3. Backend valida credenciais (bcrypt.compare)
-3. Gera access_token (JWT, 1h) + refresh_token (random, 30 dias)
-4. Salva refresh_token na tabela refresh_token
-5. Retorna { access_token, refresh_token, expires_in, usuario }
-6. Frontend salva ambos no localStorage
+4. Gera access_token (JWT, 1h) + refresh_token (random, 8h)
+5. Salva refresh_token na tabela refresh_token
+6. Retorna { access_token, refresh_token, expires_in, usuario }
+7. Frontend salva ambos no localStorage
 ```
 
 ### 4.3 Fluxo de Renovação Automática
@@ -181,7 +181,7 @@ O sistema usa **dois tokens**:
 - **CORS seguro**: em produção bloqueia se `FRONTEND_URL` não definida; em dev libera tudo
 - **Bcrypt**: salt rounds = 12 (padrão segurança 2026)
 - **Login falho logado**: `Logger.warn` com email para auditoria de brute-force
-- **CAPTCHA**: Cloudflare Turnstile validado no backend via `TURNSTILE_SECRET`
+- **CAPTCHA**: Cloudflare Turnstile validado no backend via `TURNSTILE_SECRET`. Quando o secret está configurado, o `turnstile_token` é **obrigatório** — omissão resulta em 401 (fecha bypass onde o cliente simplesmente não enviava o token).
 - **_fetchWithRefresh**: toda requisição que retorna 401 tenta refresh automático; só redireciona para login se o servidor CONFIRMOU que o token expirou (não por erro de rede)
 
 ### 4.6 Endpoints de Auth
@@ -488,7 +488,7 @@ A resposta é processada por `_parseOrThrow()`, que em caso de erro lê o body J
 | Key | Conteúdo |
 |---|---|
 | `camm_token` | access_token JWT (1 hora) |
-| `camm_refresh` | refresh_token (30 dias) |
+| `camm_refresh` | refresh_token (8 horas) |
 | `camm_user` | JSON com { id, nome, email, nivel_acesso } |
 
 ### 8.4 Bibliotecas Externas
@@ -599,6 +599,7 @@ O `LoggingInterceptor` registra automaticamente toda operação de escrita (POST
 - **Validação de CPF**: MinLength(11) MaxLength(14) nos DTOs
 - **Foreign Keys**: catch P2003 retorna NotFoundException com mensagem clara
 - **Login falho**: Logger.warn registra email para detecção de brute-force
+- **CAPTCHA obrigatório**: em produção (com `TURNSTILE_SECRET` configurado), o body do login deve incluir `turnstile_token` — ausência retorna 401 antes de qualquer consulta ao banco. Previne bypass trivial onde o cliente simplesmente omitia o campo opcional do DTO.
 - **Bcrypt**: salt rounds = 12
 - **XSS Frontend**: função `esc()` escapa &, <, >, ", ' em todos os templates dinâmicos (nomes, emails, doadores, títulos)
 - **Validação Frontend**: campos obrigatórios validados antes de enviar à API (nome, CPF, data nascimento, telefone). Data de nascimento bloqueia hoje e datas futuras (atributo `max` + check no submit).
@@ -664,7 +665,7 @@ Configuradas no painel do Render (Environment → Environment Variables):
 - Dashboard: página, gráficos Chart.js, glassmorphism, animações, endpoint backend
 - Segurança frontend: função `esc()` (XSS), validações, CAPTCHA Turnstile
 - Correções de bugs (11+ itens reportados da ONG): modais, permissões, PDF em memória, session handling
-- Funcionalidades adicionadas: gênero, turno/justificativa na frequência, matrícula aleatória, foto/documentos, contadores dinâmicos, histórico de presença com calendário
+- Funcionalidades adicionadas: gênero, turno/justificativa na frequência, matrícula aleatória, upload de documentos (certidão, vacina), avatar com iniciais, contadores dinâmicos, histórico de presença com calendário
 - Páginas novas/reescritas: home.html, dashboard.html, admin-permissoes.html
 - Deploy: configuração Vercel + Render + Docker, Speed Insights/Analytics
 - Documentação: CLAUDE.md, README.md
@@ -734,6 +735,15 @@ O projeto inclui 10 skills em `.claude/skills/`, organizadas por tipo:
 
 Veja `.claude/skills-setup-prompt.md` para o mapa de composição entre elas.
 
+**Configurações de segurança do Claude Code:**
+
+O arquivo `.claude/settings.json` (commitado no repo) bloqueia leitura/edição de arquivos `.env*` pelo Claude Code via regras `deny`:
+- `Read(.env*)` / `Read(**/.env*)` — bloqueia leitura em qualquer pasta
+- `Edit(.env*)` / `Edit(**/.env*)` — idem para edição
+- `Bash(cat|head|tail|less|more|grep|type *.env*)` — bloqueia inspeção via shell
+
+Protege `DATABASE_URL`, `JWT_SECRET`, `TURNSTILE_SECRET` e outras credenciais contra exposição acidental. Configurações locais (e permissões `allow` por máquina) ficam em `.claude/settings.local.json` (gitignored).
+
 ---
 
 ## 15. ATUALIZAÇÕES FUTURAS
@@ -773,7 +783,7 @@ Endpoints que retornam datasets completos (`findAll`) devem implementar paginaç
 
 ### 15.3 Testes Automatizados
 
-**Status atual**: 112 testes em 17 suites — `npm test` passa 100% verde.
+**Status atual**: 113 testes em 17 suites — `npm test` passa 100% verde.
 
 **Stack em uso**:
 - **Jest + ts-jest** (padrão NestJS, já configurado)
@@ -781,7 +791,7 @@ Endpoints que retornam datasets completos (`findAll`) devem implementar paginaç
 - Helper `src/test-utils/prisma-mock.ts` expõe `createPrismaMock()` tipado como `any` — Prisma 6+ tem types circulares que travam inferência do TS em testes
 
 **Cobertura atual (services + infra transversal)**:
-- `AuthService` — 12 testes (login, refresh, logout, me, CAPTCHA)
+- `AuthService` — 13 testes (login, refresh, logout, me, CAPTCHA obrigatório quando secret set)
 - `UsuariosService` — 13 testes (bcrypt rounds=12, P2002, reset-senha)
 - `CriancasService` — 14 testes (matrícula retry 50x, P2002, P2003)
 - `ResponsaveisService` — 9 testes
