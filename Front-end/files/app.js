@@ -134,7 +134,10 @@ async function _parseOrThrow(res, label) {
     let apiMsg = '';
     try {
       const body = await res.json();
-      apiMsg = Array.isArray(body?.message) ? body.message.join(', ') : (body?.message || '');
+      const msg = body?.message;
+      apiMsg = Array.isArray(msg) ? msg.join(', ')
+             : typeof msg === 'string' ? msg
+             : '';
     } catch (_) { /* sem body JSON */ }
     const err = new Error(apiMsg || `${label} → ${res.status}`);
     err.status = res.status;
@@ -581,8 +584,10 @@ async function handleCadastrarCrianca(e) {
             a.download = `declaracao-responsabilidade-${criancaData.id_matricula}.pdf`;
             a.click();
             URL.revokeObjectURL(url);
+            Toast.success('Declaracao de responsabilidade gerada!');
+          } else {
+            Toast.error('Crianca cadastrada, mas falhou o download do PDF da declaracao.');
           }
-          Toast.success('Declaracao de responsabilidade gerada!');
         } catch (declErr) {
           console.error('Erro ao gerar declaracao:', declErr);
           Toast.error('Crianca cadastrada, mas erro ao gerar declaracao.');
