@@ -773,11 +773,33 @@ Endpoints que retornam datasets completos (`findAll`) devem implementar paginaç
 
 ### 15.3 Testes Automatizados
 
-O projeto não possui testes. Prioridade de implementação:
-1. **Auth** — login, refresh, logout, guards (módulo mais crítico)
-2. **Criancas/Frequencia** — CRUD principal
-3. **Dashboard** — endpoint de métricas
-4. Stack sugerida: Jest + Supertest (já inclusos no NestJS)
+**Status atual**: 112 testes em 17 suites — `npm test` passa 100% verde.
+
+**Stack em uso**:
+- **Jest + ts-jest** (padrão NestJS, já configurado)
+- **jest-mock-extended** para mockar `PrismaClient` (dev dependency)
+- Helper `src/test-utils/prisma-mock.ts` expõe `createPrismaMock()` tipado como `any` — Prisma 6+ tem types circulares que travam inferência do TS em testes
+
+**Cobertura atual (services + infra transversal)**:
+- `AuthService` — 12 testes (login, refresh, logout, me, CAPTCHA)
+- `UsuariosService` — 13 testes (bcrypt rounds=12, P2002, reset-senha)
+- `CriancasService` — 14 testes (matrícula retry 50x, P2002, P2003)
+- `ResponsaveisService` — 9 testes
+- `FrequenciaService` — 10 testes (turno, observacao, data range)
+- `DoacoesService` + `AtividadesService` + `EventosService` — 17 testes
+- `DeclaracoesService` — 4 testes (inclui validação de bytes `%PDF` no buffer)
+- `RelatoriosService` — 5 testes (PDFs gerados em memória)
+- `DashboardService` — 5 testes (zero-state, aniversariantes, frequência hoje)
+- `AuthController` + `JwtStrategy` — 7 testes
+- `JwtAuthGuard` + `RolesGuard` — 8 testes
+- `LoggingInterceptor` + `HttpExceptionFilter` — 8 testes
+
+**Próximos passos** (débito técnico):
+- Testes E2E com Supertest (fluxo completo HTTP → auth → CRUD)
+- Controllers dos módulos restantes (hoje cobertos indiretamente pelos testes de service)
+- DTOs (validação class-validator)
+
+**Comando**: `cd Back-end && npm test` (ou `npm run test:cov` para cobertura).
 
 ### 15.4 Armazenamento Externo de Arquivos
 
