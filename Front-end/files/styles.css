@@ -45,7 +45,9 @@ body {
   color: var(--titulo);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
   animation: pageIn 0.3s ease-out;
+  overflow-x: hidden;
 }
 @keyframes pageIn {
   from { opacity: 0; transform: translateY(6px); }
@@ -1144,15 +1146,51 @@ input, textarea, select { font-family: var(--font-body); }
     padding: 0;
     padding-top: 0;
   }
+
+  /* Header gradiente: altura natural, conteudo em coluna, sem overflow */
   .main-content > .page-header {
-    padding: 68px 16px 24px;
+    height: auto;
+    min-height: 88px;
+    padding: 68px 16px 20px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
   }
+  /* Botao filho DIRETO do header (ex: admin-voluntarios): largura total */
+  .main-content > .page-header > .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  /* Grupo de acoes (div com flex inline contendo btns/inputs) vira row flexivel */
+  .main-content > .page-header > div[style*="flex"],
+  .main-content > .page-header > div:last-child:not(:only-child) {
+    width: 100%;
+    display: flex !important;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+  }
+  /* Inputs/selects/botoes DENTRO do grupo de acoes: dividem o espaco */
+  .main-content > .page-header > div input,
+  .main-content > .page-header > div select {
+    width: auto !important;
+    max-width: none !important;
+    flex: 1 1 calc(50% - 4px);
+    min-width: 140px;
+  }
+  .main-content > .page-header > div .btn {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 130px;
+    justify-content: center;
+  }
+
   .main-content > *:not(.page-header) {
     padding-left: 16px;
     padding-right: 16px;
   }
 
-  .page-title { font-size: 22px; }
+  .page-title { font-size: 22px; line-height: 1.25; }
   .form-row.cols-2,
   .form-row.cols-3 { grid-template-columns: 1fr; }
   .stats-row { grid-template-columns: 1fr; }
@@ -1193,15 +1231,50 @@ input, textarea, select { font-family: var(--font-body); }
     margin-right: 8px;
   }
 
-  .search-bar { flex-direction: column; }
-  .page-header { flex-direction: column; align-items: flex-start; }
+  /* Barra de busca empilhada com items em largura total */
+  .search-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+  .search-bar > * { width: 100% !important; max-width: none !important; }
+  .search-bar .btn { justify-content: center; }
+
+  .page-header { flex-direction: column; align-items: stretch; }
+
+  /* Inputs em mobile: font-size 16px evita zoom automatico do iOS */
+  .form-input,
+  .form-select,
+  .form-textarea { font-size: 16px; }
+
+  /* Touch targets: botoes e action buttons com altura minima confortavel */
+  .btn { min-height: 44px; padding: 12px 20px; }
+  .btn-sm { min-height: 36px; padding: 8px 14px; }
+  .action-btn { width: 40px; height: 40px; }
+
+  /* Modais: altura segura e scroll interno em telas pequenas */
+  .modal-overlay { padding: 12px; }
+  .modal {
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Table wrapper com scroll horizontal quando a tabela nao vira cards */
+  .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
 
 @media (max-width: 480px) {
-  .main-content > .page-header { padding: 64px 12px 20px; }
+  .main-content > .page-header { padding: 64px 12px 18px; }
   .main-content > *:not(.page-header) { padding-left: 12px; padding-right: 12px; }
   .card { padding: 16px; }
-  .modal { padding: 20px; }
+  .modal { padding: 20px 16px; }
+  .page-title { font-size: 20px; }
+
+  /* Em telas muito pequenas, botoes/inputs do header ocupam linha inteira */
+  .main-content > .page-header input,
+  .main-content > .page-header select,
+  .main-content > .page-header .btn {
+    flex: 1 1 100%;
+  }
 }
 
 /* ================================================
