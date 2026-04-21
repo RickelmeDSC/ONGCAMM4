@@ -20,6 +20,10 @@ describe('UsuariosService', () => {
     service = module.get<UsuariosService>(UsuariosService);
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   // ── findAll ────────────────────────────────────────────────────────────
   describe('findAll', () => {
     it('should return all users without senha_hash', async () => {

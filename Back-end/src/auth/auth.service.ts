@@ -21,15 +21,18 @@ export class AuthService {
   ) {}
 
   async login(dto: LoginDto) {
-    // Validar Turnstile CAPTCHA em produção
-    if (process.env.TURNSTILE_SECRET && dto.turnstile_token) {
+    // Validar Turnstile CAPTCHA em producao — token e OBRIGATORIO quando secret esta configurado
+    if (process.env.TURNSTILE_SECRET) {
+      if (!dto.turnstile_token) {
+        throw new UnauthorizedException('CAPTCHA e obrigatorio');
+      }
       const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `secret=${process.env.TURNSTILE_SECRET}&response=${dto.turnstile_token}`,
       });
       const result = await res.json();
-      if (!result.success) throw new UnauthorizedException('Verificação CAPTCHA falhou');
+      if (!result.success) throw new UnauthorizedException('Verificacao CAPTCHA falhou');
     }
 
     const usuario = await this.prisma.usuario.findUnique({

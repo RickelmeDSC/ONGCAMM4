@@ -27,6 +27,10 @@ describe('AuthService', () => {
     delete process.env.TURNSTILE_SECRET;
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   // ── login ──────────────────────────────────────────────────────────────
   describe('login', () => {
     const validDto: any = { email: 'a@b.com', senha: '123' };
@@ -75,6 +79,17 @@ describe('AuthService', () => {
       await expect(
         service.login({ ...validDto, turnstile_token: 'bad' }),
       ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should reject login when TURNSTILE_SECRET is set but token is missing', async () => {
+      process.env.TURNSTILE_SECRET = 'secret';
+      // Sem turnstile_token — nao deve chamar bcrypt nem prisma
+      const fetchSpy = jest.fn();
+      global.fetch = fetchSpy as any;
+
+      await expect(service.login(validDto)).rejects.toThrow(UnauthorizedException);
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(prisma.usuario.findUnique).not.toHaveBeenCalled();
     });
 
     it('should skip CAPTCHA when TURNSTILE_SECRET is not set', async () => {
