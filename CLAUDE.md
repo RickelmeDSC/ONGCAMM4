@@ -639,6 +639,8 @@ O `LoggingInterceptor` registra automaticamente toda operação de escrita (POST
 Configuradas no painel do Render (Environment → Environment Variables):
 `DATABASE_URL`, `DIRECT_URL`, `JWT_SECRET`, `JWT_EXPIRATION`, `NODE_ENV=production`, `PORT=3000`, `FRONTEND_URL`, `TURNSTILE_SECRET`, `UPLOAD_DIR`, `MAX_FILE_SIZE_MB`
 
+> ⚠️ **Atenção com `TURNSTILE_SECRET`**: é opcional mas **recomendada em produção**. Uma vez configurada, **todos** os logins passam a exigir `turnstile_token` no body — ausência retorna 401 imediatamente (antes de qualquer consulta ao banco). Em dev, deixar ausente permite login sem CAPTCHA.
+
 ---
 
 ## 12. DIVISÃO DE RESPONSABILIDADES
@@ -666,9 +668,11 @@ Configuradas no painel do Render (Environment → Environment Variables):
 - Segurança frontend: função `esc()` (XSS), validações, CAPTCHA Turnstile
 - Correções de bugs (11+ itens reportados da ONG): modais, permissões, PDF em memória, session handling
 - Funcionalidades adicionadas: gênero, turno/justificativa na frequência, matrícula aleatória, upload de documentos (certidão, vacina), avatar com iniciais, contadores dinâmicos, histórico de presença com calendário
+- Refatoração mobile completa: page-header responsivo, touch targets 44px, anti-zoom iOS, modais com `100dvh`
+- Testes automatizados: 113 testes em 17 suites (Jest + jest-mock-extended) cobrindo services, guards, interceptors e geração de PDF
 - Páginas novas/reescritas: home.html, dashboard.html, admin-permissoes.html
 - Deploy: configuração Vercel + Render + Docker, Speed Insights/Analytics
-- Documentação: CLAUDE.md, README.md
+- Documentação: CLAUDE.md, README.md, PROFILE-README.md
 
 ---
 
@@ -682,7 +686,7 @@ O Dashboard é a página central de métricas do sistema. Acessível por todos o
 
 | Componente | Descrição | Permissão |
 |---|---|---|
-| Cards de Resumo | 4 cards glassmorphism: Crianças Ativas, Frequência Hoje (%), Doações do Mês, Voluntários Ativos | Todos |
+| Cards de Resumo | 4 cards glassmorphism: Crianças Cadastradas (total após hard delete), Frequência Hoje (%), Doações do Mês, Voluntários Cadastrados | Todos |
 | Gráfico Frequência | Barras (Chart.js) — presentes vs ausentes nos últimos 7 dias | Todos |
 | Gráfico Doações | Linha (Chart.js) — valor de doações nos últimos 6 meses | Todos |
 | Atividade Recente | Últimos 10 registros do LogSistema com tempo relativo | Gestor+ (nível >= 2) |
@@ -837,4 +841,4 @@ Registro de domínio `.org.br` via registro.br com o CNPJ da ONG. Após registro
 
 ---
 
-*Documento atualizado em 2026-04-12. Toda alteração estrutural deve ser refletida aqui antes de ser implementada.*
+*Última revisão: 2026-04-12 (inclui hard delete, CAPTCHA obrigatório, 113 testes automatizados, refatoração mobile). Toda alteração estrutural deve ser refletida aqui antes de ser implementada.*

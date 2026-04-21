@@ -115,21 +115,27 @@ ONGCAMM4/
 │   │   ├── doacoes/           # Registro de doacoes
 │   │   ├── declaracoes/       # Declaracoes (PDF)
 │   │   ├── relatorios/        # Relatorios em PDF
-│   │   ├── dashboard/          # Metricas agregadas
+│   │   ├── dashboard/         # Metricas agregadas
 │   │   ├── auditoria/         # Logs do sistema
 │   │   ├── documentos/        # Upload de certidao e cartao de vacina
 │   │   ├── prisma/            # Prisma Service
-│   │   └── common/            # Guards, decorators, interceptors
+│   │   ├── test-utils/        # Mocks do Prisma para testes (jest-mock-extended)
+│   │   └── common/            # Guards, decorators, interceptors, filters
 │   ├── prisma/
-│   │   └── schema.prisma
+│   │   ├── schema.prisma
+│   │   └── migrations/        # 9 migrations aplicadas
 │   ├── Dockerfile
 │   └── package.json
 ├── Front-end/
-│   ├── files/                 # HTML, CSS, JS, logo
+│   ├── files/                 # HTML, CSS, JS, assets
 │   ├── nginx.conf
 │   └── Dockerfile
+├── .claude/                   # Skills + settings do Claude Code
+│   ├── settings.json          # Bloqueia leitura de .env*
+│   └── skills/                # code-review, test-review, api-review, etc.
 ├── docker-compose.yml
 ├── vercel.json
+├── CLAUDE.md                  # Documentacao global (fonte de verdade)
 └── README.md
 ```
 
@@ -148,7 +154,7 @@ Prefixo global: `/api/v1` | Swagger: `/api/docs`
 | Responsaveis | CRUD completo | Voluntario+ |
 | Frequencia | CRUD + historico por crianca | Voluntario+ |
 | Relatorios | PDF de criancas, frequencia, doacoes, atividades, auditoria | Gestor+ |
-| Doacoes, Atividades, Eventos | CRUD padrao | Gestor+ |
+| Doacoes, Atividades, Eventos | CRUD padrao | Gestor+ (exclusao: Diretor) |
 | Declaracoes | Geracao de PDF | Diretor |
 | Auditoria | Logs do sistema | Diretor |
 
@@ -198,16 +204,18 @@ Auto-deploy: push na `main` atualiza Vercel e Render automaticamente.
 - Arquitetura modular (NestJS)
 - RBAC com Guards globais
 - Autenticacao robusta (JWT 1h + Refresh Token 8h com rotacao)
+- CAPTCHA Turnstile obrigatorio em producao (fecha bypass de token opcional)
 - Validacao de sessao automatica ao reabrir pagina
 - Auditoria via interceptor (entidade, ID, IP)
 - Indices de performance em todas as tabelas criticas
 - Banco serverless (Neon)
 - Separacao clara: Controller / Service / ORM
-- CAPTCHA anti-bot (Cloudflare Turnstile)
+- 113 testes automatizados (Jest + jest-mock-extended) cobrindo auth, CRUD, PDF e infra
 - Dashboard com metricas, graficos Chart.js e design glassmorphism
 - Relatorios PDF gerados em memoria (sem dependencia de disco)
 - Avatar com iniciais geradas dinamicamente (sem dependencia de disco)
 - Frequencia com turno e justificativa de falta
+- Layout mobile-first (page-header responsivo, touch targets 44px, evita zoom iOS)
 - Controle de visibilidade do menu por nivel de acesso
 
 ---
@@ -239,4 +247,5 @@ Olinda - PE, Brasil
 
 ## Licenca
 
-Projeto publico — uso exclusivo da ONG CAMM.
+Repositorio publico com codigo-fonte aberto para fins educacionais.
+O sistema e operado pela ONG CAMM (Centro de Atendimento a Meninos e a Meninas).

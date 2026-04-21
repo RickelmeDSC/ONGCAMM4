@@ -102,6 +102,7 @@ Sistema real em producao para o Centro de Atendimento a Meninos e a Meninas.
 - **Dashboard** com metricas, graficos **Chart.js** e design **glassmorphism**
 - Geracao de **relatorios em PDF** (em memoria, sem disco)
 - **Hard delete** auditavel — exclusao definitiva com log de acao e IP
+- **113 testes automatizados** (Jest + jest-mock-extended) cobrindo auth, CRUD, PDF e infra transversal
 - **CAPTCHA** (Cloudflare Turnstile) + **CORS seguro**
 - Deploy: **Render** (API) + **Vercel** (Frontend) + **Neon** (DB)
 
