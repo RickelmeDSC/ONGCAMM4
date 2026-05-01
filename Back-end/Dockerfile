@@ -23,4 +23,7 @@ RUN mkdir -p /app/uploads
 
 EXPOSE 3000
 
-CMD ["node", "dist/main"]
+# Aplica migrations pendentes (se houver) antes de subir o app.
+# Se a migration falhar, o container nao sobe — falha fica visivel
+# em vez de virar erros silenciosos no runtime.
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
