@@ -83,8 +83,8 @@ flowchart TD
 
 ## Funcionalidades
 
-- **Cadastro de criancas** — dados pessoais, genero, documentos e responsavel legal (avatar com iniciais do nome)
-- **Controle de frequencia** — registro diario com turno (Manha/Tarde/Integral) e justificativa de falta
+- **Cadastro de criancas** — dados pessoais, genero, turno (Manha/Tarde/Integral), documentos e responsavel legal (avatar com iniciais do nome)
+- **Controle de frequencia** — chamada filtrada pelo turno selecionado, registro diario com justificativa de falta, salvamento resiliente (Promise.allSettled — uma falha nao trava as outras)
 - **Painel administrativo** — gestao de voluntarios, permissoes por nivel, atividades e doacoes
 - **Relatorios em PDF** — criancas, frequencia, doacoes, atividades e auditoria (gerados em memoria)
 - **Hard delete** — exclusao de usuarios, criancas e doacoes remove permanentemente do banco
@@ -214,7 +214,8 @@ Auto-deploy: push na `main` atualiza Vercel e Render automaticamente.
 - Dashboard com metricas, graficos Chart.js e design glassmorphism
 - Relatorios PDF gerados em memoria (sem dependencia de disco)
 - Avatar com iniciais geradas dinamicamente (sem dependencia de disco)
-- Frequencia com turno e justificativa de falta
+- Frequencia com turno fixo da crianca filtrando a chamada (Manha/Tarde/Integral) e justificativa de falta
+- Privilege escalation bloqueado: usuario nao pode criar/promover outro com nivel superior ao seu
 - Layout mobile-first (page-header responsivo, touch targets 44px, evita zoom iOS)
 - Controle de visibilidade do menu por nivel de acesso
 
