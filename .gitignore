@@ -25,10 +25,3 @@ Thumbs.db
 
 # Claude
 .claude/settings.local.json
-
-# Apresentacao (nunca commitar)
-APRESENTACAO.md
-APRESENTACAO.docx
-md-to-docx.py
-~$*.docx
-~$*.doc
