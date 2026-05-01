@@ -608,7 +608,7 @@ async function handleCadastrarCrianca(e) {
 async function handleCadastrarVoluntario(e) {
   e.preventDefault();
   const nome  = document.getElementById('v-nome')?.value.trim();
-  const email = document.getElementById('v-email')?.value.trim();
+  const email = document.getElementById('v-email')?.value.trim().toLowerCase();
   const senha = document.getElementById('v-senha')?.value;
   const conf  = document.getElementById('v-conf')?.value;
   const cargo = document.getElementById('v-cargo')?.value;
@@ -627,15 +627,18 @@ async function handleCadastrarVoluntario(e) {
 
   const body = { nome, email, senha, nivel_acesso };
 
+  const btn = e.submitter || document.querySelector('#form-voluntario button[type="submit"]');
+  if (btn) { btn.classList.add('is-loading'); btn.disabled = true; }
+
   try {
     await api.post('/usuarios', body);
     Toast.success('Voluntário cadastrado!');
-    document.getElementById('modal-voluntario')?.classList.remove('open');
     document.getElementById('form-voluntario')?.reset();
-    renderUsuariosTable();
+    setTimeout(() => { window.location.href = 'admin-voluntarios.html'; }, 800);
   } catch (err) {
-    Toast.error('Erro ao cadastrar voluntário.');
     console.error(err);
+    Toast.error(err?.apiMessage || err?.message || 'Erro ao cadastrar voluntário.');
+    if (btn) { btn.classList.remove('is-loading'); btn.disabled = false; }
   }
 }
 
@@ -1555,6 +1558,15 @@ document.addEventListener('DOMContentLoaded', () => {
     case 'cadastrar-voluntario':
       if (!Auth.requireAuth()) break;
       setActiveNav('admin');
+      {
+        const nivelLogado = Auth.getUser()?.nivel_acesso || 1;
+        if (nivelLogado < 3) {
+          document.querySelector('#v-cargo option[value="diretor"]')?.remove();
+        }
+        if (nivelLogado < 2) {
+          document.querySelector('#v-cargo option[value="gestor"]')?.remove();
+        }
+      }
       document.getElementById('form-voluntario')?.addEventListener('submit', handleCadastrarVoluntario);
       break;
 

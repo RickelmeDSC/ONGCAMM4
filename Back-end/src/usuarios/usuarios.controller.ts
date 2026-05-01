@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { UsuariosService } from './usuarios.service';
@@ -16,6 +17,7 @@ import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { ResetSenhaDto } from './dto/reset-senha.dto';
 import { Roles } from '../common/decorators/roles.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @ApiTags('usuarios')
 @ApiBearerAuth()
@@ -40,14 +42,31 @@ export class UsuariosController {
   @Post()
   @Roles(2)
   @ApiOperation({ summary: 'Criar novo usuário' })
-  create(@Body() dto: CreateUsuarioDto) {
+  create(
+    @Body() dto: CreateUsuarioDto,
+    @CurrentUser() user: { nivel_acesso: number },
+  ) {
+    if (dto.nivel_acesso > user.nivel_acesso) {
+      throw new ForbiddenException(
+        'Você não pode criar um usuário com nível superior ao seu',
+      );
+    }
     return this.usuariosService.create(dto);
   }
 
   @Patch(':id')
   @Roles(2)
   @ApiOperation({ summary: 'Atualizar usuário' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUsuarioDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateUsuarioDto,
+    @CurrentUser() user: { nivel_acesso: number },
+  ) {
+    if (dto.nivel_acesso !== undefined && dto.nivel_acesso > user.nivel_acesso) {
+      throw new ForbiddenException(
+        'Você não pode atribuir um nível superior ao seu',
+      );
+    }
     return this.usuariosService.update(id, dto);
   }
 
