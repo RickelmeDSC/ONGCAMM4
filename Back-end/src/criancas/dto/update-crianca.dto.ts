@@ -22,6 +22,11 @@ export class UpdateCriancaDto {
   @IsString()
   genero?: string;
 
+  @ApiPropertyOptional({ example: 'Manhã', enum: ['Manhã', 'Tarde', 'Integral'] })
+  @IsOptional()
+  @IsString()
+  turno?: string;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsInt()

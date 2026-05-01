@@ -281,6 +281,7 @@ model Crianca {
   data_nascimento DateTime
   cpf             String   @unique
   genero          String?
+  turno           String?  // "Manhã" | "Tarde" | "Integral"
   foto_path       String?
   certidao_nasc   String?
   cartao_vacina   String?
@@ -512,7 +513,8 @@ A resposta é processada por `_parseOrThrow()`, que em caso de erro lê o body J
 - **Formulários modais**: cadastro de voluntário e doação usam modais com overlay opaco (65%)
 - **Relatórios PDF**: botão "Gerar PDF" em cadastros e frequência, gerados em memória (buffer) e retornados direto na response
 - **Hard delete**: exclusão de usuários, crianças e doações remove permanentemente do banco de dados
-- **Frequência**: inclui turno (Manhã/Tarde/Integral) e campo de justificativa de falta (observação)
+- **Frequência**: inclui turno (Manhã/Tarde/Integral) e campo de justificativa de falta (observação). A tabela filtra automaticamente pelo turno selecionado no dropdown — crianças com turno `Integral` aparecem em qualquer chamada. Salvar usa `Promise.allSettled` (uma falha não trava as outras) e mostra `err.apiMessage` real quando algo dá errado.
+- **Turno da criança**: `Crianca.turno` (`String?`) define em qual turno a criança frequenta a ONG (Manhã/Tarde/Integral). Setado no cadastro e usado para filtrar a lista de chamada da frequência.
 - **Dashboard**: página com cards glassmorphism (crianças, frequência, doações, voluntários), gráficos Chart.js (frequência semanal barras, doações mensais linha), logs recentes, aniversariantes da semana e alertas de crianças sem frequência. Cards com animação de entrada escalonada e contagem animada. Logs visíveis apenas para gestores/diretores (nível >= 2).
 - **Glassmorphism**: cards do dashboard usam `backdrop-filter: blur()`, bordas translúcidas, sombras coloridas por categoria
 - **Chart.js**: CDN v4.4.7, carregado apenas no dashboard.html

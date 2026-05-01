@@ -437,6 +437,13 @@ async function salvarChamada() {
   const rows = document.querySelectorAll('#freq-tbody tr[data-matricula]');
   if (!rows.length) { Toast.error('Nenhuma criança na lista.'); return; }
 
+  // Avisa se ha criancas sem status marcado (vao virar Ausente por padrao)
+  const naoMarcadas = Array.from(rows).filter(r => !r.dataset.status).length;
+  if (naoMarcadas > 0) {
+    const ok = confirm(`${naoMarcadas} criança(s) sem status marcado serão registradas como AUSENTE. Continuar?`);
+    if (!ok) return;
+  }
+
   const btn = document.getElementById('btn-salvar-chamada');
   if (btn) { btn.textContent = 'Salvando...'; btn.disabled = true; }
 
@@ -455,11 +462,22 @@ async function salvarChamada() {
         observacao,
       });
     });
-    await Promise.all(promises);
-    Toast.success('Chamada salva com sucesso!');
-  } catch (e) {
-    Toast.error('Erro ao salvar chamada.');
-    console.error(e);
+
+    const results = await Promise.allSettled(promises);
+    const sucessos = results.filter(r => r.status === 'fulfilled').length;
+    const falhas = results.filter(r => r.status === 'rejected');
+
+    if (falhas.length === 0) {
+      Toast.success(`Chamada salva: ${sucessos} registro(s).`);
+    } else if (sucessos === 0) {
+      const primeira = falhas[0].reason;
+      console.error('Falhas ao salvar chamada:', falhas);
+      Toast.error(primeira?.apiMessage || primeira?.message || 'Erro ao salvar chamada.');
+    } else {
+      const primeira = falhas[0].reason;
+      console.error('Falhas ao salvar chamada:', falhas);
+      Toast.error(`${sucessos} salva(s), ${falhas.length} com erro: ${primeira?.apiMessage || primeira?.message || 'erro desconhecido'}`);
+    }
   } finally {
     if (btn) { btn.innerHTML = '<i data-lucide="save" style="width:14px;height:14px"></i> Salvar Chamada'; btn.disabled = false; if(window.lucide) lucide.createIcons(); }
   }
@@ -514,6 +532,9 @@ async function handleCadastrarCrianca(e) {
   }
   if (!Validate.required(cpf, 'CPF da criança')) return;
 
+  const turno = document.getElementById('c-turno')?.value;
+  if (!turno) { Toast.error('Selecione o turno da criança.'); return; }
+
   const resp_nome = document.getElementById('r-nome')?.value.trim();
   const resp_cpf  = document.getElementById('r-cpf')?.value;
   const resp_tel  = document.getElementById('r-tel')?.value;
@@ -553,6 +574,7 @@ async function handleCadastrarCrianca(e) {
       data_nascimento: toISO(data_nascimento),
       cpf: cpf || '',
       id_responsavel: responsavel.id_responsavel,
+      turno,
     };
     if (genero) criancaBody.genero = genero;
     const criancaData = await api.post('/criancas', criancaBody);
@@ -1172,7 +1194,22 @@ async function renderFreqTable() {
   const tbody = document.getElementById('freq-tbody');
   if (!tbody) return;
   try {
-    const criancas = await api.get('/criancas');
+    const todas = await api.get('/criancas');
+    const turnoSel = document.getElementById('freq-turno')?.value || '';
+    // Filtra pelo turno: chamada Integral mostra todas. Em Manha/Tarde, mostra
+    // criancas daquele turno + Integral (todo dia) + sem turno definido (legacy
+    // — aparece em tudo ate alguem editar e setar o turno correto).
+    const criancas = !turnoSel || turnoSel === 'Integral'
+      ? todas
+      : todas.filter(c => !c.turno || c.turno === turnoSel || c.turno === 'Integral');
+
+    if (!criancas.length) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--paragrafo);padding:24px">Nenhuma criança no turno ${esc(turnoSel)}.</td></tr>`;
+      const countEl = document.getElementById('freq-count');
+      if (countEl) countEl.textContent = '0 criança(s)';
+      return;
+    }
+
     // Buscar ultima frequencia de cada crianca
     const freqPromises = criancas.map(c =>
       api.get(`/frequencia/crianca/${c.id_matricula}`).catch(() => [])
@@ -1202,6 +1239,8 @@ async function renderFreqTable() {
       </tr>`;
     }).join('');
     initFreqButtons();
+    const countEl = document.getElementById('freq-count');
+    if (countEl) countEl.textContent = `${criancas.length} criança(s)`;
   } catch (err) {
     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--paragrafo)">Erro ao carregar dados.</td></tr>';
     console.error(err);
@@ -1467,6 +1506,7 @@ document.addEventListener('DOMContentLoaded', () => {
       renderFreqTable();
       initSearch('search-freq', 'freq-tbody', [0, 1]);
       document.getElementById('btn-salvar-chamada')?.addEventListener('click', salvarChamada);
+      document.getElementById('freq-turno')?.addEventListener('change', renderFreqTable);
       // Definir data de hoje no input (YYYY-MM-DD para type="date")
       const freqDate = document.getElementById('freq-date');
       if (freqDate) freqDate.value = new Date().toISOString().slice(0, 10);

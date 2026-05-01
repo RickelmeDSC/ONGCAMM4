@@ -80,7 +80,7 @@
               </div>
             </div>
 
-            <div class="form-row cols-3">
+            <div class="form-row cols-2">
               <div class="form-group">
                 <label class="form-label">CPF da Criança</label>
                 <input id="c-cpf" type="text" class="form-input" placeholder="000.000.000-00" data-mask="cpf" required>
@@ -89,12 +89,24 @@
                 <label class="form-label">RG da Criança <span class="optional">(Opcional)</span></label>
                 <input id="c-rg" type="text" class="form-input" placeholder="00.000.000-0" data-mask="rg">
               </div>
+            </div>
+
+            <div class="form-row cols-2">
               <div class="form-group">
                 <label class="form-label">Gênero</label>
                 <select id="c-genero" class="form-select">
                   <option value="">Selecione</option>
                   <option value="Masculino">Masculino</option>
                   <option value="Feminino">Feminino</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Turno</label>
+                <select id="c-turno" class="form-select" required>
+                  <option value="">Selecione o turno</option>
+                  <option value="Manhã">Manhã</option>
+                  <option value="Tarde">Tarde</option>
+                  <option value="Integral">Integral</option>
                 </select>
               </div>
             </div>

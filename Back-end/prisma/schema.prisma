@@ -60,6 +60,7 @@ model Crianca {
   data_nascimento DateTime
   cpf             String   @unique
   genero          String?
+  turno           String?  // "Manhã" | "Tarde" | "Integral" — turno fixo de matricula
   foto_path       String?
   certidao_nasc   String?
   cartao_vacina   String?

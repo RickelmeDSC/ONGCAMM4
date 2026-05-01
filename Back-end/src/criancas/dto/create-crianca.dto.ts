@@ -23,6 +23,11 @@ export class CreateCriancaDto {
   @IsString()
   genero?: string;
 
+  @ApiPropertyOptional({ example: 'Manhã', enum: ['Manhã', 'Tarde', 'Integral'] })
+  @IsOptional()
+  @IsString()
+  turno?: string;
+
   @ApiProperty({ example: 1 })
   @IsInt()
   id_responsavel: number;
